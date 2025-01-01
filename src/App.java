@@ -2049,6 +2049,14 @@ public class App {
     // subarrays whose sum equals to k.
     // A subarray is a contiguous non-empty sequence of elements within an array.
 
+    public int subArraySum(int[] nums, int k){
+        //the trick here is to keep a count of prefix sums in a map
+        //if we store prefix sum, and the count that sum appears, then we can keep track of how
+        //many subarrays exist that sum up to k
+
+        
+    }
+
     // end of arrays and hashing section following is 2 pointer
 
     public void reverseString(char[] s) {
