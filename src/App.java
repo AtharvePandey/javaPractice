@@ -2012,14 +2012,16 @@ public class App {
         return true;
     }
 
-    //Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times.
-    //Moores algorithm also works for this O(1) space, this one below is O(n) space and time
+    // Given an integer array of size n, find all elements that appear more than ⌊
+    // n/3 ⌋ times.
+    // Moores algorithm also works for this O(1) space, this one below is O(n) space
+    // and time
     public List<Integer> majorityElementII(int[] nums) {
         HashMap<Integer, Integer> hm = new HashMap<>();
-        for(int num : nums){
-          hm.put(num, hm.getOrDefault(num , 0) + 1);
+        for (int num : nums) {
+            hm.put(num, hm.getOrDefault(num, 0) + 1);
         }
-        
+
         List<Integer> result = new ArrayList<>();
         for (Map.Entry<Integer, Integer> entry : hm.entrySet()) {
             if (entry.getValue() > nums.length / 3) {
@@ -2027,23 +2029,40 @@ public class App {
             }
         }
         return result;
-  
-      }
+
+    }
+
+    // given an array of numbers, calculate and return a new array where the current
+    // index holds the sum of this element and all prev ones
+    // e.g [2,4,5,2,1] = [2,6,11,13,14] after function call
+
+    public int[] prefixSum(int[] nums) {
+        for (int i = 1; i < nums.length; i++) {
+            nums[i] = nums[i - 1] + nums[i];
+        }
+        return nums;
+    }
+    // the above is a popular algorithm called prefix sum, and we can use it to
+    // solve the following question
+
+    // Given an array of integers nums and an integer k, return the total number of
+    // subarrays whose sum equals to k.
+    // A subarray is a contiguous non-empty sequence of elements within an array.
 
     // end of arrays and hashing section following is 2 pointer
 
     public void reverseString(char[] s) {
-        //since its O(1) extra memory, no extra datastructures
+        // since its O(1) extra memory, no extra datastructures
         int i = 0;
         int j = s.length - 1;
-        while(i<j){
+        while (i < j) {
             swap(i, j, s);
             i++;
             j--;
         }
     }
 
-    private void swap(int i, int j, char[] s){
+    private void swap(int i, int j, char[] s) {
         char temp = s[i];
         s[i] = s[j];
         s[j] = temp;
@@ -2068,10 +2087,10 @@ public class App {
         return true;
     }
 
-    //is a string still palendromic if we remove a letter? 
+    // is a string still palendromic if we remove a letter?
     public boolean isPalindromeII(String s) {
         int i = 0, j = s.length() - 1;
-        
+
         while (i < j) {
             if (s.charAt(i) != s.charAt(j)) {
                 return isPalindrome(s, i + 1, j) || isPalindrome(s, i, j - 1);
@@ -2082,10 +2101,10 @@ public class App {
 
         return true;
     }
-    
+
     /* Check is s[i...j] is palindrome. */
     private boolean isPalindrome(String s, int i, int j) {
-        
+
         while (i < j) {
             if (s.charAt(i) != s.charAt(j)) {
                 return false;
@@ -2093,7 +2112,7 @@ public class App {
             i++;
             j--;
         }
-        
+
         return true;
     }
 
@@ -2418,6 +2437,5 @@ public class App {
         }
         return maxProfit;
     }
-    
 
 }
