@@ -2528,4 +2528,10 @@ public class App {
         }
     }
 
+    //the solution which uses O(1) time but does it in place is very simple
+    //reverse the entire array, then reverse the first k elements (subarray from (0 -> k]
+    //then reverse the remaining elements (k to end]
+
+    
+
 }
