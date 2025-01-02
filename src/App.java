@@ -2251,9 +2251,9 @@ public class App {
                         }
                         k++;
                         l--;
-                    }else if(sum < target){
+                    } else if (sum < target) {
                         k++;
-                    }else{
+                    } else {
                         l--;
                     }
                 }
@@ -2430,9 +2430,10 @@ public class App {
         // a space of O(n) because we are using stringBuilder object
     }
 
-    //sort the array without using inbuilt methods
-    //O(nlogn) time and O(n) space 
-    //its better if we use either merge sort or quicksort (merge is easier and better so memorize that)
+    // sort the array without using inbuilt methods
+    // O(nlogn) time and O(n) space
+    // its better if we use either merge sort or quicksort (merge is easier and
+    // better so memorize that)
 
     public int[] sortArray(int[] nums) {
         PriorityQueue<Integer> minHeap = new PriorityQueue<Integer>();
@@ -2455,7 +2456,7 @@ public class App {
     // and mid is at i
     // only because there are 3 numbers we can assume everything left of i and right
     // of j are already sorted, all we need to do is compare using mid, if value of
-    // mid is 0, swap with
+    // mid is 0, swap with i and increment i, else swap with j and decrement j
     // [2,0,2,1,1,0]
     public void sortColors(int[] nums) {
         int low = 0, mid = 0, high = nums.length - 1;
@@ -2500,6 +2501,31 @@ public class App {
             }
         }
         return maxProfit;
+    }
+
+    // given an array and an integer k, rotate each element k times to the right of
+    // the array
+    // [-1,-100,3,99] for each index, index + k, e.g if k is 2, then -1 goes to
+    // index 2, -100 to index 3
+    // 3 goes to index 4, but that is out of bounds; if we mod by length however,
+    // then it goes to index 0 (4%4)
+    // 99 goes to index 5 but we mod by length, 5%4 = 1;
+    public void rotate(int[] nums, int k) {
+
+        // so if im not wrong then the pattern is, (currIndex += k) % nums.length = newIndex
+        // here we already take care of currIndex if its less than length, since
+        // anyThing % lessThanThatThing is thatThing
+
+        // without following the O(1) extra space constraint, we can just use a new array
+        int length = nums.length;
+        int[] arr = new int[length];
+        for(int i = 0; i<length;i++){
+            int newIndex = (i + k) % length;
+            arr[newIndex] = nums[i];
+        }
+        for(int i = 0; i<length;i++){
+            nums[i] = arr[i];
+        }
     }
 
 }
