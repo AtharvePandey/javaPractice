@@ -2053,8 +2053,21 @@ public class App {
         //the trick here is to keep a count of prefix sums in a map
         //if we store prefix sum, and the count that sum appears, then we can keep track of how
         //many subarrays exist that sum up to k
+        //further more, we need to check if prefixsum(up to this index) - k is in the map; the count of that will tell us # of subarrays
+        //else just store prefix sum of count in the map
+        int res = 0;
+        HashMap<Integer, Integer> hm = new HashMap<>();
+        int prefixSum = 0;
+        hm.put(0, 1); //this is the start, since the first prefix sum would be 0
+        for(int num : nums){
+            prefixSum += num;
+            int diff = prefixSum - k;
 
-        
+            res+=hm.getOrDefault(diff , 0);
+            hm.put(prefixSum, 1 + hm.getOrDefault(prefixSum, 0));
+        }
+        return res;
+
     }
 
     // end of arrays and hashing section following is 2 pointer
