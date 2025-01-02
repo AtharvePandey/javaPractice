@@ -2049,21 +2049,23 @@ public class App {
     // subarrays whose sum equals to k.
     // A subarray is a contiguous non-empty sequence of elements within an array.
 
-    public int subArraySum(int[] nums, int k){
-        //the trick here is to keep a count of prefix sums in a map
-        //if we store prefix sum, and the count that sum appears, then we can keep track of how
-        //many subarrays exist that sum up to k
-        //further more, we need to check if prefixsum(up to this index) - k is in the map; the count of that will tell us # of subarrays
-        //else just store prefix sum of count in the map
+    public int subArraySum(int[] nums, int k) {
+        // the trick here is to keep a count of prefix sums in a map
+        // if we store prefix sum, and the count that sum appears, then we can keep
+        // track of how
+        // many subarrays exist that sum up to k
+        // further more, we need to check if prefixsum(up to this index) - k is in the
+        // map; the count of that will tell us # of subarrays
+        // else just store prefix sum of count in the map
         int res = 0;
         HashMap<Integer, Integer> hm = new HashMap<>();
         int prefixSum = 0;
-        hm.put(0, 1); //this is the start, since the first prefix sum would be 0
-        for(int num : nums){
+        hm.put(0, 1); // this is the start, since the first prefix sum would be 0
+        for (int num : nums) {
             prefixSum += num;
             int diff = prefixSum - k;
 
-            res+=hm.getOrDefault(diff , 0);
+            res += hm.getOrDefault(diff, 0);
             hm.put(prefixSum, 1 + hm.getOrDefault(prefixSum, 0));
         }
         return res;
@@ -2220,6 +2222,45 @@ public class App {
             }
         }
         return retList;
+    }
+
+    // same idea as above, but with 4 integers instead of 2
+    // all 4 integers need to be distinct, but the 4 different array pointers we use
+    // already account for that
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        int length = nums.length;
+        if (length < 4) {
+            return null; // length has to be atleast 4 for this
+        }
+        List<List<Integer>> retList = new ArrayList<>();
+        Arrays.sort(nums);
+        for (int i = 0; i < length; i++) {
+            for (int j = i + 1; j < length; j++) {
+                int k = j + 1;
+                int l = length - 1;
+                while (k < l) {
+                    long sum = (long) nums[i] + nums[j] + nums[k] + nums[l];
+                    if (sum == target) {
+                        List<Integer> listToPush = new ArrayList<>();
+                        listToPush.add(nums[i]);
+                        listToPush.add(nums[j]);
+                        listToPush.add(nums[k]);
+                        listToPush.add(nums[l]);
+                        if (!retList.contains(listToPush)) {
+                            retList.add(listToPush);
+                        }
+                        k++;
+                        l--;
+                    }else if(sum < target){
+                        k++;
+                    }else{
+                        l--;
+                    }
+                }
+            }
+        }
+        return retList;
+
     }
 
     // You are given an integer array heights where heights[i] represents the height
