@@ -2430,7 +2430,9 @@ public class App {
         // a space of O(n) because we are using stringBuilder object
     }
 
-    // sort the array without using inbuilt methods
+    //sort the array without using inbuilt methods
+    //O(nlogn) time and O(n) space 
+    //its better if we use either merge sort or quicksort (merge is easier and better so memorize that)
 
     public int[] sortArray(int[] nums) {
         PriorityQueue<Integer> minHeap = new PriorityQueue<Integer>();
