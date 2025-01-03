@@ -2532,6 +2532,9 @@ public class App {
     //reverse the entire array, then reverse the first k elements (subarray from (0 -> k]
     //then reverse the remaining elements (k to end]
 
+    //start of the sliding window portion
+
+
     
 
 }
