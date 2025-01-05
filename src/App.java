@@ -2512,29 +2512,49 @@ public class App {
     // 99 goes to index 5 but we mod by length, 5%4 = 1;
     public void rotate(int[] nums, int k) {
 
-        // so if im not wrong then the pattern is, (currIndex += k) % nums.length = newIndex
+        // so if im not wrong then the pattern is, (currIndex += k) % nums.length =
+        // newIndex
         // here we already take care of currIndex if its less than length, since
         // anyThing % lessThanThatThing is thatThing
 
-        // without following the O(1) extra space constraint, we can just use a new array
+        // without following the O(1) extra space constraint, we can just use a new
+        // array
         int length = nums.length;
         int[] arr = new int[length];
-        for(int i = 0; i<length;i++){
+        for (int i = 0; i < length; i++) {
             int newIndex = (i + k) % length;
             arr[newIndex] = nums[i];
         }
-        for(int i = 0; i<length;i++){
+        for (int i = 0; i < length; i++) {
             nums[i] = arr[i];
         }
     }
 
-    //the solution which uses O(1) time but does it in place is very simple
-    //reverse the entire array, then reverse the first k elements (subarray from (0 -> k]
-    //then reverse the remaining elements (k to end]
+    // the solution which uses O(1) time but does it in place is very simple
+    // reverse the entire array, then reverse the first k elements (subarray from (0
+    // -> k]
+    // then reverse the remaining elements (k to end]
 
-    //start of the sliding window portion
+    // start of the sliding window portion
 
+    // Given an integer array nums and an integer k, return true if there are two
+    // distinct indices
+    // i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k.
 
-    
+    //basically we want to find two numbers in an array that are equal, and the distance between them is less than k
+
+    public boolean containsNearbyDuplicate(int[] nums, int k) {
+        int i = 0;
+        int j = 1;
+        while(i < j){
+            if(nums[i] == nums[j] && Math.abs(i-j) <= k){
+                return true;
+            }else if(j == nums.length){
+                i++;
+                j = i + 1;
+            }
+        }
+        return false;
+    }
 
 }
