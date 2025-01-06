@@ -23,8 +23,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] test = { 1, 0, 1, 1 };
-        boolean temp = app.containsNearbyDuplicate(test, 1);
+        // int[] test = { 1, 0, 1, 1 };
+        // boolean temp = app.containsNearbyDuplicate(test, 1);
     }
 
     public ListNode tempfunction1() {
@@ -2493,7 +2493,7 @@ public class App {
     // its greedy because you are day-trading and trying to keep as much profit
     // possible, i.e selling everytime you make a bit of profit
 
-    public int maxProfit(int[] prices) {
+    public int maxProfitII(int[] prices) {
         int maxProfit = 0;
         for (int i = 0; i < prices.length - 1; i++) {
             if (prices[i] < prices[i + 1]) {
@@ -2577,7 +2577,27 @@ public class App {
     // cannot achieve any profit, return 0.
 
     public int maxProfit(int[] prices) {
+        //the obvious brute force solution is n^2 with constant space
+        //where we run an embedded forloop
+        //profit at day[i] = price[i] - priceWhenBought;
 
+        //how is this one a sliding window i also don't know
+
+        //obviously since we are figuring out when to buy and sell, we start off by buying on day 1
+        int buyDate = prices[0];
+        int profitSoFar = 0; //since we haven't sold anything
+        //next running a forloop, we can calculate the max profit, and also when to buy
+        //now since its the stockmarket, we will buy on the cheapest day and sell on the most expensive one
+        for(int i = 1; i < prices.length; i++){
+            if(prices[i] < buyDate){ //if a cheaper day exists, then buy on that day
+                buyDate = prices[i];
+            }else{
+                if(prices[i] - buyDate > profitSoFar){
+                    profitSoFar = prices[i] - buyDate;
+                }
+            }
+        }
+        return profitSoFar;
     }
 
 }
