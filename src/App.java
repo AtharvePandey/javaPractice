@@ -2577,27 +2577,37 @@ public class App {
     // cannot achieve any profit, return 0.
 
     public int maxProfit(int[] prices) {
-        //the obvious brute force solution is n^2 with constant space
-        //where we run an embedded forloop
-        //profit at day[i] = price[i] - priceWhenBought;
+        // the obvious brute force solution is n^2 with constant space
+        // where we run an embedded forloop
+        // profit at day[i] = price[i] - priceWhenBought;
 
-        //how is this one a sliding window i also don't know
+        // how is this one a sliding window i also don't know
 
-        //obviously since we are figuring out when to buy and sell, we start off by buying on day 1
+        // obviously since we are figuring out when to buy and sell, we start off by
+        // buying on day 1
         int buyDate = prices[0];
-        int profitSoFar = 0; //since we haven't sold anything
-        //next running a forloop, we can calculate the max profit, and also when to buy
-        //now since its the stockmarket, we will buy on the cheapest day and sell on the most expensive one
-        for(int i = 1; i < prices.length; i++){
-            if(prices[i] < buyDate){ //if a cheaper day exists, then buy on that day
+        int profitSoFar = 0; // since we haven't sold anything
+        // next running a forloop, we can calculate the max profit, and also when to buy
+        // now since its the stockmarket, we will buy on the cheapest day and sell on
+        // the most expensive one
+        for (int i = 1; i < prices.length; i++) {
+            if (prices[i] < buyDate) { // if a cheaper day exists, then buy on that day
                 buyDate = prices[i];
-            }else{
-                if(prices[i] - buyDate > profitSoFar){
+            } else {
+                if (prices[i] - buyDate > profitSoFar) {
                     profitSoFar = prices[i] - buyDate;
                 }
             }
         }
         return profitSoFar;
+    }
+
+    // Given a string s, find the length of the longest substring
+    // without repeating characters.
+
+    // now this one feels more like a 2 pointer problem
+    public int lengthOfLongestSubstring(String s) {
+
     }
 
 }
