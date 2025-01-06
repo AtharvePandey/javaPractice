@@ -23,8 +23,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] test = { 2, 0, 2, 1, 1, 0 };
-        app.sortColors(test);
+        int[] test = {1,0,1,1};
+        boolean temp = app.containsNearbyDuplicate(test, 1);
     }
 
     public ListNode tempfunction1() {
@@ -2541,12 +2541,31 @@ public class App {
     // distinct indices
     // i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k.
 
-    //basically we want to find two numbers in an array that are equal, and the distance between them is less than k
+    // basically we want to find two numbers in an array that are equal, and the
+    // distance between them is less than k
 
     public boolean containsNearbyDuplicate(int[] nums, int k) {
-        //I still don't see how this is a sliding window problem
-        //both solutions on leetcode use either a set or a map in O(n) time and space
-        
+        // I still don't see how this is a sliding window problem
+        // both solutions on leetcode use either a set or a map in O(n) time and space
+
+        // the set approach feels more like sliding window but i like the hashmap one
+        // better
+        HashMap<Integer, Integer> hm = new HashMap<>();
+        // where we store value at i, and also i
+        for (int i = 0; i < nums.length; i++) {
+            if (!hm.containsKey(nums[i])) {
+                hm.put(nums[i], i);
+            }else{
+                //we check if the indexes are <= k apart
+                if(Math.abs(hm.get(nums[i]) - i) <=k){
+                    return true;
+                }else{
+                    //we need to update the most recent index to i
+                    hm.put(nums[i], i);
+                }
+            }
+        }
+        return false;
     }
 
 }
