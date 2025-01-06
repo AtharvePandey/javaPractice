@@ -23,8 +23,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        // int[] test = { 1, 0, 1, 1 };
-        // boolean temp = app.containsNearbyDuplicate(test, 1);
+        String s = "abcabcbb";
+        app.lengthOfLongestSubstring(s);
     }
 
     public ListNode tempfunction1() {
@@ -2607,6 +2607,33 @@ public class App {
 
     // now this one feels more like a 2 pointer problem
     public int lengthOfLongestSubstring(String s) {
+        // the easy solution would be to use a set, and also keep count of 'how far we
+        // explored into the string'
+        // reset the count if duplicate letter comes up and also keep track of longest count
+        // single pass O(n) time and space
+        int longestLengthSoFar = 0; // To store the result
+        int i = 0; // Left pointer of the window
+        Set<Character> seen = new HashSet<>(); // To track unique characters in the window
+
+        for (int j = 0; j < s.length(); j++) { // j is the right pointer
+            // If the character is already in the set, shrink the window from the left
+            while (seen.contains(s.charAt(j))) {
+                seen.remove(s.charAt(i));
+                i++; //we basically shrink our window until we remove duplicate value
+                //so that the new window won't have a duplicate value
+            }
+
+            // Add the current character to the set and update the longest length
+            seen.add(s.charAt(j));
+            longestLengthSoFar = Math.max(longestLengthSoFar, j - i + 1);
+            //here the j-i+1 represents the current distance between 2 pointers, and we do +1 since array is 0-indexed
+        }
+
+        return longestLengthSoFar;
+
+        // i can see how this is sort of a sliding window approach since we have
+        // difference between i and j be the window
+        // and we dynamically update i to be j if conditions fail
 
     }
 
