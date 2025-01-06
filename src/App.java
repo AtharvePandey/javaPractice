@@ -2544,17 +2544,9 @@ public class App {
     //basically we want to find two numbers in an array that are equal, and the distance between them is less than k
 
     public boolean containsNearbyDuplicate(int[] nums, int k) {
-        int i = 0;
-        int j = 1;
-        while(i < j){
-            if(nums[i] == nums[j] && Math.abs(i-j) <= k){
-                return true;
-            }else if(j == nums.length){
-                i++;
-                j = i + 1;
-            }
-        }
-        return false;
+        //I still don't see how this is a sliding window problem
+        //both solutions on leetcode use either a set or a map in O(n) time and space
+        
     }
 
 }
