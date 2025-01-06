@@ -23,7 +23,7 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] test = {1,0,1,1};
+        int[] test = { 1, 0, 1, 1 };
         boolean temp = app.containsNearbyDuplicate(test, 1);
     }
 
@@ -2555,17 +2555,29 @@ public class App {
         for (int i = 0; i < nums.length; i++) {
             if (!hm.containsKey(nums[i])) {
                 hm.put(nums[i], i);
-            }else{
-                //we check if the indexes are <= k apart
-                if(Math.abs(hm.get(nums[i]) - i) <=k){
+            } else {
+                // we check if the indexes are <= k apart
+                if (Math.abs(hm.get(nums[i]) - i) <= k) {
                     return true;
-                }else{
-                    //we need to update the most recent index to i
+                } else {
+                    // we need to update the most recent index to i
                     hm.put(nums[i], i);
                 }
             }
         }
         return false;
+    }
+
+    // You are given an array prices where prices[i] is the price of a given stock
+    // on the ith day.
+    // You want to maximize your profit by choosing a single day to buy one stock
+    // and choosing a different
+    // day in the future to sell that stock.
+    // Return the maximum profit you can achieve from this transaction. If you
+    // cannot achieve any profit, return 0.
+
+    public int maxProfit(int[] prices) {
+
     }
 
 }
