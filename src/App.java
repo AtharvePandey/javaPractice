@@ -2609,7 +2609,8 @@ public class App {
     public int lengthOfLongestSubstring(String s) {
         // the easy solution would be to use a set, and also keep count of 'how far we
         // explored into the string'
-        // reset the count if duplicate letter comes up and also keep track of longest count
+        // reset the count if duplicate letter comes up and also keep track of longest
+        // count
         // single pass O(n) time and space
         int longestLengthSoFar = 0; // To store the result
         int i = 0; // Left pointer of the window
@@ -2619,14 +2620,15 @@ public class App {
             // If the character is already in the set, shrink the window from the left
             while (seen.contains(s.charAt(j))) {
                 seen.remove(s.charAt(i));
-                i++; //we basically shrink our window until we remove duplicate value
-                //so that the new window won't have a duplicate value
+                i++; // we basically shrink our window until we remove duplicate value
+                // so that the new window won't have a duplicate value
             }
 
             // Add the current character to the set and update the longest length
             seen.add(s.charAt(j));
             longestLengthSoFar = Math.max(longestLengthSoFar, j - i + 1);
-            //here the j-i+1 represents the current distance between 2 pointers, and we do +1 since array is 0-indexed
+            // here the j-i+1 represents the current distance between 2 pointers, and we do
+            // +1 since array is 0-indexed
         }
 
         return longestLengthSoFar;
@@ -2634,6 +2636,21 @@ public class App {
         // i can see how this is sort of a sliding window approach since we have
         // difference between i and j be the window
         // and we dynamically update i to be j if conditions fail
+
+    }
+
+    // You are given a string s consisting of only uppercase english characters and
+    // an integer k. You can choose
+    // up to k characters of the string and replace them with any other uppercase
+    // English character.
+    // After performing at most k replacements, return the length of the longest
+    // substring which contains only one distinct character.
+
+    // this one is also sliding window, but we have a dynamic one instead of a fixed
+    // one
+    // O(n) space and time
+
+    public int characterReplacement(String s, int k) {
 
     }
 
