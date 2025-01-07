@@ -2651,7 +2651,37 @@ public class App {
     // O(n) space and time
 
     public int characterReplacement(String s, int k) {
+        int result = 0;
+        //the idea is we dont HAVE to replace anything, there are 26 characters in the alphabet
+        //we have a sliding window approach, and our goal is to replace at most k characters in that window
+        //such that the result is the largest it can be for that string
 
+        //so what does our replacement look like? for a string ABABBA, and k = 2, we can choose to replace either 2 A's or B's
+        //such that the length of the substring is the longest and continuous: BBBBBA makes longest substring length 5
+
+        //but since we aren't actually replacing anything, how do we know when to increase/decrease our window?
+        //in any given instance of substring in S, it would make more sense to replace the letter that occurs the least k times (if possible)
+        //so for example, if from S = ABABBA, substring ABA, and k = 2, we can replace at most 2 letters, here it would make most sense to 
+        //replace the B with A having longest subStr length of 3
+
+        //we would need to keep a count of characters seen in a hashmap, and then start our sliding window approach, where i and j start at 0
+        //if in the windowlength (j-1+1) - mostFrequentCharCount <= k (since because we would like to replace the least frequent character), 
+        //and since we can only replace k times, we need to make sure that in the window the least frequent character occurs atmost k times
+        //else we have to decrease our window, to do this we decrement the count of character at left pointer and increase left pointer
+
+        HashMap<Character, Integer> charCount = new HashMap<>();
+        int i = 0;
+        for(int j = 0; j<s.length();j++){
+            charCount.put(s.charAt(j), (charCount.getOrDefault(s.charAt(j), 0)) + 1);
+            if(((j-i) + 1) - Collections.max(charCount.values()) > k){
+                //we need to shrink window length, and decrement count of character in map at i
+                charCount.put(s.charAt(i), charCount.get(s.charAt(i))-1);
+                i++;
+            }
+
+            result = Math.max(result, (j-i) + 1); // (j-i) + 1 is the current window length
+        }
+         return result;
     }
 
 }
