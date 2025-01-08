@@ -2628,6 +2628,54 @@ public class App {
         }
     }
 
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+
+        inorder(root, res);
+        return res;        
+    }
+
+    private void inorder(TreeNode node, List<Integer> res) {
+        if (node == null) {
+            return;
+        }
+        inorder(node.left, res);
+        res.add(node.val);
+        inorder(node.right, res);
+    }
+
+    public List<Integer> preOrderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+
+        preOrder(root, res);
+        return res;        
+    }
+
+    private void preOrder(TreeNode node, List<Integer> res) {
+        if (node == null) {
+            return;
+        }
+        res.add(node.val);
+        preOrder(node.left, res);
+        preOrder(node.right, res);
+    }
+    
+    public List<Integer> postOrderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+
+        postOrder(root, res);
+        return res;        
+    }
+
+    private void postOrder(TreeNode node, List<Integer> res) {
+        if (node == null) {
+            return;
+        }
+        postOrder(node.left, res);
+        postOrder(node.right, res);
+        res.add(node.val);
+    }  
+
     public int maxDepthOfTree(TreeNode root) {
         // the maximum depth is 0 if the root is null
         // if the root is non null, we return the maximum of the left and right subtrees
@@ -2696,5 +2744,59 @@ public class App {
         // Return the unchanged root of the tree
         return root;
     }
+
+    //the diameter of a binary tree is, given any two nodes, the longest path in the entire tree
+    //obv the root to leaf is the longest path? wrong
+
+    //the longest path doesn't have to go through the root
+    //number of edges defines path length, so height of the current node is basically number of edges to leaf node
+    //we will use this idea to calculate the diameter
+    /*
+         1
+          \
+           3
+          / \
+         4   5
+        / \ / \
+       6  7 8  9
+*/
+
+    //in the tree above, height of root is 3 since there are 3 edges to leaf from root. i.e its the Max(left and right subtrees), 
+    //since the diameter is defined as longest path however, the diameter would be 4 in this case. since the path from 
+    //6-4-3-5-9 has 4 edges.
+
+    //so null nodes have a height of 0, and diameter of current node is left + right...which makes sense because trivially if we have
+    //just one node, with 2 children, then the path would be left - root - right where there are 2 edges and the diameter would be 2
+    //height of node is different from the diameter, the height is max(left, right) and then + 1  for height of parent node
+    //and diameter is just height of left + right...
+
+    public class DiameterOfTree{
+        public int result = 0;
+
+        public int diameter(TreeNode root){
+            height(root);
+            return result;
+        }
+        private int height(TreeNode root){
+            if(root == null){
+                return 0; //this is where we will get a null leaf
+            }
+            int left = height(root.left);
+            int right = height(root.right);
+            result = Math.max(result, left + right); //to record the max diameter so far
+            return 1 + Math.max(left, right); //return the height of the current node to parent node (to use to calculate diameter.)
+
+        }
+
+
+    }
+
+
+    //basically the key difference for the above, diameter is the max left + right subtree and the current diameter
+    //take the height of the left subtree + right subtree gives diameter.
+
+    
+
+
 
 }
