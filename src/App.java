@@ -252,59 +252,6 @@ public class App {
         return candidate;
     }
 
-    public class TreeNode {
-        int val;
-        TreeNode left;
-        TreeNode right;
-
-        TreeNode() {
-        }
-
-        TreeNode(int val) {
-            this.val = val;
-        }
-
-        TreeNode(int val, TreeNode left, TreeNode right) {
-            this.val = val;
-            this.left = left;
-            this.right = right;
-        }
-    }
-
-    public int maxDepthOfTree(TreeNode root) {
-        // the maximum depth is 0 if the root is null
-        // if the root is non null, we return the maximum of the left and right subtrees
-        return root == null ? 0 : 1 + Math.max(maxDepthOfTree(root.left), maxDepthOfTree(root.right));
-    }
-
-    public boolean treesAreEqual(TreeNode p, TreeNode q) {
-        // here the key is to consider just one node first and then the recursive case
-        // in terms of one node, for both trees, they are equal if both nodes are null
-        // or if both nodes have the same value
-        // then the recursive case is just to call on both nodes left and righ subtrees
-        if (p == null && q == null) {
-            return true;
-        } else if (p == null || q == null) {
-            return false;
-        }
-        return (p.val == q.val && treesAreEqual(p.left, q.left) && treesAreEqual(p.right, q.right));
-
-    }
-
-    public TreeNode invertBinaryTree(TreeNode root) {
-        // for this one it is important to handle 1 case, and let recursion do the rest
-        if (root != null) { // non leaf node (say we start at root of tree)
-            TreeNode temp = root.right;
-            root.right = root.left;
-            root.left = temp;
-            // the above is solving for one case
-            // below is what the recursion handles;
-            invertBinaryTree(root.left);
-            invertBinaryTree(root.right);
-        }
-        return root;
-    }
-
     public class KthLargest {
         // class to return kth largest element in an array after we add an element to it
         // size is guaranteed to be bound by k
@@ -1378,41 +1325,6 @@ public class App {
         }
         return maxHeap.peek() == null ? 0 : maxHeap.poll();
 
-    }
-
-    public TreeNode insertIntoBST(TreeNode root, int val) {
-        // If the tree is empty, create a new node and return it as the root
-        if (root == null) {
-            return new TreeNode(val);
-        }
-
-        // Initialize a pointer to traverse the tree
-        TreeNode current = root;
-
-        while (true) {
-            if (val < current.val) {
-                // If the left child is null, insert the new node here
-                if (current.left == null) {
-                    current.left = new TreeNode(val);
-                    break;
-                } else {
-                    // Otherwise, move to the left child
-                    current = current.left;
-                }
-            } else {
-                // If the right child is null, insert the new node here
-                if (current.right == null) {
-                    current.right = new TreeNode(val);
-                    break;
-                } else {
-                    // Otherwise, move to the right child
-                    current = current.right;
-                }
-            }
-        }
-
-        // Return the unchanged root of the tree
-        return root;
     }
 
     class MyHashSet {
@@ -2652,36 +2564,137 @@ public class App {
 
     public int characterReplacement(String s, int k) {
         int result = 0;
-        //the idea is we dont HAVE to replace anything, there are 26 characters in the alphabet
-        //we have a sliding window approach, and our goal is to replace at most k characters in that window
-        //such that the result is the largest it can be for that string
+        // the idea is we dont HAVE to replace anything, there are 26 characters in the
+        // alphabet
+        // we have a sliding window approach, and our goal is to replace at most k
+        // characters in that window
+        // such that the result is the largest it can be for that string
 
-        //so what does our replacement look like? for a string ABABBA, and k = 2, we can choose to replace either 2 A's or B's
-        //such that the length of the substring is the longest and continuous: BBBBBA makes longest substring length 5
+        // so what does our replacement look like? for a string ABABBA, and k = 2, we
+        // can choose to replace either 2 A's or B's
+        // such that the length of the substring is the longest and continuous: BBBBBA
+        // makes longest substring length 5
 
-        //but since we aren't actually replacing anything, how do we know when to increase/decrease our window?
-        //in any given instance of substring in S, it would make more sense to replace the letter that occurs the least k times (if possible)
-        //so for example, if from S = ABABBA, substring ABA, and k = 2, we can replace at most 2 letters, here it would make most sense to 
-        //replace the B with A having longest subStr length of 3
+        // but since we aren't actually replacing anything, how do we know when to
+        // increase/decrease our window?
+        // in any given instance of substring in S, it would make more sense to replace
+        // the letter that occurs the least k times (if possible)
+        // so for example, if from S = ABABBA, substring ABA, and k = 2, we can replace
+        // at most 2 letters, here it would make most sense to
+        // replace the B with A having longest subStr length of 3
 
-        //we would need to keep a count of characters seen in a hashmap, and then start our sliding window approach, where i and j start at 0
-        //if in the windowlength (j-1+1) - mostFrequentCharCount <= k (since because we would like to replace the least frequent character), 
-        //and since we can only replace k times, we need to make sure that in the window the least frequent character occurs atmost k times
-        //else we have to decrease our window, to do this we decrement the count of character at left pointer and increase left pointer
+        // we would need to keep a count of characters seen in a hashmap, and then start
+        // our sliding window approach, where i and j start at 0
+        // if in the windowlength (j-1+1) - mostFrequentCharCount <= k (since because we
+        // would like to replace the least frequent character),
+        // and since we can only replace k times, we need to make sure that in the
+        // window the least frequent character occurs atmost k times
+        // else we have to decrease our window, to do this we decrement the count of
+        // character at left pointer and increase left pointer
 
         HashMap<Character, Integer> charCount = new HashMap<>();
         int i = 0;
-        for(int j = 0; j<s.length();j++){
+        for (int j = 0; j < s.length(); j++) {
             charCount.put(s.charAt(j), (charCount.getOrDefault(s.charAt(j), 0)) + 1);
-            if(((j-i) + 1) - Collections.max(charCount.values()) > k){
-                //we need to shrink window length, and decrement count of character in map at i
-                charCount.put(s.charAt(i), charCount.get(s.charAt(i))-1);
+            if (((j - i) + 1) - Collections.max(charCount.values()) > k) {
+                // we need to shrink window length, and decrement count of character in map at i
+                charCount.put(s.charAt(i), charCount.get(s.charAt(i)) - 1);
                 i++;
             }
 
-            result = Math.max(result, (j-i) + 1); // (j-i) + 1 is the current window length
+            result = Math.max(result, (j - i) + 1); // (j-i) + 1 is the current window length
         }
-         return result;
+        return result;
+    }
+
+    // start of tree section
+
+    public class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode() {
+        }
+
+        TreeNode(int val) {
+            this.val = val;
+        }
+
+        TreeNode(int val, TreeNode left, TreeNode right) {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    public int maxDepthOfTree(TreeNode root) {
+        // the maximum depth is 0 if the root is null
+        // if the root is non null, we return the maximum of the left and right subtrees
+        return root == null ? 0 : 1 + Math.max(maxDepthOfTree(root.left), maxDepthOfTree(root.right));
+    }
+
+    public boolean treesAreEqual(TreeNode p, TreeNode q) {
+        // here the key is to consider just one node first and then the recursive case
+        // in terms of one node, for both trees, they are equal if both nodes are null
+        // or if both nodes have the same value
+        // then the recursive case is just to call on both nodes left and righ subtrees
+        if (p == null && q == null) {
+            return true;
+        } else if (p == null || q == null) {
+            return false;
+        }
+        return (p.val == q.val && treesAreEqual(p.left, q.left) && treesAreEqual(p.right, q.right));
+
+    }
+
+    public TreeNode invertBinaryTree(TreeNode root) {
+        // for this one it is important to handle 1 case, and let recursion do the rest
+        if (root != null) { // non leaf node (say we start at root of tree)
+            TreeNode temp = root.right;
+            root.right = root.left;
+            root.left = temp;
+            // the above is solving for one case
+            // below is what the recursion handles;
+            invertBinaryTree(root.left);
+            invertBinaryTree(root.right);
+        }
+        return root;
+    }
+
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        // If the tree is empty, create a new node and return it as the root
+        if (root == null) {
+            return new TreeNode(val);
+        }
+
+        // Initialize a pointer to traverse the tree
+        TreeNode current = root;
+
+        while (true) {
+            if (val < current.val) {
+                // If the left child is null, insert the new node here
+                if (current.left == null) {
+                    current.left = new TreeNode(val);
+                    break;
+                } else {
+                    // Otherwise, move to the left child
+                    current = current.left;
+                }
+            } else {
+                // If the right child is null, insert the new node here
+                if (current.right == null) {
+                    current.right = new TreeNode(val);
+                    break;
+                } else {
+                    // Otherwise, move to the right child
+                    current = current.right;
+                }
+            }
+        }
+
+        // Return the unchanged root of the tree
+        return root;
     }
 
 }
