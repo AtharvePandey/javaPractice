@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
 import java.util.Random;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 //import java.util.Collection;
@@ -313,12 +315,12 @@ public class App {
     // return q.size();
     // }
     // }
-    public class Queue {
+    public class Q {
         // implement queue behavior using 2 stacks
         private Stack<Integer> in;
         private Stack<Integer> out;
 
-        public Queue() {
+        public Q() {
             this.in = new Stack<>();
             this.out = new Stack<>();
         }
@@ -2792,10 +2794,71 @@ public class App {
     }
 
 
-    //basically the key difference for the above, diameter is the max left + right subtree and the current diameter
+    //basically the key difference for the above, diameter is the max left + right subtree height and the current diameter
     //take the height of the left subtree + right subtree gives diameter.
 
+    // Given a binary tree, return true if it is height-balanced and false otherwise.
+    // A height-balanced binary tree is defined as a binary tree in which the left and right 
+    // subtrees of every node differ in height by no more than 1.
+
+    public boolean isBalanced(TreeNode root) {
+        //basically get height of each individual subtree on left and right
+        //return true if Math.abs(left-right) <= 1
+        if (root == null) {
+            return true; // An empty tree is balanced
+        }
     
+        // Calculate left and right subtree heights
+        int leftHeight = height(root.left);
+        int rightHeight = height(root.right);
+    
+        // Check if the current node is balanced
+        if (Math.abs(leftHeight - rightHeight) > 1) {
+            return false;
+        }
+    
+        // Recursively check if the left and right subtrees are balanced
+        return isBalanced(root.left) && isBalanced(root.right);
+    }
+    public int height(TreeNode root){
+        if(root == null){ //trivial case where we reach leaf
+            return 0;
+        }
+        int left = height(root.left);
+        int right = height(root.right);
+        return 1 + Math.max(left, right);
+    }
+
+    //given a tree, return a list that contains lists where each sublist contains all nodes at that level
+    public List<List<Integer>> levelOrderTraversal(TreeNode root){
+        List<List<Integer>> retList = new ArrayList<>();
+        //BFS uses a queue to traverse the tree (when we search for an element) and we go level by level
+        //contrary to DFS which goes depth first using a stack
+        Queue<TreeNode> queue = new ArrayDeque<>();
+        queue.add(root); //add start node to queue
+        while(!queue.isEmpty()){
+            //generally how bfs works check curr value, and if its not target, add children to the queue
+            //but we aren't searching for anything, we just need the values at each node in its own subArr
+            //im using a list since arrays are immutable and a pain in java
+            List<Integer> subList = new ArrayList<>();
+            int length = queue.size();
+            int i = 0;
+            while(i<length){
+                TreeNode currNode = queue.poll();
+                if(currNode != null){
+                    subList.add(currNode.val);
+                    queue.add(currNode.left);
+                    queue.add(currNode.right);
+                }
+                i++;
+            }
+            retList.add(subList);
+        }
+        return retList;
+
+        //has O(n) time and space since we are visiting each node exactly once, and the queue will have atmost n/2 elements at any given time
+
+    }
 
 
 
