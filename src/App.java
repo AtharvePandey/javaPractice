@@ -1,7 +1,6 @@
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -11,8 +10,6 @@ import java.util.Stack;
 import java.util.TreeSet;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.swing.plaf.TreeUI;
 
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
@@ -2825,16 +2822,13 @@ public class App {
             // its own subArr
             // im using a list since arrays are immutable and a pain in java
             List<Integer> subList = new ArrayList<>();
-            int length = queue.size();
-            int i = 0;
-            while (i < length) {
-                TreeNode currNode = queue.poll();
-                if (currNode != null) {
-                    subList.add(currNode.val);
-                    queue.add(currNode.left);
-                    queue.add(currNode.right);
+            for(int i = queue.size(); i>0; i--){
+                TreeNode curr = queue.poll();
+                if(curr != null){
+                    subList.add(curr.val);
+                    queue.add(curr.left);
+                    queue.add(curr.right);
                 }
-                i++;
             }
             retList.add(subList);
         }
@@ -2878,32 +2872,48 @@ public class App {
     // the tree remains a BST after insertion.
     // You can return any of them.
 
-    public TreeNode insertIntoBST(TreeNode root, int val){
-        if(root == null){
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        if (root == null) {
             TreeNode node = new TreeNode(val);
             root = node;
             return root;
         }
         TreeNode curr = root;
-        while(true){
-            if(curr.val < val){ //we serarch right half of the tree to add val to
-                if(curr.right == null){
+        while (true) {
+            if (curr.val < val) { // we serarch right half of the tree to add val to
+                if (curr.right == null) {
                     TreeNode insert = new TreeNode(val);
                     curr.right = insert;
                     return root;
-                }else{
+                } else {
                     curr = curr.right;
                 }
-            }else{ //we search the left half of the tree
-                if(curr.left == null){
+            } else { // we search the left half of the tree
+                if (curr.left == null) {
                     TreeNode insert = new TreeNode(val);
                     curr.left = insert;
                     return root;
-                }else{
+                } else {
                     curr = curr.left;
                 }
             }
         }
     }
+
+    // Given a root node reference of a BST and a key, delete the node with the
+    // given key in the BST.
+    // Return the root node reference (possibly updated) of the BST.
+    // Basically, the deletion can be divided into two stages:
+
+    // Search for a node to remove.
+    // If the node is found, delete the node.
+
+    public TreeNode deleteNode(TreeNode root, int key) {
+        //very complicated i would just memorize this one
+        //makes no sense
+        return null;
+    }
+
+
 
 }
