@@ -11,6 +11,9 @@ import java.util.Stack;
 import java.util.TreeSet;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.swing.plaf.TreeUI;
+
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
 import java.util.Random;
@@ -2635,7 +2638,7 @@ public class App {
         List<Integer> res = new ArrayList<>();
 
         inorder(root, res);
-        return res;        
+        return res;
     }
 
     private void inorder(TreeNode node, List<Integer> res) {
@@ -2651,7 +2654,7 @@ public class App {
         List<Integer> res = new ArrayList<>();
 
         preOrder(root, res);
-        return res;        
+        return res;
     }
 
     private void preOrder(TreeNode node, List<Integer> res) {
@@ -2662,12 +2665,12 @@ public class App {
         preOrder(node.left, res);
         preOrder(node.right, res);
     }
-    
+
     public List<Integer> postOrderTraversal(TreeNode root) {
         List<Integer> res = new ArrayList<>();
 
         postOrder(root, res);
-        return res;        
+        return res;
     }
 
     private void postOrder(TreeNode node, List<Integer> res) {
@@ -2677,7 +2680,7 @@ public class App {
         postOrder(node.left, res);
         postOrder(node.right, res);
         res.add(node.val);
-    }  
+    }
 
     public int maxDepthOfTree(TreeNode root) {
         // the maximum depth is 0 if the root is null
@@ -2713,82 +2716,92 @@ public class App {
         return root;
     }
 
+    // the diameter of a binary tree is, given any two nodes, the longest path in
+    // the entire tree
+    // obv the root to leaf is the longest path? wrong
 
-    //the diameter of a binary tree is, given any two nodes, the longest path in the entire tree
-    //obv the root to leaf is the longest path? wrong
-
-    //the longest path doesn't have to go through the root
-    //number of edges defines path length, so height of the current node is basically number of edges to leaf node
-    //we will use this idea to calculate the diameter
+    // the longest path doesn't have to go through the root
+    // number of edges defines path length, so height of the current node is
+    // basically number of edges to leaf node
+    // we will use this idea to calculate the diameter
     /*
-         1
-          \
-           3
-          / \
-         4   5
-        / \ / \
-       6  7 8  9
-*/
+     * 1
+     * \
+     * 3
+     * / \
+     * 4 5
+     * / \ / \
+     * 6 7 8 9
+     */
 
-    //in the tree above, height of root is 3 since there are 3 edges to leaf from root. i.e its the Max(left and right subtrees), 
-    //since the diameter is defined as longest path however, the diameter would be 4 in this case. since the path from 
-    //6-4-3-5-9 has 4 edges.
+    // in the tree above, height of root is 3 since there are 3 edges to leaf from
+    // root. i.e its the Max(left and right subtrees),
+    // since the diameter is defined as longest path however, the diameter would be
+    // 4 in this case. since the path from
+    // 6-4-3-5-9 has 4 edges.
 
-    //so null nodes have a height of 0, and diameter of current node is left + right...which makes sense because trivially if we have
-    //just one node, with 2 children, then the path would be left - root - right where there are 2 edges and the diameter would be 2
-    //height of node is different from the diameter, the height is max(left, right) and then + 1  for height of parent node
-    //and diameter is just height of left + right...
+    // so null nodes have a height of 0, and diameter of current node is left +
+    // right...which makes sense because trivially if we have
+    // just one node, with 2 children, then the path would be left - root - right
+    // where there are 2 edges and the diameter would be 2
+    // height of node is different from the diameter, the height is max(left, right)
+    // and then + 1 for height of parent node
+    // and diameter is just height of left + right...
 
-    public class DiameterOfTree{
+    public class DiameterOfTree {
         public int result = 0;
 
-        public int diameter(TreeNode root){
+        public int diameter(TreeNode root) {
             height(root);
             return result;
         }
-        private int height(TreeNode root){
-            if(root == null){
-                return 0; //this is where we will get a null leaf
+
+        private int height(TreeNode root) {
+            if (root == null) {
+                return 0; // this is where we will get a null leaf
             }
             int left = height(root.left);
             int right = height(root.right);
-            result = Math.max(result, left + right); //to record the max diameter so far
-            return 1 + Math.max(left, right); //return the height of the current node to parent node (to use to calculate diameter.)
+            result = Math.max(result, left + right); // to record the max diameter so far
+            return 1 + Math.max(left, right); // return the height of the current node to parent node (to use to
+                                              // calculate diameter.)
 
         }
-
 
     }
 
+    // basically the key difference for the above, diameter is the max left + right
+    // subtree height and the current diameter
+    // take the height of the left subtree + right subtree gives diameter.
 
-    //basically the key difference for the above, diameter is the max left + right subtree height and the current diameter
-    //take the height of the left subtree + right subtree gives diameter.
-
-    // Given a binary tree, return true if it is height-balanced and false otherwise.
-    // A height-balanced binary tree is defined as a binary tree in which the left and right 
+    // Given a binary tree, return true if it is height-balanced and false
+    // otherwise.
+    // A height-balanced binary tree is defined as a binary tree in which the left
+    // and right
     // subtrees of every node differ in height by no more than 1.
 
     public boolean isBalanced(TreeNode root) {
-        //basically get height of each individual subtree on left and right
-        //return true if Math.abs(left-right) <= 1
+        // basically get height of each individual subtree on left and right
+        // return true if Math.abs(left-right) <= 1
         if (root == null) {
             return true; // An empty tree is balanced
         }
-    
+
         // Calculate left and right subtree heights
         int leftHeight = height(root.left);
         int rightHeight = height(root.right);
-    
+
         // Check if the current node is balanced
         if (Math.abs(leftHeight - rightHeight) > 1) {
             return false;
         }
-    
+
         // Recursively check if the left and right subtrees are balanced
         return isBalanced(root.left) && isBalanced(root.right);
     }
-    public int height(TreeNode root){
-        if(root == null){ //trivial case where we reach leaf
+
+    public int height(TreeNode root) {
+        if (root == null) { // trivial case where we reach leaf
             return 0;
         }
         int left = height(root.left);
@@ -2796,23 +2809,27 @@ public class App {
         return 1 + Math.max(left, right);
     }
 
-    //given a tree, return a list that contains lists where each sublist contains all nodes at that level
-    public List<List<Integer>> levelOrderTraversal(TreeNode root){
+    // given a tree, return a list that contains lists where each sublist contains
+    // all nodes at that level
+    public List<List<Integer>> levelOrderTraversal(TreeNode root) {
         List<List<Integer>> retList = new ArrayList<>();
-        //BFS uses a queue to traverse the tree (when we search for an element) and we go level by level
-        //contrary to DFS which goes depth first using a stack
+        // BFS uses a queue to traverse the tree (when we search for an element) and we
+        // go level by level
+        // contrary to DFS which goes depth first using a stack
         Queue<TreeNode> queue = new ArrayDeque<>();
-        queue.add(root); //add start node to queue
-        while(!queue.isEmpty()){
-            //generally how bfs works check curr value, and if its not target, add children to the queue
-            //but we aren't searching for anything, we just need the values at each node in its own subArr
-            //im using a list since arrays are immutable and a pain in java
+        queue.add(root); // add start node to queue
+        while (!queue.isEmpty()) {
+            // generally how bfs works check curr value, and if its not target, add children
+            // to the queue
+            // but we aren't searching for anything, we just need the values at each node in
+            // its own subArr
+            // im using a list since arrays are immutable and a pain in java
             List<Integer> subList = new ArrayList<>();
             int length = queue.size();
             int i = 0;
-            while(i<length){
+            while (i < length) {
                 TreeNode currNode = queue.poll();
-                if(currNode != null){
+                if (currNode != null) {
                     subList.add(currNode.val);
                     queue.add(currNode.left);
                     queue.add(currNode.right);
@@ -2823,33 +2840,70 @@ public class App {
         }
         return retList;
 
-        //has O(n) time and space since we are visiting each node exactly once, and the queue will have atmost n/2 elements at any given time
+        // has O(n) time and space since we are visiting each node exactly once, and the
+        // queue will have atmost n/2 elements at any given time
 
     }
 
-    // Given a binary search tree (BST) where all node values are unique, and two nodes from the tree p and q, return 
+    // Given a binary search tree (BST) where all node values are unique, and two
+    // nodes from the tree p and q, return
     // the lowest common ancestor (LCA) of the two nodes.
-    // The lowest common ancestor between two nodes p and q is the lowest node in a tree T such that both p and q 
+    // The lowest common ancestor between two nodes p and q is the lowest node in a
+    // tree T such that both p and q
     // as descendants. The ancestor is allowed to be a descendant of itself.
 
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        //its like searching in a binary tree,
-        //if we know p is less than root, and q is greater than root, then we just return root
-        //and we can sort of recursivley check for each subtree root, moving pointer
+        // its like searching in a binary tree,
+        // if we know p is less than root, and q is greater than root, then we just
+        // return root
+        // and we can sort of recursivley check for each subtree root, moving pointer
         TreeNode curr = root;
-        while(curr != null){
-            if(p.val > curr.val && q.val > curr.val){
+        while (curr != null) {
+            if (p.val > curr.val && q.val > curr.val) {
                 curr = curr.right;
-            }else if(p.val < curr.val && q.val < curr.val){
+            } else if (p.val < curr.val && q.val < curr.val) {
                 curr = curr.left;
-            }else{
+            } else {
                 return curr;
             }
         }
         return null;
     }
 
+    // You are given the root node of a binary search tree (BST) and a value to
+    // insert into the tree.
+    // Return the root node of the BST after the insertion. It is guaranteed that
+    // the new value does not exist in the original BST.
+    // Notice that there may exist multiple valid ways for the insertion, as long as
+    // the tree remains a BST after insertion.
+    // You can return any of them.
 
-
+    public TreeNode insertIntoBST(TreeNode root, int val){
+        if(root == null){
+            TreeNode node = new TreeNode(val);
+            root = node;
+            return root;
+        }
+        TreeNode curr = root;
+        while(true){
+            if(curr.val < val){ //we serarch right half of the tree to add val to
+                if(curr.right == null){
+                    TreeNode insert = new TreeNode(val);
+                    curr.right = insert;
+                    return root;
+                }else{
+                    curr = curr.right;
+                }
+            }else{ //we search the left half of the tree
+                if(curr.left == null){
+                    TreeNode insert = new TreeNode(val);
+                    curr.left = insert;
+                    return root;
+                }else{
+                    curr = curr.left;
+                }
+            }
+        }
+    }
 
 }
