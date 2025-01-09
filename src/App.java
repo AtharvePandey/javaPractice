@@ -2839,6 +2839,44 @@ public class App {
 
     }
 
+    //Given a BST perform a zigzag traversal, i.e from root, visit first level right to left, then second level left to right etc
+    //return order of traversal in a list
+    
+    public List<List<Integer>> zigZagtraversal(TreeNode root){
+        //using the same logic as above, we have to traverse the tree in zigzag format
+        //here, it depends on how we add the current level to the queue (left -> right or right -> left)
+        //since we add odd numbered levels in reverse, we can just keep track of level currently...
+        int levelNumber = 0;
+        Queue<TreeNode> queue = new ArrayDeque<>();
+        List<List<Integer>> retList = new ArrayList<>();
+        queue.add(root);
+        while(!queue.isEmpty()){
+            List<Integer> subList = new ArrayList<>();
+            for(int i = queue.size(); i>0;i--){
+                if(levelNumber % 2 == 0){//we add to queue normally
+                    TreeNode curr = queue.poll();
+                    if(curr != null){
+                        subList.add(curr.val);
+                        queue.add(curr.left);
+                        queue.add(curr.right);
+                    }
+                }else{
+                    TreeNode curr = queue.poll();
+                    if(curr != null){
+                        subList.add(curr.val);
+                        queue.add(curr.right);
+                        queue.add(curr.left);
+                    }
+                }
+            }
+            retList.add(subList);
+        }
+        return retList;
+    }
+
+
+
+
     // Given a binary search tree (BST) where all node values are unique, and two
     // nodes from the tree p and q, return
     // the lowest common ancestor (LCA) of the two nodes.
