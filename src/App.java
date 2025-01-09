@@ -1,6 +1,7 @@
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -2712,40 +2713,6 @@ public class App {
         return root;
     }
 
-    public TreeNode insertIntoBST(TreeNode root, int val) {
-        // If the tree is empty, create a new node and return it as the root
-        if (root == null) {
-            return new TreeNode(val);
-        }
-
-        // Initialize a pointer to traverse the tree
-        TreeNode current = root;
-
-        while (true) {
-            if (val < current.val) {
-                // If the left child is null, insert the new node here
-                if (current.left == null) {
-                    current.left = new TreeNode(val);
-                    break;
-                } else {
-                    // Otherwise, move to the left child
-                    current = current.left;
-                }
-            } else {
-                // If the right child is null, insert the new node here
-                if (current.right == null) {
-                    current.right = new TreeNode(val);
-                    break;
-                } else {
-                    // Otherwise, move to the right child
-                    current = current.right;
-                }
-            }
-        }
-
-        // Return the unchanged root of the tree
-        return root;
-    }
 
     //the diameter of a binary tree is, given any two nodes, the longest path in the entire tree
     //obv the root to leaf is the longest path? wrong
@@ -2859,6 +2826,29 @@ public class App {
         //has O(n) time and space since we are visiting each node exactly once, and the queue will have atmost n/2 elements at any given time
 
     }
+
+    // Given a binary search tree (BST) where all node values are unique, and two nodes from the tree p and q, return 
+    // the lowest common ancestor (LCA) of the two nodes.
+    // The lowest common ancestor between two nodes p and q is the lowest node in a tree T such that both p and q 
+    // as descendants. The ancestor is allowed to be a descendant of itself.
+
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        //its like searching in a binary tree,
+        //if we know p is less than root, and q is greater than root, then we just return root
+        //and we can sort of recursivley check for each subtree root, moving pointer
+        TreeNode curr = root;
+        while(curr != null){
+            if(p.val > curr.val && q.val > curr.val){
+                curr = curr.right;
+            }else if(p.val < curr.val && q.val < curr.val){
+                curr = curr.left;
+            }else{
+                return curr;
+            }
+        }
+        return null;
+    }
+
 
 
 
