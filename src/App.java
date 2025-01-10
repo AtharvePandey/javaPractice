@@ -2941,6 +2941,39 @@ public class App {
         return null;
     }
 
+    //given 2 arrays preorder and inorder traversals of a binary tree, we need to construct the tree
+    //preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
+    //here preOrder[0] is topmost root, everything to left of that in inorder array is left subtree, and after is right...
+    //so what would we pass to buildTree to implement the recursive soluton? 
+    //well first we add this node, preorder[0], next we find that index in the inorder array to find out our left and right subtree size..
+    //if index of preorder[0] in the inorder array is mid, then we can say everything to left of mid is the left subtree and right of mid is right
+    //so for first iteration, mid = 1; leftsubtree would be inorder[0->mid] where mid is exclusive, and rightsubtree would be mid+1->length
+    //where mid+1 is inclusive [start, end)... and for preorder, we start at 1, and go to mid (since 0 is this root, we take 1) and preorder
+    //for right side is mid+1 to end
+
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        //basically we know preorder[0] will contain the first root (and every root of subtree)
+        //everything to the left of inorder[indexOf(preorder[0])] is the left subtree, and everything else is the right subtree
+        //so we can use a recursive approach where if preorder.length>0 set preorder[0] to root
+        //then recursively call to build left and right subtrees
+
+        TreeNode root = new TreeNode(preorder[0]);
+        int mid = indexOf(inorder, preorder[0]);
+        root.left = buildTree(Arrays.copyOfRange(preorder, 1, mid+1), Arrays.copyOfRange(inorder, 0, mid));
+        root.right = buildTree(Arrays.copyOfRange(preorder, mid+1, preorder.length), Arrays.copyOfRange(inorder, mid+1, inorder.length));
+        return root;
+
+        
+    }
+    private int indexOf(int[] inorder, int target){
+        for(int i = 0; i<inorder.length;i++){
+            if(inorder[i] == target){
+                return i;
+            }
+        }
+        return -1;
+    }
+
     // You are given the root node of a binary search tree (BST) and a value to
     // insert into the tree.
     // Return the root node of the BST after the insertion. It is guaranteed that
