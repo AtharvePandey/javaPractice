@@ -1,6 +1,7 @@
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -2822,9 +2823,9 @@ public class App {
             // its own subArr
             // im using a list since arrays are immutable and a pain in java
             List<Integer> subList = new ArrayList<>();
-            for(int i = queue.size(); i>0; i--){
+            for (int i = queue.size(); i > 0; i--) {
                 TreeNode curr = queue.poll();
-                if(curr != null){
+                if (curr != null) {
                     subList.add(curr.val);
                     queue.add(curr.left);
                     queue.add(curr.right);
@@ -2839,30 +2840,33 @@ public class App {
 
     }
 
-    //Given a BST perform a zigzag traversal, i.e from root, visit first level right to left, then second level left to right etc
-    //return order of traversal in a list
-    
-    public List<List<Integer>> zigZagtraversal(TreeNode root){
-        //using the same logic as above, we have to traverse the tree in zigzag format
-        //here, it depends on how we add the current level to the queue (left -> right or right -> left)
-        //since we add odd numbered levels in reverse, we can just keep track of level currently...
+    // Given a BST perform a zigzag traversal, i.e from root, visit first level
+    // right to left, then second level left to right etc
+    // return order of traversal in a list
+
+    public List<List<Integer>> zigZagtraversal(TreeNode root) {
+        // using the same logic as above, we have to traverse the tree in zigzag format
+        // here, it depends on how we add the current level to the queue (left -> right
+        // or right -> left)
+        // since we add odd numbered levels in reverse, we can just keep track of level
+        // currently...
         int levelNumber = 0;
         Queue<TreeNode> queue = new ArrayDeque<>();
         List<List<Integer>> retList = new ArrayList<>();
         queue.add(root);
-        while(!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             List<Integer> subList = new ArrayList<>();
-            for(int i = queue.size(); i>0;i--){
-                if(levelNumber % 2 == 0){//we add to queue normally
+            for (int i = queue.size(); i > 0; i--) {
+                if (levelNumber % 2 == 0) {// we add to queue normally
                     TreeNode curr = queue.poll();
-                    if(curr != null){
+                    if (curr != null) {
                         subList.add(curr.val);
                         queue.add(curr.left);
                         queue.add(curr.right);
                     }
-                }else{
+                } else {
                     TreeNode curr = queue.poll();
-                    if(curr != null){
+                    if (curr != null) {
                         subList.add(curr.val);
                         queue.add(curr.right);
                         queue.add(curr.left);
@@ -2874,8 +2878,43 @@ public class App {
         return retList;
     }
 
+    // You are given the root of a binary tree. Return only the values of the
+    // nodes that are visible from the right side of the tree, ordered from top to
+    // bottom.
 
+    public List<Integer> rightSideView(TreeNode root) {
+        // I thought this was supposed to be simple, just recursively add everything you
+        // see in root.right
+        // but the problem can also have cases where there could exists a node on the
+        // left subtree
+        // that doesn't have a node blocking it on the right subtree
+        // so you would add that node
 
+        // the idea to solve this problem would be to do a level order traversal, and
+        // add right most node in each level
+        List<Integer> res = new ArrayList<>();
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(root);
+
+        while (!q.isEmpty()) {
+            TreeNode rightSide = null;
+            int qLen = q.size();
+
+            for (int i = 0; i < qLen; i++) {
+                TreeNode node = q.poll();
+                if (node != null) {
+                    rightSide = node;
+                    q.offer(node.left);
+                    q.offer(node.right);
+                }
+            }
+            if (rightSide != null) {
+                res.add(rightSide.val);
+            }
+        }
+        return res;
+
+    }
 
     // Given a binary search tree (BST) where all node values are unique, and two
     // nodes from the tree p and q, return
@@ -2947,11 +2986,9 @@ public class App {
     // If the node is found, delete the node.
 
     public TreeNode deleteNode(TreeNode root, int key) {
-        //very complicated i would just memorize this one
-        //makes no sense
+        // very complicated i would just memorize this one
+        // makes no sense
         return null;
     }
-
-
 
 }
