@@ -3028,22 +3028,26 @@ public class App {
     // Within a binary tree, a node x is considered good if the path from the root of the tree 
     // to the node x contains no nodes with a value greater than the value of node x
     // Given the root of a binary tree root, return the number of good nodes within the tree.
-    int count = 0;
-    public int goodNodes(TreeNode root){
-        return dfs(root.val, root);
-    }
-
-    private int dfs(int maxSoFar, TreeNode root){
-        if(root == null){
-            return 0;
+    
+    class GoodNodes{
+        int count = 0;
+        public int goodNodes(TreeNode root){
+            return dfs(root.val, root);
         }
-        if(root.val >= maxSoFar){
-            this.count += 1;
+    
+        private int dfs(int maxSoFar, TreeNode root){
+            if(root == null){ //null nodes are not good
+                return 0;
+            }
+            if(root.val >= maxSoFar){
+                this.count += 1; //update count since this node is good
+            }
+            maxSoFar = Math.max(maxSoFar, root.val); //update max
+            //recursively traverse the tree with that paths max value...
+            dfs(maxSoFar, root.left);
+            dfs(maxSoFar, root.right);
+            return this.count; //return the final global count
         }
-        maxSoFar = Math.max(maxSoFar, root.val);
-        dfs(maxSoFar, root.left);
-        dfs(maxSoFar, root.right);
-        return this.count;
     }
 
 }
