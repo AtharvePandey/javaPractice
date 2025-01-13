@@ -2941,33 +2941,43 @@ public class App {
         return null;
     }
 
-    //given 2 arrays preorder and inorder traversals of a binary tree, we need to construct the tree
-    //preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
-    //here preOrder[0] is topmost root, everything to left of that in inorder array is left subtree, and after is right...
-    //so what would we pass to buildTree to implement the recursive soluton? 
-    //well first we add this node, preorder[0], next we find that index in the inorder array to find out our left and right subtree size..
-    //if index of preorder[0] in the inorder array is mid, then we can say everything to left of mid is the left subtree and right of mid is right
-    //so for first iteration, mid = 1; leftsubtree would be inorder[0->mid] where mid is exclusive, and rightsubtree would be mid+1->length
-    //where mid+1 is inclusive [start, end)... and for preorder, we start at 1, and go to mid (since 0 is this root, we take 1) and preorder
-    //for right side is mid+1 to end
+    // given 2 arrays preorder and inorder traversals of a binary tree, we need to
+    // construct the tree
+    // preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
+    // here preOrder[0] is topmost root, everything to left of that in inorder array
+    // is left subtree, and after is right...
+    // so what would we pass to buildTree to implement the recursive soluton?
+    // well first we add this node, preorder[0], next we find that index in the
+    // inorder array to find out our left and right subtree size..
+    // if index of preorder[0] in the inorder array is mid, then we can say
+    // everything to left of mid is the left subtree and right of mid is right
+    // so for first iteration, mid = 1; leftsubtree would be inorder[0->mid] where
+    // mid is exclusive, and rightsubtree would be mid+1->length
+    // where mid+1 is inclusive [start, end)... and for preorder, we start at 1, and
+    // go to mid (since 0 is this root, we take 1) and preorder
+    // for right side is mid+1 to end
 
     public TreeNode buildTree(int[] preorder, int[] inorder) {
-        //basically we know preorder[0] will contain the first root (and every root of subtree)
-        //everything to the left of inorder[indexOf(preorder[0])] is the left subtree, and everything else is the right subtree
-        //so we can use a recursive approach where if preorder.length>0 set preorder[0] to root
-        //then recursively call to build left and right subtrees
+        // basically we know preorder[0] will contain the first root (and every root of
+        // subtree)
+        // everything to the left of inorder[indexOf(preorder[0])] is the left subtree,
+        // and everything else is the right subtree
+        // so we can use a recursive approach where if preorder.length>0 set preorder[0]
+        // to root
+        // then recursively call to build left and right subtrees
 
         TreeNode root = new TreeNode(preorder[0]);
         int mid = indexOf(inorder, preorder[0]);
-        root.left = buildTree(Arrays.copyOfRange(preorder, 1, mid+1), Arrays.copyOfRange(inorder, 0, mid));
-        root.right = buildTree(Arrays.copyOfRange(preorder, mid+1, preorder.length), Arrays.copyOfRange(inorder, mid+1, inorder.length));
+        root.left = buildTree(Arrays.copyOfRange(preorder, 1, mid + 1), Arrays.copyOfRange(inorder, 0, mid));
+        root.right = buildTree(Arrays.copyOfRange(preorder, mid + 1, preorder.length),
+                Arrays.copyOfRange(inorder, mid + 1, inorder.length));
         return root;
 
-        
     }
-    private int indexOf(int[] inorder, int target){
-        for(int i = 0; i<inorder.length;i++){
-            if(inorder[i] == target){
+
+    private int indexOf(int[] inorder, int target) {
+        for (int i = 0; i < inorder.length; i++) {
+            if (inorder[i] == target) {
                 return i;
             }
         }
@@ -3024,30 +3034,105 @@ public class App {
         return null;
     }
 
-    
-    // Within a binary tree, a node x is considered good if the path from the root of the tree 
+    // Within a binary tree, a node x is considered good if the path from the root
+    // of the tree
     // to the node x contains no nodes with a value greater than the value of node x
-    // Given the root of a binary tree root, return the number of good nodes within the tree.
-    
-    class GoodNodes{
+    // Given the root of a binary tree root, return the number of good nodes within
+    // the tree.
+
+    class GoodNodes {
         int count = 0;
-        public int goodNodes(TreeNode root){
+
+        public int goodNodes(TreeNode root) {
             return dfs(root.val, root);
         }
-    
-        private int dfs(int maxSoFar, TreeNode root){
-            if(root == null){ //null nodes are not good
+
+        private int dfs(int maxSoFar, TreeNode root) {
+            if (root == null) { // null nodes are not good
                 return 0;
             }
-            if(root.val >= maxSoFar){
-                this.count += 1; //update count since this node is good
+            if (root.val >= maxSoFar) {
+                this.count += 1; // update count since this node is good
             }
-            maxSoFar = Math.max(maxSoFar, root.val); //update max
-            //recursively traverse the tree with that paths max value...
+            maxSoFar = Math.max(maxSoFar, root.val); // update max
+            // recursively traverse the tree with that paths max value...
             dfs(maxSoFar, root.left);
             dfs(maxSoFar, root.right);
-            return this.count; //return the final global count
+            return this.count; // return the final global count
         }
+    }
+
+    // Given the root of a binary tree, return true if it is a valid binary search
+    // tree, otherwise return false.
+
+    // A valid binary search tree satisfies the following constraints:
+
+    // The left subtree of every node contains only nodes with keys less than the
+    // node's key.
+    // The right subtree of every node contains only nodes with keys greater than
+    // the node's key.
+    // Both the left and right subtrees are also binary search trees.
+
+    class ValidBST {
+        public boolean isValidBST(TreeNode root) {
+            return isValid(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        }
+        private boolean isValid(TreeNode root, int leftVal, int rightVal){
+            //same as above, we run a dfs through tree
+            //if root is null we return true
+            if(root == null){
+                return true;
+            }
+
+            //next we need to do the check where we return false
+            //we return false if root val is not > left subtree or < right subtree
+            if(!(root.val > leftVal && root.val<rightVal)){
+                return false;
+            }
+            //next we need to return the boolean value of left and right subtree, but how do we update the left and right vals? 
+            return isValid(root.left, leftVal, root.val) && isValid(root.right, root.val, rightVal);
+
+            //when we go into left subtree, its root.val has to be <rightVal which in this case is parent's root value
+            //same logic applies when we go to the right subtree
+        }
+    }
+
+    // The thief has found himself a new place for his thievery again. There is only one entrance to this area, called root.
+    // Besides the root, each house has one and only one parent house. After a tour, the smart thief realized that all houses 
+    // in this place form a binary tree. It will automatically contact the police if two directly-linked 
+    // houses were broken into on the same night.Given the root of the binary tree, return the maximum amount of money the
+    // thief can rob without alerting the police.
+
+    public int rob(TreeNode root) {
+        //the goal for this one is to use an array where arr[0] is sum with root
+        //arr[1] is without root
+
+        //we can use dfs to update the array each round
+        //then we return the max value in the array
+        return max(dfs(root));
+    }
+    private int[] dfs(TreeNode root){
+        if(root == null){
+            int[] retArr = new int[2];
+            retArr[0] = 0;
+            retArr[1] = 0;
+        }
+        int[] left = dfs(root.left);
+        int[] right = dfs(root.right);
+        //if we made it this far, update the sum with root, and without root
+        int[] retArr = new int[2];
+        int withRoot = root.val + left[1] + right[1]; //with root is the sum of this root's val, and the max sum from L,R subtree without that root
+        int withoutRoot = max(left) + max(right); 
+        retArr[0] = withRoot;
+        retArr[1] = withoutRoot;
+        return retArr;
+    }
+    private int max(int[] arr){
+        int max = arr[0];
+        if(arr[1] > max){
+            max = arr[1];
+        }
+        return max;
     }
 
 }
