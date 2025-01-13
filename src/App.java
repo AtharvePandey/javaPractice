@@ -3077,59 +3077,69 @@ public class App {
         public boolean isValidBST(TreeNode root) {
             return isValid(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
         }
-        private boolean isValid(TreeNode root, int leftVal, int rightVal){
-            //same as above, we run a dfs through tree
-            //if root is null we return true
-            if(root == null){
+
+        private boolean isValid(TreeNode root, int leftVal, int rightVal) {
+            // same as above, we run a dfs through tree
+            // if root is null we return true
+            if (root == null) {
                 return true;
             }
 
-            //next we need to do the check where we return false
-            //we return false if root val is not > left subtree or < right subtree
-            if(!(root.val > leftVal && root.val<rightVal)){
+            // next we need to do the check where we return false
+            // we return false if root val is not > left subtree or < right subtree
+            if (!(root.val > leftVal && root.val < rightVal)) {
                 return false;
             }
-            //next we need to return the boolean value of left and right subtree, but how do we update the left and right vals? 
+            // next we need to return the boolean value of left and right subtree, but how
+            // do we update the left and right vals?
             return isValid(root.left, leftVal, root.val) && isValid(root.right, root.val, rightVal);
 
-            //when we go into left subtree, its root.val has to be <rightVal which in this case is parent's root value
-            //same logic applies when we go to the right subtree
+            // when we go into left subtree, its root.val has to be <rightVal which in this
+            // case is parent's root value
+            // same logic applies when we go to the right subtree
         }
     }
 
-    // The thief has found himself a new place for his thievery again. There is only one entrance to this area, called root.
-    // Besides the root, each house has one and only one parent house. After a tour, the smart thief realized that all houses 
-    // in this place form a binary tree. It will automatically contact the police if two directly-linked 
-    // houses were broken into on the same night.Given the root of the binary tree, return the maximum amount of money the
+    // The thief has found himself a new place for his thievery again. There is only
+    // one entrance to this area, called root.
+    // Besides the root, each house has one and only one parent house. After a tour,
+    // the smart thief realized that all houses
+    // in this place form a binary tree. It will automatically contact the police if
+    // two directly-linked
+    // houses were broken into on the same night.Given the root of the binary tree,
+    // return the maximum amount of money the
     // thief can rob without alerting the police.
 
     public int rob(TreeNode root) {
-        //the goal for this one is to use an array where arr[0] is sum with root
-        //arr[1] is without root
+        // the goal for this one is to use an array where arr[0] is sum with root
+        // arr[1] is without root
 
-        //we can use dfs to update the array each round
-        //then we return the max value in the array
+        // we can use dfs to update the array each round
+        // then we return the max value in the array
         return max(dfs(root));
     }
-    private int[] dfs(TreeNode root){
-        if(root == null){
+
+    private int[] dfs(TreeNode root) {
+        if (root == null) {
             int[] retArr = new int[2];
             retArr[0] = 0;
             retArr[1] = 0;
         }
         int[] left = dfs(root.left);
         int[] right = dfs(root.right);
-        //if we made it this far, update the sum with root, and without root
+        // if we made it this far, update the sum with root, and without root
         int[] retArr = new int[2];
-        int withRoot = root.val + left[1] + right[1]; //with root is the sum of this root's val, and the max sum from L,R subtree without that root
-        int withoutRoot = max(left) + max(right); 
+        int withRoot = root.val + left[1] + right[1]; // with root is the sum of this root's val, and the max sum from
+                                                      // L,R subtree without that root
+        int withoutRoot = max(left) + max(right);
         retArr[0] = withRoot;
         retArr[1] = withoutRoot;
         return retArr;
     }
-    private int max(int[] arr){
+
+    private int max(int[] arr) {
         int max = arr[0];
-        if(arr[1] > max){
+        if (arr[1] > max) {
             max = arr[1];
         }
         return max;
