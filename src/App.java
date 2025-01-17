@@ -3163,11 +3163,7 @@ public class App {
     }
 
     private int max(int[] arr) {
-        int max = arr[0];
-        if (arr[1] > max) {
-            max = arr[1];
-        }
-        return max;
+        return arr[0] > arr[1] ? arr[0] : arr[1];
     }
 
 }
