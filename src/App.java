@@ -1861,6 +1861,26 @@ public class App {
 
     }
 
+    //given an array of numbers, ascending or descending by some constant, once number is removed
+    //we need to return that number 
+
+    //we are told the first and last number wont be the removed one
+    
+    public int missingNumber(int[] arr){
+        int jmpLength = (arr[arr.length-1] - arr[0]) / arr.length;
+        for(int i = 0; i<arr.length-1;i++){
+            if(Math.abs(arr[i] - arr[i+1]) != jmpLength){
+                if(arr[i] < arr[i+1])//this is when the array is in increasing order
+                return arr[i] + jmpLength;
+
+                else{
+                    return arr[i] - jmpLength; //decreasing order
+                }
+            }
+        }
+        return -1;
+    }
+
     // the board is 9x9 and we have to validate:
     // 1 if there is any repeat in each row, --> map row number to a set, check for
     // duplicates
