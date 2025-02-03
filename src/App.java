@@ -9,6 +9,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -2407,6 +2409,34 @@ public class App {
             i++;
         }
         return nums;
+    }
+
+    //given an integer n, return an array of ints from 1->n that are lexicographically sorted
+    //i.e if n is 13, then we return [1,10,11,12,13,2,3,4,5,6,7,8,9]
+
+    public List<Integer> lexicalOrder(int n){
+        ArrayList<Integer> retList = new ArrayList<>();
+        //when looking at the numbers, we can treat them as nodes
+        //since 1 is starting, 1 gets added to array, then we need to add the next numbers as long as they are <= n
+        //so if > n just break
+
+        //gotta take a dfs approach, where 1 is root, its children in first level are 10,11,...19
+        //each nodes' child is 10* more since its in the next level
+        Function<Integer,Void> dfs = x -> {
+            if(x > n){
+                return null;//don't add anything greater than n to the retList
+            }
+            retList.add(x);
+            x = x * 10; //for the next level
+            //next we need to use the recursive callstack to add this nodes children
+            for(int i = 0; i<10; i++){ //since each level has 0-9
+                dfs.apply(x + i);
+            }
+        };
+        for(int i = 1; i<10;i++){
+            dfs.apply(i);
+        }
+        return retList;
     }
 
     // given array of 0,1,2 we need to sort them so that all 0's come first, then
