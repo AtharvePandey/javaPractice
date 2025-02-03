@@ -2422,15 +2422,19 @@ public class App {
 
         //gotta take a dfs approach, where 1 is root, its children in first level are 10,11,...19
         //each nodes' child is 10* more since its in the next level
-        Function<Integer,Void> dfs = x -> {
-            if(x > n){
-                return null;//don't add anything greater than n to the retList
-            }
-            retList.add(x);
-            x = x * 10; //for the next level
-            //next we need to use the recursive callstack to add this nodes children
-            for(int i = 0; i<10; i++){ //since each level has 0-9
-                dfs.apply(x + i);
+        Function<Integer, Void> dfs = new Function<Integer, Void>() {
+            @Override
+            public Void apply(Integer x) {
+                if (x > n) {
+                    return null; // don't add anything greater than n to the retList
+                }
+                retList.add(x);
+                x = x * 10; // for the next level
+                // next we need to use the recursive callstack to add this nodes children
+                for (int i = 0; i < 10; i++) { // since each level has 0-9
+                    this.apply(x + i);
+                }
+                return null;
             }
         };
         for(int i = 1; i<10;i++){
