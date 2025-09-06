@@ -3219,4 +3219,36 @@ public class App {
         return arr[0] > arr[1] ? arr[0] : arr[1];
     }
 
+
+    // // You are given two integers num1 and num2.
+    // // In one operation, you can choose integer i in the range [0, 60] and subtract 2^i + num2 from num1.
+    // // Return the integer denoting the minimum number of operations needed to make num1 equal to 0.
+    // // If it is impossible to make num1 equal to 0, return -1.
+    // public int makeTheIntegerZero(int num1, int num2) {
+    //     // num1 = num1 - (2^i + num2) is 1 operation, we need the minimum number of operations to get num1 = 0
+    //     //lets say it takes 3 operations to reach 0 that means we substracted 2^i - num2 3 times from num 1
+    //     //if we substitute k for number of operations, then it becomes num1 - k(2^i - num2) = 0;
+    //     //we wanna solve for k to get the number of operations:
+    //     //  num1 = -k(2^i - num2);
+    //     //  - num1 / (2^i - num2) = k;
+
+    //     //above equation will give us k, if we know the value of i, i.e if 'i' is 5, then we can calculate exact value of k
+    //     //but we don't know i, and will have to iterate through values of i from 0 -> 60
+    //     //and since we want to return the smallest whole integer k, we can return the first instance of a whole number k...
+
+    //     //also since int is inherently a whole number, and since we can have decimals when we solve for k, we have to use a float
+    //     for(double i = 0; i<60; i++){
+    //         double k = -(num1 / ((Math.pow(2, i)) - num2));
+    //         if(k % 1 == 0){
+    //             return (int) k;
+    //         }
+    //     }
+    //     return -1;
+
+    // }
+
+    //small compute error above
+
+    
+
 }
