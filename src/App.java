@@ -28,9 +28,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        String temp = "ABCDE";
-        int numRows = 2;
-        System.out.println(app.convert(temp, numRows));
+        int x = 1534236469;
+        app.reverse(x);
     }
 
     public ListNode tempfunction1() {
@@ -3390,6 +3389,46 @@ public class App {
             }
         }
         return result;
+    }
+
+    // Given a signed 32-bit integer x, return x with its digits reversed.
+    // If reversing x causes the value to go outside
+    // the signed 32-bit integer range [-231, 231 - 1], then return 0.
+
+    public int reverse(int x) {
+        //we just need to extract the 1's place to construct our new number
+        //then we need to add it to the changing result
+        //result will be 0 to begin with
+        long result = 0;
+        boolean neg = x < 0 ? true : false;
+        //how would we add to changing result?
+        //well its 0 to start
+        //assume x is 123, then first digit for new number we extract is 3
+        //result becomes 3
+        //x becomes 12
+        //next we extract 2...notice how we extract then update
+        //how do we update result? it should become 32
+        //we basically take the old result, move the 3 to tens place and add the new number
+        //so equation becomes result = result * 10 + extracted number
+        //we also need to check bounds
+        int bound = x < 0 ? Integer.MIN_VALUE : Integer.MAX_VALUE; 
+        //and as per result equation, we need to set 10 to be either +10 or -10 
+        //because reverse of negative number has to be negative
+        int scale = 10;
+        while(x != 0){
+            //we loop till we're done processing the number
+
+            //lets start by extracting the first number into result
+            //we will extract by % 10 since that gives us the remainder in 1's digit
+
+            result = result * scale + (x%10);
+            
+
+            //next we update x
+            x = x/10;
+        }
+        if(neg ? result < bound : result > bound) return 0;
+        return (int) result;
     }
 
 }
