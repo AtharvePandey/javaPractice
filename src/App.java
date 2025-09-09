@@ -28,8 +28,9 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        String s = "abcabcbb";
-        app.lengthOfLongestSubstring(s);
+        String temp = "ABCDE";
+        int numRows = 2;
+        System.out.println(app.convert(temp, numRows));
     }
 
     public ListNode tempfunction1() {
@@ -3292,6 +3293,7 @@ public class App {
         }
         return retArr;
     }
+
     private boolean containsNoZero(int n) {
         boolean retBool = true;
         // we need to go through each digit, and see if it is a zero
@@ -3321,10 +3323,10 @@ public class App {
     public long bowlSubarrays(int[] nums) {
         long ans = 0;
         Stack<Integer> s = new Stack<>();
-        for(int i = 0; i<nums.length; i++){
-            while(!s.empty() && nums[s.peek()] < nums[i]){
+        for (int i = 0; i < nums.length; i++) {
+            while (!s.empty() && nums[s.peek()] < nums[i]) {
                 s.pop();
-                if(!s.empty()){
+                if (!s.empty()) {
                     ans++;
                 }
             }
@@ -3332,4 +3334,62 @@ public class App {
         }
         return ans;
     }
+
+    // The string "PAYPALISHIRING" is written in a zigzag pattern on a given number
+    // of
+    // rows like this:
+    //     P   A   H   N
+    //     A P L S I I G
+    //     Y   I   R
+    // And then read line by line: "PAHNAPLSIIGYIR"
+    // Write the code that will take a string and make this conversion given a
+    // number
+    // of rows:
+
+    public String convert(String s, int numRows) {
+        // so we can use a 2d list to 'put' our string into zigzag form
+        // then we can concat row by row until we get our final return string
+
+        // first we need to do some checks
+        // if our numRows is the size of our string, we can just return our string
+        if (numRows >= s.length() || numRows < 0 || numRows == 1) {
+            return s;
+        }
+
+        // lets start by getting an arraylist to convert our string into zigzag
+        ArrayList<ArrayList<Character>> list = new ArrayList<>();
+        // we need to init our arraylist with the number of rows
+        for (int i = 0; i < numRows; i++) {
+            list.add(i, new ArrayList<Character>()); // we now have an empty arraylist which stores Characters
+        }
+
+        // next we need to actually add our characters in diagonal order
+        // so to do this, we just need to keep track of the current index we add our
+        // character to
+        // and also when to add 'upwards' and 'downwards' to 'diagonalize' the string
+        int index = 0; // we will start at the first list in the array list
+        int direction = 1; // this will increment the index, when index == rows, we will change this
+        // to decrement our index
+
+        // we can then 'mock' the diagonality
+        for (char c : s.toCharArray()) {
+            list.get(index).add(c);
+            if (index == 0) {
+                direction = 1;
+            }
+            if (index == numRows - 1) {
+                direction = -1;
+            }
+            index = index + direction;
+        }
+        // next we need to convert the zigzag string row by row to get our return string
+        String result = "";
+        for (int i = 0; i < numRows; i++) {
+            for (Character c : list.get(index)) {
+                result.concat(c.toString());
+            }
+        }
+        return result;
+    }
+
 }
