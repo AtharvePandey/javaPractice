@@ -1862,20 +1862,21 @@ public class App {
 
     }
 
-    //given an array of numbers, ascending or descending by some constant, once number is removed
-    //we need to return that number 
+    // given an array of numbers, ascending or descending by some constant, once
+    // number is removed
+    // we need to return that number
 
-    //we are told the first and last number wont be the removed one
-    
-    public int missingNumber(int[] arr){
-        int jmpLength = (arr[arr.length-1] - arr[0]) / arr.length;
-        for(int i = 0; i<arr.length-1;i++){
-            if(Math.abs(arr[i] - arr[i+1]) != jmpLength){
-                if(arr[i] < arr[i+1])//this is when the array is in increasing order
-                return arr[i] + jmpLength;
+    // we are told the first and last number wont be the removed one
 
-                else{
-                    return arr[i] - jmpLength; //decreasing order
+    public int missingNumber(int[] arr) {
+        int jmpLength = (arr[arr.length - 1] - arr[0]) / arr.length;
+        for (int i = 0; i < arr.length - 1; i++) {
+            if (Math.abs(arr[i] - arr[i + 1]) != jmpLength) {
+                if (arr[i] < arr[i + 1])// this is when the array is in increasing order
+                    return arr[i] + jmpLength;
+
+                else {
+                    return arr[i] - jmpLength; // decreasing order
                 }
             }
         }
@@ -2410,17 +2411,20 @@ public class App {
         return nums;
     }
 
-    //given an integer n, return an array of ints from 1->n that are lexicographically sorted
-    //i.e if n is 13, then we return [1,10,11,12,13,2,3,4,5,6,7,8,9]
+    // given an integer n, return an array of ints from 1->n that are
+    // lexicographically sorted
+    // i.e if n is 13, then we return [1,10,11,12,13,2,3,4,5,6,7,8,9]
 
-    public List<Integer> lexicalOrder(int n){
+    public List<Integer> lexicalOrder(int n) {
         ArrayList<Integer> retList = new ArrayList<>();
-        //when looking at the numbers, we can treat them as nodes
-        //since 1 is starting, 1 gets added to array, then we need to add the next numbers as long as they are <= n
-        //so if > n just break
+        // when looking at the numbers, we can treat them as nodes
+        // since 1 is starting, 1 gets added to array, then we need to add the next
+        // numbers as long as they are <= n
+        // so if > n just break
 
-        //gotta take a dfs approach, where 1 is root, its children in first level are 10,11,...19
-        //each nodes' child is 10* more since its in the next level
+        // gotta take a dfs approach, where 1 is root, its children in first level are
+        // 10,11,...19
+        // each nodes' child is 10* more since its in the next level
         Function<Integer, Void> dfs = new Function<Integer, Void>() {
             @Override
             public Void apply(Integer x) {
@@ -2436,7 +2440,7 @@ public class App {
                 return null;
             }
         };
-        for(int i = 1; i<10;i++){
+        for (int i = 1; i < 10; i++) {
             dfs.apply(i);
         }
         return retList;
@@ -2919,7 +2923,7 @@ public class App {
     }
 
     // Given a BST perform a zigzag traversal, i.e from root, visit first level
-    // right to left, then second level left to right etc
+    // right to left (not normal), then second level left to right (normal)
     // return order of traversal in a list
 
     public List<List<Integer>> zigZagtraversal(TreeNode root) {
@@ -3219,36 +3223,113 @@ public class App {
         return arr[0] > arr[1] ? arr[0] : arr[1];
     }
 
+    // You are given an integer array nums of length n.
+    // In one operation, choose any subarray nums[l...r] (0 <= l <= r < n) and
+    // replace each element in that subarray with the bitwise AND of all elements.
+    // Return the minimum number of operations required to make all elements of nums
+    // equal.
+    // A subarray is a contiguous non-empty sequence of elements within an array.
+    public int minOperations(int[] nums) {
+        // basically if all elements are equal then we have 0 elements to change
+        // else we have to change all elements using 1 operation (take the entire array
+        // as range and bitwise and to make the elements equal...this counts as 1
+        // operation)
+        boolean numOperations = true;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] != nums[i - 1]) {
+                numOperations = false;
+            }
+        }
+        return numOperations ? 0 : 1;
+    }
 
-    // // You are given two integers num1 and num2.
-    // // In one operation, you can choose integer i in the range [0, 60] and subtract 2^i + num2 from num1.
-    // // Return the integer denoting the minimum number of operations needed to make num1 equal to 0.
-    // // If it is impossible to make num1 equal to 0, return -1.
-    // public int makeTheIntegerZero(int num1, int num2) {
-    //     // num1 = num1 - (2^i + num2) is 1 operation, we need the minimum number of operations to get num1 = 0
-    //     //lets say it takes 3 operations to reach 0 that means we substracted 2^i - num2 3 times from num 1
-    //     //if we substitute k for number of operations, then it becomes num1 - k(2^i - num2) = 0;
-    //     //we wanna solve for k to get the number of operations:
-    //     //  num1 = -k(2^i - num2);
-    //     //  - num1 / (2^i - num2) = k;
+    // You are given a string s consisting only of lowercase English letters.
+    // You can perform the following operation any number of times (including zero):
+    // Choose any character c in the string and replace every occurrence of c with
+    // the next lowercase letter in the English alphabet.
+    // Return the minimum number of operations required to transform s into a string
+    // consisting of only 'a' characters.
+    // Note: Consider the alphabet as circular, thus 'a' comes after 'z'.
 
-    //     //above equation will give us k, if we know the value of i, i.e if 'i' is 5, then we can calculate exact value of k
-    //     //but we don't know i, and will have to iterate through values of i from 0 -> 60
-    //     //and since we want to return the smallest whole integer k, we can return the first instance of a whole number k...
+    public int minOperations(String s) {
 
-    //     //also since int is inherently a whole number, and since we can have decimals when we solve for k, we have to use a float
-    //     for(double i = 0; i<60; i++){
-    //         double k = -(num1 / ((Math.pow(2, i)) - num2));
-    //         if(k % 1 == 0){
-    //             return (int) k;
-    //         }
-    //     }
-    //     return -1;
+        // we need to do amount of operations as the character furthest from 'a'
+        // we can calculate character furthest from 'a' by substracting this character
+        // from 'a'.... and we take that and substract 26 because we sort of want the
+        // compliment
+        // since we only go from a-z in one direction
+        // i.e say we have z, z - a = 25 since there are 25 letters, and a is at
+        // position 1
 
-    // }
+        int minOperations = 0;
+        for (char c : s.toCharArray()) {
+            if (c == 'a') {
+                continue;
+            }
+            minOperations = Math.max(minOperations, (26 - ((int) c - (int) 'a')));
+        }
+        return minOperations;
+    }
 
-    //small compute error above
+    // No-Zero integer is a positive integer that does not contain any 0 in its
+    // decimal representation.
+    // Given an integer n, return a list of two integers [a, b] where:
+    // a and b are No-Zero integers.
+    // a + b = n
+    // The test cases are generated so that there is at least one valid solution.
+    // If there are many valid solutions, you can return any of them.
 
-    
+    public int[] getNoZeroIntegers(int n) {
+        int[] retArr = new int[2];
+        for (int i = 1; i < n; i++) { // we start looping through 1 since it avoids an extra loop through
+            int a = i;
+            int b = n - i;
+            if (a + b == n && containsNoZero(a) && containsNoZero(b)) {
+                retArr[0] = a;
+                retArr[1] = b;
+                return retArr;
+            }
+        }
+        return retArr;
+    }
+    private boolean containsNoZero(int n) {
+        boolean retBool = true;
+        // we need to go through each digit, and see if it is a zero
+        // we can update n until its 0 itself (that means there is no 0)
+        // i.e take 1009, the number % 10 gives 9, so no 0
+        // lets take out the 9, we can update n and look at just 100
+        // we do get 0 when we mod by 10 so set bool to false and return
+        while (n != 0) {
+            if (n % 10 == 0) {
+                retBool = false;
+                return retBool;
+            }
+            n = (int) Math.floor(n / 10);
+        }
+        return retBool;
 
+    }
+
+    // You are given an integer array nums with distinct elements.
+    // A subarray nums[l...r] of nums is called a bowl if:
+    // The subarray has length at least 3. That is, r - l + 1 >= 3.
+    // The minimum of its two ends is strictly greater than the maximum of all
+    // elements in between. That is, min(nums[l], nums[r]) > max(nums[l + 1], ...,
+    // nums[r - 1]).
+    // Return the number of bowl subarrays in nums.
+
+    public long bowlSubarrays(int[] nums) {
+        long ans = 0;
+        Stack<Integer> s = new Stack<>();
+        for(int i = 0; i<nums.length; i++){
+            while(!s.empty() && nums[s.peek()] < nums[i]){
+                s.pop();
+                if(!s.empty()){
+                    ans++;
+                }
+            }
+            s.push(i);
+        }
+        return ans;
+    }
 }
