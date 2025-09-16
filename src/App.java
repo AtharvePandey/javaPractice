@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 //import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Pattern;
@@ -3337,9 +3338,9 @@ public class App {
     // The string "PAYPALISHIRING" is written in a zigzag pattern on a given number
     // of
     // rows like this:
-    //     P   A   H   N
-    //     A P L S I I G
-    //     Y   I   R
+    // P A H N
+    // A P L S I I G
+    // Y I R
     // And then read line by line: "PAHNAPLSIIGYIR"
     // Write the code that will take a string and make this conversion given a
     // number
@@ -3396,39 +3397,191 @@ public class App {
     // the signed 32-bit integer range [-231, 231 - 1], then return 0.
 
     public int reverse(int x) {
-        //we just need to extract the 1's place to construct our new number
-        //then we need to add it to the changing result
-        //result will be 0 to begin with
+        // we just need to extract the 1's place to construct our new number
+        // then we need to add it to the changing result
+        // result will be 0 to begin with
         long result = 0;
         boolean neg = x < 0 ? true : false;
-        //how would we add to changing result?
-        //well its 0 to start
-        //assume x is 123, then first digit for new number we extract is 3
-        //result becomes 3
-        //x becomes 12
-        //next we extract 2...notice how we extract then update
-        //how do we update result? it should become 32
-        //we basically take the old result, move the 3 to tens place and add the new number
-        //so equation becomes result = result * 10 + extracted number
-        //we also need to check bounds
-        int bound = x < 0 ? Integer.MIN_VALUE : Integer.MAX_VALUE; 
-        //and as per result equation, we need to set 10 to be either +10 or -10 
-        //because reverse of negative number has to be negative
+        // how would we add to changing result?
+        // well its 0 to start
+        // assume x is 123, then first digit for new number we extract is 3
+        // result becomes 3
+        // x becomes 12
+        // next we extract 2...notice how we extract then update
+        // how do we update result? it should become 32
+        // we basically take the old result, move the 3 to tens place and add the new
+        // number
+        // so equation becomes result = result * 10 + extracted number
+        // we also need to check bounds
+        int bound = x < 0 ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        // and as per result equation, we need to set 10 to be either +10 or -10
+        // because reverse of negative number has to be negative
         int scale = 10;
-        while(x != 0){
-            //we loop till we're done processing the number
+        while (x != 0) {
+            // we loop till we're done processing the number
 
-            //lets start by extracting the first number into result
-            //we will extract by % 10 since that gives us the remainder in 1's digit
+            // lets start by extracting the first number into result
+            // we will extract by % 10 since that gives us the remainder in 1's digit
 
-            result = result * scale + (x%10);
-            
+            result = result * scale + (x % 10);
 
-            //next we update x
-            x = x/10;
+            // next we update x
+            x = x / 10;
         }
-        if(neg ? result < bound : result > bound) return 0;
+        if (neg ? result < bound : result > bound)
+            return 0;
         return (int) result;
+    }
+
+    // given an int, return its compliment
+    // i.e 5 in binary is 101, return 010 which is 2
+
+    public int compliment(int x) {
+
+        if (x == 0) { // this is an edgecase
+            return 1;
+        }
+
+        // an int is 32 bits, so when we have something like x = 5
+        // its actually 0000...101 32 bits
+        // if we compliment it, we get 1111...010 which is not 2, but some other big
+        // number
+        // so after we compliment, we need to extract the right n most bits since those
+        // are the flipped ones
+
+        // there are a couple ways to extract bits, but how would we calculate the
+        // rightmost n bits?
+        // we need to figure out what n is to make our mask
+
+        // and our mask will be something like 0000...111 where 111 represents the bits
+        // we want
+        // we can & the mask with the compliment of x to get our final answer
+        int num = x;
+        int mask = 1;
+        // how do we calculate mask? we need to see how many bits represent x
+        // how do we do that?
+        // we can go through the bits in x, and right shift them off x until x is 0
+        // for each rightshift to x, we left shift mask
+        // and 1 gets added as we do leftshift
+
+        while (num != 0) {
+            mask = (mask << 1) | 1; // we | with 1 because when we leftshift the mask, the next bit is 0, we want
+                                    // them all to be 1
+            num = num >> 1; // we rightshift num by 1 so that 'for each' bit in num, we have a bit in our
+                            // mask
+        }
+
+        // now we have our mask
+        return ~x & mask;
+    }
+
+    // Implement the myAtoi(string s) function, which converts a string to a 32-bit
+    // signed integer.
+    // The algorithm for myAtoi(string s) is as follows:
+    // Whitespace: Ignore any leading whitespace (" ").
+    // Signedness: Determine the sign by checking if the next character is
+    // '-' or '+', assuming positivity if neither present.
+    // Conversion: Read the integer by skipping leading zeros until a
+    // non-digit character is encountered or the end of the string is reached. If no
+    // digits were read, then the result is 0.
+    // Rounding: If the integer is out of the 32-bit signed integer range
+    // [-231, 231 - 1], then round the integer to remain in the range.
+    // Specifically, integers less than -231 should be rounded to -231,
+    // and integers greater than 231 - 1 should be rounded to 231 - 1.
+    // Return the integer as the final result.
+
+    // public int myAtoi(String s) {
+    // //first lets tackle the whitespace thing
+    // s = s.trim(); //this will get rid of all whitespace throughout the string
+    // //next lets make a boolean which will let us know when we are finished
+    // reading in
+    // //leading 0's
+    // boolean readingZero = true;
+    // //now lets account for converting chars to numbers via hashmap
+    // //we can just do Character.getNumericalValue(c);'
+
+    // //this is the result to return
+    // int result = 0;
+
+    // //now we traverse and read char by char
+    // for(int i = 0; i<s.length(); i++){
+    // //we need to first make sure this current char is not a 0
+    // //also i feel a while loop would be better
+    // }
+
+    // }
+
+    // given an array of positive ints, and a number k, we need to return the maxsum
+    // possible
+    // of the k distinct elementss
+
+    public int[] maxKDistinct(int[] nums, int k) {
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) { // using a set ensures we don't have distinct elements
+            set.add(num);
+        }
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        maxHeap.addAll(set);
+
+        int[] retArr = new int[k];
+        for (int i = 0; i < retArr.length; i++) {
+            retArr[i] = maxHeap.poll();
+        }
+        return retArr;
+    }
+
+
+    //given linked list, swap the nodes in pairs. i.e two adjacent nodes get swpped
+    //if there are an odd number of nodes, then the last node doesn't need to get swapped. 
+
+    public ListNode swapPairs(ListNode head) {
+        // now we just need to call swapNodes with 2 pairs
+        // if list is odd, the last node doesn't get swapped
+        if (head == null) {
+            return head;
+        }
+        ListNode retNode = head;
+        ListNode first = head;
+        ListNode second = head.next;
+        if (second == null) { // we only have 1 node, nothing to swap
+            return retNode;
+        }
+
+        while (second != null) {
+            swapNodes(first, second);
+            first = second.next;
+            second = second.next == null ? null : second.next;
+            if (second == null) {
+                break;
+            } else {
+                second = second.next;
+            }
+        }
+
+        return retNode;
+    }
+
+    private void swapNodes(ListNode one, ListNode two) {
+        // to swap 2 nodes (and the question says we can't just switch values)
+        // we have to manipulate what the nodes point to
+
+        // 1 -> 2 -> 3 -> 4 //say we swap 1 and 2, this means list should be
+        // 2 -> 1 -> 3 -> 4 //which means 1 points to 2's next
+        // and 2's next becomes 1
+
+        // what about from this list:
+        // 1 -> 2 -> 3 -> 4 we wanna swap 2 and 3
+        // this means 2's next becomes 3's next
+        // and 3's next becomes 1's next (it's previous' next)
+
+        // it would be easier if we just swap the values
+
+        // the only reason the problem is medium is because of the swapping logic, not
+        // the 'inpairs' logic
+        // work on this logic later...
+        int temp = one.val;
+        one.val = two.val;
+        two.val = temp;
     }
 
 }

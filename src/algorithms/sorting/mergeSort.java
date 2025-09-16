@@ -20,6 +20,7 @@ public class mergeSort {
     }
 
     private void sort(int[] arr){ //merge sort implementation
-        
+        //happens in 2 parts, we divide array into 2 parts
+        //recursively merge the two parts
     }
 }
