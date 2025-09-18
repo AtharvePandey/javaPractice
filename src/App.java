@@ -29,8 +29,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int x = 1534236469;
-        app.reverse(x);
+        int[] x = { 2, 2 };
+        app.searchRange(x, 2);
     }
 
     public ListNode tempfunction1() {
@@ -1021,6 +1021,105 @@ public class App {
         // The left pointer is greater than the right pointers, we have exhausted the
         // num list, return -1
         return -1;
+    }
+
+    // we have an array sorted from low to high, with distinct values.
+    // the array might be rotated such that resulting array becomes
+    // nums[k], nums[k+1] ... nums [n-1] nums[n] nums[0].
+    // we need to find our target value
+    // this can obviously be done in o(n) time, but can we do better?
+
+    public int search(int[] nums, int target) {
+        // lets do a binary search
+        // but our search condition and how we move low and high pointers will be
+        // different
+        // since the array might be rotated, we will move our pointers accordingly
+        int low = 0;
+        int high = nums.length - 1;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (nums[mid] == target) {
+                return mid; // we wanna return index of the target
+            }
+            // else
+            // now we need to figure out which half to search
+            // but the array might be rotated
+            // what are the possible cases?
+
+            // we need to check which halfs are sorted
+            // if arr[low] <= arr[mid] this means we are ascending from low to mid
+            // then we can check if target is in that range, and if it is, set high to mid-1
+            // else we can set low = mid + 1, and check the right half
+            if (nums[low] <= nums[mid]) { // if the left half is sorted
+                if (nums[low] <= target && target <= nums[mid]) { // then check if target is in that range
+                    high = mid - 1; // if it is eliminate the right half since we dont want that
+                } else {
+                    low = mid + 1; // otherwise don't eliminate the right half
+                }
+            } else {
+                if (nums[mid] <= target && target <= nums[high]) { // if left half is not sorted, check if target is in
+                                                                   // right half
+                    low = mid + 1; // if it is in right half then eliminate left half
+                } else {
+                    high = mid - 1; // else eliminate right half
+                }
+            }
+        }
+        return -1;
+    }
+
+    // given a sorted int array, increasing order, we need to find the start and
+    // ending positions
+    // of our target value, and return an array of start index, end index
+
+    // e.g [5,7,7,8,8,10] //return value = [1, 2] if target is 7
+
+    public int[] searchRange(int[] nums, int target) {
+        // run binary search twice, once to find the left most index of target
+        // and second to find right most index
+
+        int index = Integer.MAX_VALUE; // this is a temp value
+        int[] retArr = new int[2];
+        // first lets find the leftmost index for target by binary search
+
+        int low = 0;
+        int high = nums.length - 1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (nums[mid] == target) {
+                index = Math.min(mid, index); // left most index will be the smallest
+                high = mid - 1;
+            } else if (target <= nums[mid]) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        // we have our first left most index
+        retArr[0] = index == Integer.MAX_VALUE ? -1 : index;
+        index = Integer.MIN_VALUE;
+        low = 0;
+        high = nums.length - 1;
+
+        // now we do a second binary search for the rightmost index
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (nums[mid] == target) {
+                index = Math.max(mid, index); // now we want the rightmost number
+                low = mid + 1;
+            } else if (target <= nums[mid]) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        retArr[1] = index == Integer.MIN_VALUE ? -1 : index;
+
+        return retArr;
     }
 
     // We are given an array asteroids of integers representing asteroids in a row.
@@ -3530,9 +3629,9 @@ public class App {
         return retArr;
     }
 
-
-    //given linked list, swap the nodes in pairs. i.e two adjacent nodes get swpped
-    //if there are an odd number of nodes, then the last node doesn't need to get swapped. 
+    // given linked list, swap the nodes in pairs. i.e two adjacent nodes get swpped
+    // if there are an odd number of nodes, then the last node doesn't need to get
+    // swapped.
 
     public ListNode swapPairs(ListNode head) {
         // now we just need to call swapNodes with 2 pairs
