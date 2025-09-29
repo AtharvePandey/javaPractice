@@ -3770,4 +3770,80 @@ public class App {
         }
     }
 
+
+    //given an int like 102, ot 537, return an array in decreasing order
+    //which contains the number evaluated in sci notation
+    // e.g if 102, return [100, 2]
+    // if 537, return [500, 30, 7]
+
+    public int[] decimalRepresentation(int n){
+        //in java arrays don't have pushback methods or something cool like that
+        ArrayList<Integer> list = new ArrayList<>();
+        //now we need to go through the number
+        int exp = 0; //this is 0 to start
+        double currDigit;
+        while(n != 0){
+            //until we exhaust our number
+            //lets calculate the current digit, starting from 0 (going right to left)
+            currDigit = (n%10) * Math.pow(10, exp);
+            if(currDigit != 0){
+                list.add((int)currDigit);
+            }
+            exp+=1;
+            n = n / 10;
+        }
+        //now we populated our list
+        Collections.reverse(list);
+        
+        return arrayify(list);
+    }
+
+    public int[] arrayify(List<Integer> list){
+        int[] retArr = new int[list.size()];
+        for(int i = 0; i<retArr.length; i++){
+            retArr[i] = list.get(i);
+        }
+        return retArr;
+    }
+
+
+
+    //given an array, we need to split it into 2 subarrays
+    //such that the left subarray is strictly increasing, and the right subarray
+    //is strictly decreasing
+
+    //then we need to return the minimum possible absolute difference between the sums of left and right
+    //return -1 if no split exists
+
+    public int splitArray(int[] nums){
+        //sliding window problem, since we can't reorder, we should build a window which matches criteria 
+    }
+
+    //given an array of nums, return true if you can split the array into 2
+    //such that each half contains distinct elements
+
+    //we will always be passed an even length array 
+
+    public boolean canSplit(int[] nums){
+        //we will always have an even length array
+        //all we have to do is check the array
+        //such that if there are duplicates, there are only 2 of them
+        //lets use a map, return false if count of any key is > 2
+        //true otherwise
+
+        HashMap <Integer, Integer> hm = new HashMap<>();
+        for(int num : nums){
+            hm.put(num, 1 + hm.getOrDefault(num, 0));
+        }
+
+        final boolean[] bool = {true};
+
+        hm.forEach((key ,value) -> {
+            if(value > 2){
+                bool[0] = false;
+            }
+        });
+        return bool[0];
+    }
+
 }
