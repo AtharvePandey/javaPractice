@@ -29,8 +29,7 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] x = { 2, 2 };
-        app.searchRange(x, 2);
+        app.fractionToDecimal(3, 12);
     }
 
     public ListNode tempfunction1() {
@@ -3211,9 +3210,60 @@ public class App {
     // If the node is found, delete the node.
 
     public TreeNode deleteNode(TreeNode root, int key) {
-        // very complicated i would just memorize this one
-        // makes no sense
-        return null;
+
+        //so base case is if root is null, return null
+        if(root == null){
+            return root;
+        }else if(key < root.val){
+            //lets traverse the left subtree in search of the value
+            root.left = deleteNode(root.left, key);
+        }else if(key > root.val){
+            //go into the right subtree
+            root.right = deleteNode(root.right, key);
+        }else{
+            //we found our node, since the value is not greater/less than or equal to key
+            //so here we have 3 cases
+
+            //1. if this node has no children, just deallocate it and return null
+            if(root.left == null && root.right == null){
+                root = null;
+            }
+
+            //2. if root only has one child
+            // in this case all we do is set the childs child to our root.left/right depending on whats not null
+            else if(root.left == null){
+                //this means right is not null, there is a right child
+                //so we set root to the child of root thats not null
+                root = root.right;
+            }
+            else if(root.right == null){
+                root = root.left;
+            }
+
+            //3. if there exists a left and right child
+            // in this case, find the min of right subtree or max of left subtree
+            // copy that into root val, and then remove the duplicate node from right subtree down (or left)
+            else{
+                //neither is null
+                int val = minValInTree(root.right, Integer.MIN_VALUE);
+                root.val = val;
+                root.right = deleteNode(root.right, val);
+            }
+        }
+        return root;
+    }
+
+    private int minValInTree(TreeNode root, Integer minVal){
+        if(root == null){
+            return minVal; //if we have explored everything, return min of this subtree
+        }
+
+        minVal = Math.min(minVal, root.val);
+
+        int left = minValInTree(root.left, minVal);
+        int right = minValInTree(root.right, minVal);
+
+        return Math.min(left, right);
     }
 
     // Within a binary tree, a node x is considered good if the path from the root
@@ -3681,6 +3731,43 @@ public class App {
         int temp = one.val;
         one.val = two.val;
         two.val = temp;
+    }
+
+
+    //given 2 integers, numerator and denominator, return a string of the decimal representation.
+
+    /*
+     * 
+     *  examples, numerator 3 denominator 12
+     *  3/12 = 12 | 3; 0.0 -> 12 | 30; 0.02 r6; 12 | 6 = 5 -> 0.025; //so after we are done moving decimals, 
+     * 
+     */
+
+    public String fractionToDecimal(int numerator, int denominator){
+        StringBuilder decimal = new StringBuilder();
+        //take an example, 3/12
+        //what do we usually do? 
+        //we multiply the numerator by 10, and see if we can divide with a valid remainder, if not, add 0 to the running decimal, and multiply by 10 again
+        //our constraint is that we are guaranteed 10^4 `
+        if(numerator < denominator){
+            //our decimal will start with "0.xyz"
+            decimal.append("0.");
+            //then we have to convert numerator so that we can divide
+            while (numerator < denominator) {
+                numerator *= 10;
+            }
+            //then we start by getting values to build our decimal
+            //since we know ans will have 10^4 at most
+            while(numerator != 0 || decimal.length() > Math.pow(10, 4)){
+                decimal.append((char)Math.floor(denominator / numerator));
+                if(numerator < denominator){
+                    numerator *= 10;
+                }
+            }
+            return decimal.toString();
+        }else{
+            return "0"; //just to test rn
+        }
     }
 
 }
