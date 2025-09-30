@@ -3211,40 +3211,41 @@ public class App {
 
     public TreeNode deleteNode(TreeNode root, int key) {
 
-        //so base case is if root is null, return null
-        if(root == null){
+        // so base case is if root is null, return null
+        if (root == null) {
             return root;
-        }else if(key < root.val){
-            //lets traverse the left subtree in search of the value
+        } else if (key < root.val) {
+            // lets traverse the left subtree in search of the value
             root.left = deleteNode(root.left, key);
-        }else if(key > root.val){
-            //go into the right subtree
+        } else if (key > root.val) {
+            // go into the right subtree
             root.right = deleteNode(root.right, key);
-        }else{
-            //we found our node, since the value is not greater/less than or equal to key
-            //so here we have 3 cases
+        } else {
+            // we found our node, since the value is not greater/less than or equal to key
+            // so here we have 3 cases
 
-            //1. if this node has no children, just deallocate it and return null
-            if(root.left == null && root.right == null){
+            // 1. if this node has no children, just deallocate it and return null
+            if (root.left == null && root.right == null) {
                 root = null;
             }
 
-            //2. if root only has one child
-            // in this case all we do is set the childs child to our root.left/right depending on whats not null
-            else if(root.left == null){
-                //this means right is not null, there is a right child
-                //so we set root to the child of root thats not null
+            // 2. if root only has one child
+            // in this case all we do is set the childs child to our root.left/right
+            // depending on whats not null
+            else if (root.left == null) {
+                // this means right is not null, there is a right child
+                // so we set root to the child of root thats not null
                 root = root.right;
-            }
-            else if(root.right == null){
+            } else if (root.right == null) {
                 root = root.left;
             }
 
-            //3. if there exists a left and right child
+            // 3. if there exists a left and right child
             // in this case, find the min of right subtree or max of left subtree
-            // copy that into root val, and then remove the duplicate node from right subtree down (or left)
-            else{
-                //neither is null
+            // copy that into root val, and then remove the duplicate node from right
+            // subtree down (or left)
+            else {
+                // neither is null
                 int val = minValInTree(root.right, Integer.MIN_VALUE);
                 root.val = val;
                 root.right = deleteNode(root.right, val);
@@ -3253,9 +3254,9 @@ public class App {
         return root;
     }
 
-    private int minValInTree(TreeNode root, Integer minVal){
-        if(root == null){
-            return minVal; //if we have explored everything, return min of this subtree
+    private int minValInTree(TreeNode root, Integer minVal) {
+        if (root == null) {
+            return minVal; // if we have explored everything, return min of this subtree
         }
 
         minVal = Math.min(minVal, root.val);
@@ -3373,20 +3374,20 @@ public class App {
         return arr[0] > arr[1] ? arr[0] : arr[1];
     }
 
-    //given a root node of bst and a number sum
-    //return true if there exists a path from root to leaf which totals sum
-    //false otherwise
-    
-    public boolean findSumPath(TreeNode root, int targetSum){
+    // given a root node of bst and a number sum
+    // return true if there exists a path from root to leaf which totals sum
+    // false otherwise
+
+    public boolean findSumPath(TreeNode root, int targetSum) {
         int currSum = 0;
         return traverse(root, targetSum, currSum);
     }
 
-    private boolean traverse(TreeNode root, int targetSum, int currSum){
-        if(root == null && targetSum == currSum){
-            return true; //we reached a leaf, and our current sum is our target sum
+    private boolean traverse(TreeNode root, int targetSum, int currSum) {
+        if (root == null && targetSum == currSum) {
+            return true; // we reached a leaf, and our current sum is our target sum
         }
-        //lets traverse to the left and right subtrees
+        // lets traverse to the left and right subtrees
         traverse(root.left, targetSum, currSum += root.val);
         traverse(root.right, targetSum, currSum += root.val);
 
@@ -3753,110 +3754,111 @@ public class App {
         two.val = temp;
     }
 
-
-    //given 2 integers, numerator and denominator, return a string of the decimal representation.
+    // given 2 integers, numerator and denominator, return a string of the decimal
+    // representation.
 
     /*
      * 
-     *  examples, numerator 3 denominator 12
-     *  3/12 = 12 | 3; 0.0 -> 12 | 30; 0.02 r6; 12 | 6 = 5 -> 0.025; //so after we are done moving decimals, 
+     * examples, numerator 3 denominator 12
+     * 3/12 = 12 | 3; 0.0 -> 12 | 30; 0.02 r6; 12 | 6 = 5 -> 0.025; //so after we
+     * are done moving decimals,
      * 
      */
 
-    public String fractionToDecimal(int numerator, int denominator){
+    public String fractionToDecimal(int numerator, int denominator) {
         StringBuilder decimal = new StringBuilder();
-        //take an example, 3/12
-        //what do we usually do? 
-        //we multiply the numerator by 10, and see if we can divide with a valid remainder, if not, add 0 to the running decimal, and multiply by 10 again
-        //our constraint is that we are guaranteed 10^4 `
-        if(numerator < denominator){
-            //our decimal will start with "0.xyz"
+        // take an example, 3/12
+        // what do we usually do?
+        // we multiply the numerator by 10, and see if we can divide with a valid
+        // remainder, if not, add 0 to the running decimal, and multiply by 10 again
+        // our constraint is that we are guaranteed 10^4 `
+        if (numerator < denominator) {
+            // our decimal will start with "0.xyz"
             decimal.append("0.");
-            //then we have to convert numerator so that we can divide
+            // then we have to convert numerator so that we can divide
             while (numerator < denominator) {
                 numerator *= 10;
             }
-            //then we start by getting values to build our decimal
-            //since we know ans will have 10^4 at most
-            while(numerator != 0 || decimal.length() > Math.pow(10, 4)){
-                decimal.append((char)Math.floor(denominator / numerator));
-                if(numerator < denominator){
+            // then we start by getting values to build our decimal
+            // since we know ans will have 10^4 at most
+            while (numerator != 0 || decimal.length() > Math.pow(10, 4)) {
+                decimal.append((char) Math.floor(denominator / numerator));
+                if (numerator < denominator) {
                     numerator *= 10;
                 }
             }
             return decimal.toString();
-        }else{
-            return "0"; //just to test rn
+        } else {
+            return "0"; // just to test rn
         }
     }
 
-
-    //given an int like 102, ot 537, return an array in decreasing order
-    //which contains the number evaluated in sci notation
+    // given an int like 102, ot 537, return an array in decreasing order
+    // which contains the number evaluated in sci notation
     // e.g if 102, return [100, 2]
     // if 537, return [500, 30, 7]
 
-    public int[] decimalRepresentation(int n){
-        //in java arrays don't have pushback methods or something cool like that
+    public int[] decimalRepresentation(int n) {
+        // in java arrays don't have pushback methods or something cool like that
         ArrayList<Integer> list = new ArrayList<>();
-        //now we need to go through the number
-        int exp = 0; //this is 0 to start
+        // now we need to go through the number
+        int exp = 0; // this is 0 to start
         double currDigit;
-        while(n != 0){
-            //until we exhaust our number
-            //lets calculate the current digit, starting from 0 (going right to left)
-            currDigit = (n%10) * Math.pow(10, exp);
-            if(currDigit != 0){
-                list.add((int)currDigit);
+        while (n != 0) {
+            // until we exhaust our number
+            // lets calculate the current digit, starting from 0 (going right to left)
+            currDigit = (n % 10) * Math.pow(10, exp);
+            if (currDigit != 0) {
+                list.add((int) currDigit);
             }
-            exp+=1;
+            exp += 1;
             n = n / 10;
         }
-        //now we populated our list
+        // now we populated our list
         Collections.reverse(list);
-        
+
         return arrayify(list);
     }
 
-    public int[] arrayify(List<Integer> list){
+    public int[] arrayify(List<Integer> list) {
         int[] retArr = new int[list.size()];
-        for(int i = 0; i<retArr.length; i++){
+        for (int i = 0; i < retArr.length; i++) {
             retArr[i] = list.get(i);
         }
         return retArr;
     }
 
+    // given an array, we need to split it into 2 subarrays
+    // such that the left subarray is strictly increasing, and the right subarray
+    // is strictly decreasing
 
+    // then we need to return the minimum possible absolute difference between the
+    // sums of left and right
+    // return -1 if no split exists
 
-    //given an array, we need to split it into 2 subarrays
-    //such that the left subarray is strictly increasing, and the right subarray
-    //is strictly decreasing
-
-    //then we need to return the minimum possible absolute difference between the sums of left and right
-    //return -1 if no split exists
-
-    public int splitArray(int[] nums){
-        //sliding window problem, since we can't reorder, we should build a window which matches criteria 
-        return 0; //some variation of prefix sum
+    public int splitArray(int[] nums) {
+        // sliding window problem, since we can't reorder, we should build a window
+        // which matches criteria
+        return 0; // some variation of prefix sum
     }
 
-    //given an array of nums, return true if you can split the array into 2
-    //such that each half contains distinct elements
+    // given an array of nums, return true if you can split the array into 2
+    // such that each half contains distinct elements
 
-    //we will always be passed an even length array 
+    // we will always be passed an even length array
 
-    public boolean canSplit(int[] nums){
-        //we will always have an even length array
-        //all we have to do is check the array
-        //such that if there are duplicates, there are only 2 of them
-        //lets use a map, return false if count of any key is > 2
-        //true otherwise
+    public boolean canSplit(int[] nums) {
+        // we will always have an even length array
+        // all we have to do is check the array
+        // such that if there are duplicates, there are only 2 of them
+        // lets use a map, return false if count of any key is > 2
+        // true otherwise
 
-        HashMap <Integer, Integer> hm = new HashMap<>();
-        for(int num : nums){
+        HashMap<Integer, Integer> hm = new HashMap<>();
+        for (int num : nums) {
             hm.put(num, 1 + hm.getOrDefault(num, 0));
 
-            if(hm.get(num) > 2){
+            if (hm.get(num) > 2) {
                 return false;
             }
         }
@@ -3864,25 +3866,62 @@ public class App {
         return true;
     }
 
-    //given an int, return a string array where ans[i] is "FizzBuzz" if i is divisible by 3,5
-    //"Fizz" if by 3, "Buzz if by 5"
-    //and i as a string if neither condition is true
+    // given an int, return a string array where ans[i] is "FizzBuzz" if i is
+    // divisible by 3,5
+    // "Fizz" if by 3, "Buzz if by 5"
+    // and i as a string if neither condition is true
 
-    public List<String> fizzBuzz(int n){
+    public List<String> fizzBuzz(int n) {
         List<String> retList = new ArrayList<>(n);
-        for(int i = 1; i<=n;i++){
-            if(i % 3 == 0 && i % 5 == 0){
+        for (int i = 1; i <= n; i++) {
+            if (i % 3 == 0 && i % 5 == 0) {
                 retList.add("FizzBuzz");
-            }else if(i % 3 == 0){
+            } else if (i % 3 == 0) {
                 retList.add("Fizz");
-            }else if(i % 5 == 0){
+            } else if (i % 5 == 0) {
                 retList.add("Buzz");
-            }else{
+            } else {
                 retList.add(String.valueOf(i));
             }
         }
         return retList;
 
+    }
+
+    // calculate running sum of array
+
+    public int[] runningSum(int[] nums) {
+        if (nums.length == 1) {
+            return nums;
+        }
+        int[] sum = new int[nums.length];
+        sum[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            sum[i] = sum[i - 1] + nums[i];
+        }
+        return sum;
+
+    }
+
+    // calculate the richest customer given a 2d matrix where each row is account
+
+    public int maximumWealth(int[][] accounts) {
+        Integer maxSum = Integer.MIN_VALUE;
+        // for each subarray, calculate the prefix sum, and update the maxSum
+        for (int[] account : accounts) {
+            maxSum = Math.max(maxSum, getMaxSum(account));
+        }
+        return maxSum;
+    }
+
+    private int getMaxSum(int[] account) {
+        if (account.length <= 1) {
+            return account[0];
+        }
+        for (int i = 1; i < account.length; i++) {
+            account[i] = account[i - 1] + account[i];
+        }
+        return account[account.length - 1];
     }
 
 }
