@@ -29,8 +29,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] nums = { -5, -3, -2, -1 };
-        app.sortedSquares(nums);
+        int[] nums = { 1, 0, 2, 3, 0, 4, 5, 0 };
+        app.duplicateZeros(nums);
     }
 
     public ListNode tempfunction1() {
@@ -4028,6 +4028,40 @@ public class App {
         }
 
         return result; // sorted and squared in O(n) time compared to nlogn if we trivially do it
+    }
+
+    public void duplicateZeros(int[] arr) {
+        // if we find a 0 in the array, make the next element a 0, and move all elements
+        // down by 1
+        // we don't need to resize the array, and if there is no 0 then there is nothing
+        // wrong
+
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == 0) {
+                shift(arr, i);
+                i++;
+            }
+        }
+
+    }
+
+    // private method to shift the rest of the array given index where we wanna
+    // insert the new 0
+    private void shift(int[] arr, int index) {
+        // index is the position of 0 in the array
+        // [1,0,2,3], index is 1
+        // from 1 onwards, we wanna shift everything down by 1, so [1,0,0,2] is answer
+        // anything at end of array is lost since we don't care about resizing
+
+        for (int i = arr.length - 1; i > index + 1; i--) {
+            //to shift, we need to start from end, and go till 1 after insert position
+            //we copy everything in prev index into this index
+            arr[i] = arr[i - 1];
+        }
+
+        if(index + 1 < arr.length){
+            arr[index+1] = 0; //here we add to the next index, duplicating the 0
+        }
     }
 
 }
