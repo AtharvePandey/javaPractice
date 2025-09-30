@@ -3373,6 +3373,26 @@ public class App {
         return arr[0] > arr[1] ? arr[0] : arr[1];
     }
 
+    //given a root node of bst and a number sum
+    //return true if there exists a path from root to leaf which totals sum
+    //false otherwise
+    
+    public boolean findSumPath(TreeNode root, int targetSum){
+        int currSum = 0;
+        return traverse(root, targetSum, currSum);
+    }
+
+    private boolean traverse(TreeNode root, int targetSum, int currSum){
+        if(root == null && targetSum == currSum){
+            return true; //we reached a leaf, and our current sum is our target sum
+        }
+        //lets traverse to the left and right subtrees
+        traverse(root.left, targetSum, currSum += root.val);
+        traverse(root.right, targetSum, currSum += root.val);
+
+        return false;
+    }
+
     // You are given an integer array nums of length n.
     // In one operation, choose any subarray nums[l...r] (0 <= l <= r < n) and
     // replace each element in that subarray with the bitwise AND of all elements.
@@ -3834,16 +3854,13 @@ public class App {
         HashMap <Integer, Integer> hm = new HashMap<>();
         for(int num : nums){
             hm.put(num, 1 + hm.getOrDefault(num, 0));
+
+            if(hm.get(num) > 2){
+                return false;
+            }
         }
 
-        final boolean[] bool = {true};
-
-        hm.forEach((key ,value) -> {
-            if(value > 2){
-                bool[0] = false;
-            }
-        });
-        return bool[0];
+        return true;
     }
 
 }
