@@ -29,7 +29,7 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        app.fractionToDecimal(3, 12);
+        app.fizzBuzz(3);
     }
 
     public ListNode tempfunction1() {
@@ -3837,6 +3837,7 @@ public class App {
 
     public int splitArray(int[] nums){
         //sliding window problem, since we can't reorder, we should build a window which matches criteria 
+        return 0; //some variation of prefix sum
     }
 
     //given an array of nums, return true if you can split the array into 2
@@ -3861,6 +3862,27 @@ public class App {
         }
 
         return true;
+    }
+
+    //given an int, return a string array where ans[i] is "FizzBuzz" if i is divisible by 3,5
+    //"Fizz" if by 3, "Buzz if by 5"
+    //and i as a string if neither condition is true
+
+    public List<String> fizzBuzz(int n){
+        List<String> retList = new ArrayList<>(n);
+        for(int i = 1; i<=n;i++){
+            if(i % 3 == 0 && i % 5 == 0){
+                retList.add("FizzBuzz");
+            }else if(i % 3 == 0){
+                retList.add("Fizz");
+            }else if(i % 5 == 0){
+                retList.add("Buzz");
+            }else{
+                retList.add(String.valueOf(i));
+            }
+        }
+        return retList;
+
     }
 
 }
