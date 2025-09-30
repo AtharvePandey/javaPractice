@@ -29,7 +29,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        app.fizzBuzz(3);
+        int[] nums = { -5, -3, -2, -1 };
+        app.sortedSquares(nums);
     }
 
     public ListNode tempfunction1() {
@@ -3922,6 +3923,111 @@ public class App {
             account[i] = account[i - 1] + account[i];
         }
         return account[account.length - 1];
+    }
+
+    // Given an integer num, return the number of steps to reduce it to zero.
+    // In one step, if the current number is even, you have to divide it by 2,
+    // otherwise, you have to subtract 1 from it.
+
+    public int numberOfSteps(int n) {
+        int steps = 0;
+        while (n != 0) {
+            if (n % 2 == 0) {
+                n /= 2;
+                steps++;
+            } else {
+                n -= 1;
+                steps++;
+            }
+        }
+        return steps;
+    }
+
+    // Given two strings ransomNote and magazine, return true if
+    // ransomNote can be constructed by using the letters from magazine
+    // and false otherwise
+    // Each letter in magazine can only be used once in ransomNote.
+
+    public boolean canConstruct(String ransomNote, String magazine) {
+        // just make 2 maps for both strings, and then see if key value in one, match
+        // other
+        HashMap<Character, Integer> ransomMap = mapifyString(ransomNote);
+        HashMap<Character, Integer> magazineMap = mapifyString(magazine);
+
+        boolean ret = true;
+
+        for (Map.Entry<Character, Integer> entry : ransomMap.entrySet()) {
+            char c = entry.getKey();
+            int i = entry.getValue();
+            if (!magazineMap.containsKey(c) || magazineMap.get(c) < i) {
+                ret = false;
+                break;
+            }
+        }
+        return ret;
+    }
+
+    // takes in a string and returns a map of char string pairs
+
+    private HashMap<Character, Integer> mapifyString(String str) {
+        HashMap<Character, Integer> retMap = new HashMap<>();
+        char[] chars = str.toCharArray();
+        for (char c : chars) {
+            retMap.put(c, 1 + retMap.getOrDefault(c, 0));
+        }
+        return retMap;
+    }
+
+    // given an array of ints, return how many of them have even digits
+    // [12,23,34,124323,123,123,124,435]
+    // here only 4/8 have even digits (the first 4)
+
+    public int findNumbers(int[] nums) {
+        // nums are anywhere from 0 to 10^5
+        // we can leverage above
+        int number = 0;
+        for (int num : nums) {
+            // if its inbetween 10->99 or 1000 -> 9999
+            if ((num >= 10 && num <= 99) || (num >= 1000 && num <= 9999) || (num >= 100000 && num <= 1000000)) {
+                number++;
+            }
+        }
+        return number;
+    }
+
+    // given an array in non decreasing order of ints
+    // square and return sorted version of each element
+    // [-7,-3,2,3,11] -> [4,9,9,49,121]
+    // obv just squaring and sorting is easy, but takes nlogn at min
+
+    // find an o(n) soln
+
+    public int[] sortedSquares(int[] nums) {
+        // i think a 2 pointer approach here makes sense,
+        // we can have a pointer in either end, and sort the array as we go
+        int i = 0;
+        int j = nums.length - 1;
+
+        // result array to hold squares in sorted order
+        int[] result = new int[nums.length];
+        int k = nums.length - 1; // fill from the back
+
+        // now while j > i
+        while (j >= i) {
+            // compare absolute values at both ends
+            if (Math.abs(nums[i]) < Math.abs(nums[j])) {
+                // right side is larger, so its square goes to the end
+                result[k] = nums[j] * nums[j];
+                j--;
+            } else {
+                // left side is larger (or equal), so its square goes to the end
+                result[k] = nums[i] * nums[i];
+                i++;
+            }
+            k--; // move fill pointer left
+        }
+
+        return result; // sorted and squared in O(n) time compared to nlogn if we trivially do it
     }
 
 }
