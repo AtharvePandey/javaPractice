@@ -29,8 +29,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] nums = { 1, 0, 2, 3, 0, 4, 5, 0 };
-        app.duplicateZeros(nums);
+        int[] nums = {4,3,2,7,8,2,3,1};
+        app.findDisappearedNumbers(nums);
     }
 
     public ListNode tempfunction1() {
@@ -4054,14 +4054,201 @@ public class App {
         // anything at end of array is lost since we don't care about resizing
 
         for (int i = arr.length - 1; i > index + 1; i--) {
-            //to shift, we need to start from end, and go till 1 after insert position
-            //we copy everything in prev index into this index
+            // to shift, we need to start from end, and go till 1 after insert position
+            // we copy everything in prev index into this index
             arr[i] = arr[i - 1];
         }
 
-        if(index + 1 < arr.length){
-            arr[index+1] = 0; //here we add to the next index, duplicating the 0
+        if (index + 1 < arr.length) {
+            arr[index + 1] = 0; // here we add to the next index, duplicating the 0
         }
+    }
+
+    // given an array of nums, find 2 indecies in bounds of the array and distinct
+    // such that the arr[first] is twice arr[second]
+
+    public boolean checkIfExists(int[] arr) {
+        // there are no properties of this array i.e its sorted or not etc.
+        // we could use a bruteforce search to return the indicies
+        // but lets find a better way...
+
+        // we can use a set to keep track of numbers,
+        // and if on computing this number, we see a number already in the set
+        // we can return true
+
+        HashSet<Integer> hs = new HashSet<>();
+
+        for (int num : arr) {
+            if (hs.contains(2 * num) || (num % 2 == 0 && hs.contains(num / 2))) {
+                return true;
+            }
+            hs.add(num);
+        }
+        return false;
+    }
+
+    // given an array, return true if it is a mountain array
+    // its a mountain array if before pivot we are strictly increasing (no
+    // duplicates)
+    // and decreasing after pivot
+
+    public boolean validMountainArray(int[] arr) {
+        // if length is below 3, then we can return false
+        if (arr.length < 3) {
+            return false;
+        }
+
+        int index = 0;
+        // we just need to make sure we don't have duplicates in either half
+        // and both half are either stricly increasing or decreasing
+        while (index + 1 < arr.length && arr[index] < arr[index + 1]) {
+            index++; // this takes us to pivot if it exists, and stops when we are at pivot
+        }
+
+        if (index == arr.length - 1 || index == 0) {
+            return false; // if pivot is at end, we don't have decreasing sequence, and same logic for 0
+        }
+
+        while (index + 1 < arr.length && arr[index] > arr[index + 1]) {
+            index++;
+        }
+
+        return index == arr.length - 1;
+    }
+
+    // give nums array, replace each element with the highest element that appears
+    // to its right
+
+    public int[] replaceElements(int[] arr) {
+        int maxSoFar = -1;
+        for (int i = arr.length; i > 0; i--) {
+            arr[i] = maxSoFar;
+            maxSoFar = Math.max(maxSoFar, arr[i]);
+        }
+        return arr;
+    }
+
+    // given an array, move all 0's to the end
+    // keep order the same
+
+    public int[] moveZeroes(int[] nums) {
+        // we will take a 2 pointer approach where i will be used to iterate
+        // j will be where we swap
+        int j = 0;
+
+        // if the last element is not 0, then we can have j represent the index
+        // after which every element is a 0
+        // [1,45,4,3,0,8,9,0,10]
+        // we want to keep the relative ordering, which means if we find a 0
+        // swap it so order is preserved
+
+        // j will be where we swap to, i is iterator
+
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != 0) {
+                // if this is a non zero element, swap it with j
+                // where j represents index of 0
+                int temp = nums[i];
+                nums[i] = nums[j];
+                nums[j] = temp;
+
+                j++;
+            }
+        }
+        return nums;
+
+    }
+
+    // given an array, move even ints to beginning and odd to end
+
+    public int[] sortArrayByParity(int[] nums) {
+        // its like above move 0's problem
+        // but instead of moving 0's we can focus on moving odds to end of array
+        // which would implicitly keep evens at beginning
+
+        // no need to preserve order since it doesnt matter here
+
+        int j = 0;
+        for (int i = 0; i < nums.length; i++) {
+            // to move odd's at end of list, lets just swap j with arr[i]
+            // if arr[i] % 2 == 0
+
+            if (nums[i] % 2 == 0) {
+                // we found an odd number to swap at j with
+                int temp = nums[i];
+                nums[i] = nums[j];
+                nums[j] = temp;
+
+                j++;
+            }
+        }
+        return nums;
+    }
+
+    // given an arr of nums, find 3rd distinct highest num
+
+    public int thirdMax(int[] nums) {
+        Integer max1 = null;
+        Integer max2 = null;
+        Integer max3 = null;
+
+        for (int n : nums) {
+            // skip duplicates safely (check nulls first)
+            if ((max1 != null && n == max1) ||
+                    (max2 != null && n == max2) ||
+                    (max3 != null && n == max3)) {
+                continue;
+            }
+
+            if (max1 == null || n > max1) {
+                max3 = max2;
+                max2 = max1;
+                max1 = n;
+            } else if (max2 == null || n > max2) {
+                max3 = max2;
+                max2 = n;
+            } else if (max3 == null || n > max3) {
+                max3 = n;
+            }
+        }
+
+        return (max3 == null) ? max1 : max3;
+    }
+
+    // given an array of nums from int 1-n
+    // return an array of nums which do not appear in nums
+
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        //here the important thing is that the array is numbered from 1->n
+        //we can use the input array, and change it so that 
+        //whichever number appears, that index in the list will be negative
+
+        //so in one pass we change the input array
+        //and in a second pass we check which indecies are not negative, 
+        //and add them to return list
+        List<Integer> retList = new ArrayList<>();
+
+        //first pass lets negativeify the list
+        for(int i = 0; i<nums.length;i++){
+            //how do we do this? well we know all numbers in the list
+            //are from 1 -> n
+            //we can calculate the index to make negative by getting
+            //the number at the current index, then going to that number - 1
+            int index = Math.abs(nums[i]) - 1;
+            if(index >= 0 && index < nums.length && nums[index] > 0){ //will throw out of bounds here when we reach a point in arr thats alr neg.
+                nums[index] = -nums[index];
+            }
+        }
+
+        //now in the second pass, we have to see which numbers are positive, and calculate their actual number
+        //and add to the list
+
+        for(int num : nums){
+            if(num > 0){
+                retList.add((-1 * num) + 1); //calculate the actual number, and make it a positive
+            }
+        }
+        return retList;
     }
 
 }
