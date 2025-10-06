@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 //import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -29,8 +30,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] nums = {4,3,2,7,8,2,3,1};
-        app.findDisappearedNumbers(nums);
+        String str = "jshdbbbkjsdheeeekjhd";
+        app.findLCSubsequence(str); // should be 4 (eeee)
     }
 
     public ListNode tempfunction1() {
@@ -4219,36 +4220,215 @@ public class App {
     // return an array of nums which do not appear in nums
 
     public List<Integer> findDisappearedNumbers(int[] nums) {
-        //here the important thing is that the array is numbered from 1->n
-        //we can use the input array, and change it so that 
-        //whichever number appears, that index in the list will be negative
+        // here the important thing is that the array is numbered from 1->n
+        // we can use the input array, and change it so that
+        // whichever number appears, that index in the list will be negative
 
-        //so in one pass we change the input array
-        //and in a second pass we check which indecies are not negative, 
-        //and add them to return list
+        // so in one pass we change the input array
+        // and in a second pass we check which indecies are not negative,
+        // and add them to return list
         List<Integer> retList = new ArrayList<>();
 
-        //first pass lets negativeify the list
-        for(int i = 0; i<nums.length;i++){
-            //how do we do this? well we know all numbers in the list
-            //are from 1 -> n
-            //we can calculate the index to make negative by getting
-            //the number at the current index, then going to that number - 1
+        // first pass lets negativeify the list
+        for (int i = 0; i < nums.length; i++) {
+            // how do we do this? well we know all numbers in the list
+            // are from 1 -> n
+            // we can calculate the index to make negative by getting
+            // the number at the current index, then going to that number - 1
             int index = Math.abs(nums[i]) - 1;
-            if(index >= 0 && index < nums.length && nums[index] > 0){ //will throw out of bounds here when we reach a point in arr thats alr neg.
+            if (index >= 0 && index < nums.length && nums[index] > 0) { // will throw out of bounds here when we reach a
+                                                                        // point in arr thats alr neg.
                 nums[index] = -nums[index];
             }
         }
 
-        //now in the second pass, we have to see which numbers are positive, and calculate their actual number
-        //and add to the list
+        // now in the second pass, we have to see which numbers are positive, and
+        // calculate their actual number
+        // and add to the list
 
-        for(int num : nums){
-            if(num > 0){
-                retList.add((-1 * num) + 1); //calculate the actual number, and make it a positive
+        for (int num : nums) {
+            if (num > 0) {
+                retList.add((-1 * num) + 1); // calculate the actual number, and make it a positive
             }
         }
         return retList;
+    }
+
+    // this class will be given 3 arrays 2 strings 1 int and we need to implement it
+    // in such a way
+    // that we can change a foods rating, or get the best rated food depending on
+    // cuisine
+
+    // for highest rated cuisine, we need to return food based off rating in that
+    // cuisine,
+    // and if 2 foods have same rating return the one which comes alphabetically
+    // prior
+
+    class FoodRatings {
+
+        // gonna have 3 maps here, one is for food to cuisine, since that is common
+        // between food and rating (think joins in db)
+        private Map<String, String> foodCusineMap = new HashMap<>();
+
+        // second map will be for food to rating, since we can use it in second method
+        private Map<String, Integer> foodRatingMap = new HashMap<>();
+
+        // this third map will be for the last method, the last method will return the
+        // highest rated cuisine based off food
+        // and to do that we need an ordered set (tree set)
+        private Map<String, TreeSet<String>> cuisineMap = new HashMap<>();
+
+        public FoodRatings(String[] foods, String[] cuisines, int[] ratings) {
+            // the constructor will init all the maps, we can assume we get equal len arrays
+            for (int i = 0; i < foods.length; i++) {
+                foodCusineMap.put(foods[i], cuisines[i]);
+                foodRatingMap.put(foods[i], ratings[i]);
+            }
+
+            // now to init the last map, we need to put cuisine, and then pass a comparator
+            // for the treeset
+            // this comparator will first sort by ratings, then sort by alphabetical
+
+            Comparator<String> treeComp = (a, b) -> {
+                // we wanna sort by rating first, so we get the rating from our map
+                int ratingOfA = foodRatingMap.get(a);
+                int ratingOfB = foodRatingMap.get(b);
+
+                if (ratingOfA != ratingOfB) { // if the rating isnt the same, then a comparator will put this first and
+                                              // that second if this-that < 0
+                    return ratingOfB - ratingOfA;
+                } else {
+                    return a.compareTo(b); // else we put it by strings, compareTo returns -1 if a comes before b
+                }
+            };
+
+            for (int i = 0; i < cuisines.length; i++) {
+                // for each cuisine, put it in hashmap with food, based off the foods rating
+                // so first init a treeset for that cuisine
+                cuisineMap.putIfAbsent(cuisines[i], new TreeSet<String>(treeComp));
+                // then add the food into that tree set for this cuisine
+                // note food will be added into treeset as distinct, and sorted by rating acc to
+                // comparator
+                cuisineMap.get(cuisines[i]).add(foods[i]);
+            }
+
+        }
+
+        public void changeRating(String food, int newRating) {
+            // to change the rating, just get the food and change the rating of it
+            // but we have to update the maps
+            String cuisine = foodCusineMap.get(food);
+            TreeSet<String> set = cuisineMap.get(cuisine);
+
+            set.remove(food);
+            foodRatingMap.put(food, newRating);
+            set.add(food);
+        }
+
+        public String highestRated(String cuisine) {
+            return cuisineMap.get(cuisine).first();
+        }
+    }
+
+    // given a string, find the longest contiguous subsequence of repeating letters
+
+    public int findLCSubsequence(String str) {
+
+        // function will create a window of the maximum subsequence of repeating
+        // characters
+
+        int i = 0; // left pointer
+        int j = 1; // right pointer
+        int max = 0;
+        if (str.length() == 0) {
+            return 0;
+        }
+        while (j < str.length()) {
+            if (str.charAt(i) == str.charAt(j)) {
+                j++;
+            } else {
+                // we move i forward and j forward, and update max length
+                max = Math.max(max, (j - i));
+                i++;
+                j++;
+            }
+        }
+        return max;
+    }
+
+    // You are given two arrays nums1 and nums2 consisting of positive integers.
+    // You have to replace all the 0's in both arrays with strictly positive
+    // integers
+    // such that the sum of elements of both arrays becomes equal.
+    // Return the minimum equal sum you can obtain, or -1 if it is impossible.
+
+    public long minSum(int[] nums1, int[] nums2) {
+        // we have to observe a few things here
+        // which ever array has a bigger sum is the one we have to get the sum to of the
+        // second array
+        // and the min sum is trivially gonna be the sum of the bigger array.
+
+        // the amound of zero either array has will correlate to 1, since we want a
+        // strictly positive int
+
+        int numZeroForNums1 = 0;
+        int numZeroForNums2 = 0;
+
+        int sum1 = 0;
+        int sum2 = 0;
+
+        // lets calculate first array sum
+
+        for (int num : nums1) {
+            if (num == 0) {
+                numZeroForNums1 += 1;
+            } else {
+                sum1 += 1;
+            }
+        }
+
+        // calculate for nums2
+
+        for (int num : nums2) {
+            if (num == 0) {
+                numZeroForNums2 += 1;
+            } else {
+                sum2 += 1;
+            }
+        }
+
+        int minSum = Math.max(sum1 + numZeroForNums1, sum2 + numZeroForNums2);
+
+        // now we check
+        // whichever array has a bigger sum, the opposite one should have atleast 1 zero
+        // (if it does, return min sum)
+        if ((sum1 + numZeroForNums1 > sum2 + numZeroForNums2 && numZeroForNums2 > 0)
+                || (sum1 + numZeroForNums1 < sum2 + numZeroForNums2 && numZeroForNums1 > 0)) {
+            return minSum;
+        } else {
+            return -1;
+        }
+    }
+
+    // given an mxn matrix, give all possible paths to go from
+    // top left of the grid to bottom right
+
+    public int findPaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+        for (int i = 0; i < n; i++) {
+            dp[0][i] = 1;
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            }
+        }
+
+        return dp[m - 1][n - 1];
     }
 
 }
