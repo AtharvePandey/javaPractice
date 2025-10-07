@@ -4431,4 +4431,55 @@ public class App {
         return dp[m - 1][n - 1];
     }
 
+    //maximize sum of array after k negations, i.e changing value from + -> - or viceversa
+
+    public int largestSumAfterKNegations(int[] nums, int k) {
+        // well we wanna negate all -numbers and 0's
+        // if 0's exists, then we can just negate those until we reach k
+        // and then we can proceed to sum all remaining numbers when we reach k
+
+        Arrays.sort(nums); //this way we have all negative elements
+
+        for(int i = 0; i<nums.length && k > 0; i++){ //while we are iterating through array, and we still have some flips left over
+            if(nums[i] < 0){
+                nums[i] = -nums[i]; //flip the negative numbers, and decrement k
+                k--;
+            }
+        }
+
+        //at this point we decremented k as much as possible and flipped all negative numbers
+        //if k is still > 0, then there are 2 cases
+        //either k is even, so we can just flip the smallest number to neg, and back to positive k times
+        //but no change happens since k is positive else, we flip the smallest number once to negative, and still get max sum
+
+        if(k % 2 == 1){
+            int minIndex = findMin(nums);
+            nums[minIndex] = -nums[minIndex];
+        }
+
+        int sum = 0;
+        for(int num : nums){
+            sum += num;
+        }
+
+        return sum;
+
+
+    }
+
+    //finds index of min ele
+    int findMin(int[] nums){
+        int index = 0;
+        int minNum = Integer.MAX_VALUE;
+
+        for(int i = 0; i<nums.length; i++){
+            if(nums[i] < minNum){
+                index = i;
+                minNum = nums[i];
+            }
+        }
+
+        return index;
+    }
+
 }
