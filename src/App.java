@@ -4431,55 +4431,164 @@ public class App {
         return dp[m - 1][n - 1];
     }
 
-    //maximize sum of array after k negations, i.e changing value from + -> - or viceversa
+    // maximize sum of array after k negations, i.e changing value from + -> - or
+    // viceversa
 
     public int largestSumAfterKNegations(int[] nums, int k) {
         // well we wanna negate all -numbers and 0's
         // if 0's exists, then we can just negate those until we reach k
         // and then we can proceed to sum all remaining numbers when we reach k
 
-        Arrays.sort(nums); //this way we have all negative elements
+        Arrays.sort(nums); // this way we have all negative elements
 
-        for(int i = 0; i<nums.length && k > 0; i++){ //while we are iterating through array, and we still have some flips left over
-            if(nums[i] < 0){
-                nums[i] = -nums[i]; //flip the negative numbers, and decrement k
+        for (int i = 0; i < nums.length && k > 0; i++) { // while we are iterating through array, and we still have some
+                                                         // flips left over
+            if (nums[i] < 0) {
+                nums[i] = -nums[i]; // flip the negative numbers, and decrement k
                 k--;
             }
         }
 
-        //at this point we decremented k as much as possible and flipped all negative numbers
-        //if k is still > 0, then there are 2 cases
-        //either k is even, so we can just flip the smallest number to neg, and back to positive k times
-        //but no change happens since k is positive else, we flip the smallest number once to negative, and still get max sum
+        // at this point we decremented k as much as possible and flipped all negative
+        // numbers
+        // if k is still > 0, then there are 2 cases
+        // either k is even, so we can just flip the smallest number to neg, and back to
+        // positive k times
+        // but no change happens since k is positive else, we flip the smallest number
+        // once to negative, and still get max sum
 
-        if(k % 2 == 1){
+        if (k % 2 == 1) {
             int minIndex = findMin(nums);
             nums[minIndex] = -nums[minIndex];
         }
 
         int sum = 0;
-        for(int num : nums){
+        for (int num : nums) {
             sum += num;
         }
 
         return sum;
 
-
     }
 
-    //finds index of min ele
-    int findMin(int[] nums){
+    // finds index of min ele
+    private int findMin(int[] nums) {
         int index = 0;
         int minNum = Integer.MAX_VALUE;
 
-        for(int i = 0; i<nums.length; i++){
-            if(nums[i] < minNum){
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] < minNum) {
                 index = i;
                 minNum = nums[i];
             }
         }
 
         return index;
+    }
+
+    // make a class which handles data packets
+
+    class Router {
+
+        // inits this class, the memoryLimit is how many packets we can store
+        // I guess we should first figure out where we are storing our Packets
+        // lets define a subclass for packet first
+        class Packet {
+            private int source;
+            private int destination;
+            private int timestamp;
+
+            public Packet(int source, int destination, int timestamp) {
+                this.source = source;
+                this.destination = destination;
+                this.timestamp = timestamp;
+            }
+
+            public int getTimeStamp() {
+                return this.timestamp;
+            }
+
+            public int getSource() {
+                return this.source;
+            }
+
+            public int getDestination() {
+                return this.destination;
+            }
+        }
+
+        // which datastructure to use when storing packets?
+        // well we need to store distinct packets
+        // and we need to keep track of oldest packet i.e sort by timestamp...
+        // so we can use a treeset with comparator
+
+        private Comparator<Packet> timeStampComparator = ((a, b) -> {
+            return b.getTimeStamp() - a.getTimeStamp(); // this will sort in descending order, i.e oldest timestamp is
+                                                        // on top in treeset...
+        });
+
+        private TreeSet<Packet> set;
+        private Queue<Packet> packetQueue;
+        private int maxLen;
+
+        public Router(int memoryLimit) {
+            // lets init the treeset with length memeoryLimit
+            this.set = new TreeSet<>(this.timeStampComparator);
+            this.packetQueue = new LinkedList<>();
+            this.maxLen = memoryLimit;
+        }
+
+        public boolean addPacket(int source, int destination, int timestamp) {
+            Packet toAdd = new Packet(source, destination, timestamp);
+            int currSetLen = this.set.size();
+            if (currSetLen == maxLen) {
+                // then we gotta remove the packet with largest timestamp
+                this.set.removeFirst(); // len = currlen - 1
+                // then lets add
+                this.set.add(toAdd); // len should equal currsetlen if successfull
+                if (currSetLen == this.set.size()) {
+                    this.packetQueue.add(toAdd);
+                    return true;
+                }
+            } else {
+                // we can add packet like normal
+                this.set.add(toAdd); // and the size should be < new size
+                if (currSetLen < this.set.size()) {
+                    this.packetQueue.add(toAdd);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public int[] forwardPacket() {
+            Packet packet = this.packetQueue.poll();
+            this.set.remove(packet);
+
+            int[] retPacket = new int[3];
+            retPacket[0] = packet.getSource();
+            retPacket[1] = packet.getDestination();
+            retPacket[2] = packet.getTimeStamp();
+
+            return retPacket;
+
+        }
+
+        // this method will return the number of Packets in range of startTime, endTime,
+        // and still in set, not forwarded
+        public int getCount(int destination, int startTime, int endTime) {
+            Iterator<Packet> iter = set.iterator();
+            int count = 0;
+            while (iter.hasNext()) {
+                Packet currPacket = iter.next();
+                if (startTime <= currPacket.getTimeStamp() && currPacket.getTimeStamp() <= endTime) {
+                    count++;
+                }
+            }
+            return count;
+        }
     }
 
 }
