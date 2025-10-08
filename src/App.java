@@ -4605,23 +4605,34 @@ public class App {
 
     public int maxEvents(int[][] events) {
 
-        //we can start by sorting events in order,
-        //taking a greedy approach
+        // basically for this one, take a greedy approach
+        // if we wanna maximize/minimize something, we know to take a greedy approach
+        // iff its not a dp problem/we aren't finding combinations of something
+
+        // greedy problem has characteristics of sorting, then greedily selecting
+        // from L-R
+
+        //
+
+        // we can start by sorting events in order,
+        // taking a greedy approach
         Arrays.sort(events, (a, b) -> Integer.compare(a[0], b[0]));
 
-        int day = 0; //this is the current day
-        int index = 0; //this is the current event
-        int numEvents = events.length; //this is the length of the array
-        int result = 0; //this is the final result
+        int day = 0; // this is the current day
+        int index = 0; // this is the current event
+        int numEvents = events.length; // this is the length of the array
+        int result = 0; // this is the final result
 
-        //we can use a priority queue to keep track of events, and if one is expired or not
+        // we can use a priority queue to keep track of events, and if one is expired or
+        // not
         PriorityQueue<Integer> pq = new PriorityQueue<>();
-        while (!pq.isEmpty() || index < numEvents) {
+        while (!pq.isEmpty() || index < numEvents) { // run a loop until we run out of events, or if we reach end of
+                                                     // array
             if (pq.isEmpty()) {
-                day = events[index][0];
+                day = events[index][0]; // update the smallest end day if we dont have one
             }
-            while (index < n && events[index][0] <= day) {
-                pq.offer(events[index][1]);
+            while (index < numEvents && events[index][0] <= day) { // then while we are in bounds of array and day
+                pq.offer(events[index][1]); // add end date for all events starting at this day
                 index++;
             }
             pq.poll();
@@ -4633,6 +4644,73 @@ public class App {
             }
         }
         return result;
+    }
+
+    // given an array of spells, and potions, and a long success
+    // return array where arr[i] represents spells[i] which for that spell,
+    // we need an index which inclusive till end is success
+
+    // note success in potions just means spells[i] * potions[i] >= success
+
+    public int[] successfulPairs(int[] spells, int[] potions, long success) {
+        // for each spell, brute force approach would be to multiply with all potions,
+        // and then figure out
+        // from which index to length of array do we have success
+
+        // put len(potions - index of first success) into return array
+
+        // this would take o(n^2) time.
+
+        // I think we can do better with nlogn or less time (since nlogn is next
+        // fastest)
+
+        // we wanna search for the index first, after multiplying this spell with
+        // potions array
+        // and take difference of that index and len of array, and put it into our ret
+        // array
+
+        // O(n) time for multiplying each spell with potion (no need for n^2 forloops),
+        // and then searching for index
+
+        Arrays.sort(potions); // nlogn
+        int len = potions.length; // this will be used to calculate what we put into retArr
+        int retArr[] = new int[spells.length]; // size has to match our spells array, since for each spell
+        // we wanna return number of successful potions, but no need to multiply every
+        // potion with spell, only
+        // the ones that we look at (log n)
+        for (int i = 0; i < spells.length; i++) {
+            int index = findFirstPotionIndex(potions, spells[i], success);
+            retArr[i] = index == -1 ? 0 : Math.abs(len - index);
+        }
+
+        return retArr;
+
+    }
+
+    private int findFirstPotionIndex(int[] potions, int spell, long success) {
+        // here we assume we got an array which has been multiplied through by spells
+        // we just need to find the find the index where potions[i] < success, not <=
+        // success...
+
+        int low = 0;
+        int high = potions.length - 1;
+        int retIndex = -1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2; // i gotta remember this one, its proven to avoid overflow compared to
+                                              // (low + high) / 2
+            long product = (long) spell * potions[mid]; // calculate the current spell potion combination
+            if (product >= success) {
+                // if mid is greater than success, then lets search left half
+                retIndex = mid; // maybe index directly before could be invalid
+                high = mid - 1;
+            } else {
+                // search the right half for the point
+                low = mid + 1;
+            }
+        }
+
+        return retIndex;
     }
 
 }
