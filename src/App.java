@@ -13,6 +13,8 @@ import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.hamcrest.core.Every;
+
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
 import java.util.Random;
@@ -4589,6 +4591,48 @@ public class App {
             }
             return count;
         }
+    }
+
+    // You are given an array of events where events[i] =
+    // [startDayi, endDayi]. Every event i starts at startDayi and ends
+    // at endDayi.
+
+    // You can attend an event i at any day d where
+    // startDayi <= d <= endDayi. You can only attend one event at
+    // any time d.
+
+    // Return the maximum number of events you can attend.
+
+    public int maxEvents(int[][] events) {
+
+        //we can start by sorting events in order,
+        //taking a greedy approach
+        Arrays.sort(events, (a, b) -> Integer.compare(a[0], b[0]));
+
+        int day = 0; //this is the current day
+        int index = 0; //this is the current event
+        int numEvents = events.length; //this is the length of the array
+        int result = 0; //this is the final result
+
+        //we can use a priority queue to keep track of events, and if one is expired or not
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        while (!pq.isEmpty() || index < numEvents) {
+            if (pq.isEmpty()) {
+                day = events[index][0];
+            }
+            while (index < n && events[index][0] <= day) {
+                pq.offer(events[index][1]);
+                index++;
+            }
+            pq.poll();
+            result++;
+            day++;
+
+            while (!pq.isEmpty() && pq.peek() < day) {
+                pq.poll();
+            }
+        }
+        return result;
     }
 
 }
