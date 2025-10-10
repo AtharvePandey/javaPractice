@@ -32,8 +32,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        String str = "jshdbbbkjsdheeeekjhd";
-        app.findLCSubsequence(str); // should be 4 (eeee)
+        int[] nums = { 1, 2, 3 };
+        app.permute(nums);
     }
 
     public ListNode tempfunction1() {
@@ -2104,13 +2104,71 @@ public class App {
         hm.put(0, 1); // this is the start, since the first prefix sum would be 0
         for (int num : nums) {
             prefixSum += num;
-            int diff = prefixSum - k;
+            int diff = prefixSum - k; // the difference between prefixSum so far in array, and target
 
-            res += hm.getOrDefault(diff, 0);
+            // if we have seen that difference before, (hence why we check the map)
+            // If there was some earlier prefix sum equal to diff,
+            // then the subarray between that earlier index and now sums to k.
+
+            res += hm.getOrDefault(diff, 0); // and we add to res how many times we've seen that prefix sum
             hm.put(prefixSum, 1 + hm.getOrDefault(prefixSum, 0));
         }
         return res;
 
+    }
+
+    // given array and int k, find length of longest subarray whos sum is k
+
+    public int subArraySumOfLenK(int[] nums, int k) {
+        // remember, if we have an array of prefix sums,
+        // we can just quickly calculate the subarray sum where index i is start of
+        // subarray, and index j is end
+        // by doing prefix[j] - prefix[i-1] where prefix is the array of prefix sum of
+        // nums
+
+        // here if prefix sum - k is in map (i.e we've seen it before)
+        // then calculate index and store it in max variable
+        int max = 0;
+        int sum = 0;
+        Map<Integer, Integer> sumIndexMap = new HashMap<>();
+        sumIndexMap.put(0, -1);
+        for (int j = 0; j < nums.length; j++) {
+            sum += nums[j];
+            if (sumIndexMap.containsKey(sum - k)) {
+                max = Math.max(max, j - sumIndexMap.get(sum - k));
+            }
+            sumIndexMap.putIfAbsent(sum, j);
+        }
+        return max;
+    }
+
+    // given an array of 0's and 1's find longes contiguous subarray with equal 0's
+    // and 1's
+
+    public int findLongestEqualZeroAndOne(int[] nums) {
+        // similar to the last problem, we can use prefix sum and index where we have
+        // that sum in a map
+        // and when the sums match, calculate and keep track of the longest difference
+
+        // but in this case, we treat all 0's as -1
+        for (int i = 0; i < nums.length; i++) {
+            nums[i] = nums[i] == 0 ? -1 : nums[i];
+        }
+
+        Map<Integer, Integer> sumIndexMap = new HashMap<>();
+        int prefixSum = 0;
+        int maxSubArrayLen = 0;
+        sumIndexMap.put(0, -1);
+
+        for (int i = 0; i < nums.length; i++) {
+            prefixSum += nums[i];
+            if (sumIndexMap.containsKey(prefixSum)) {
+                int index = sumIndexMap.get(prefixSum);
+                maxSubArrayLen = Math.max(maxSubArrayLen, i - index);
+            }
+            sumIndexMap.putIfAbsent(prefixSum, i);
+        }
+        return maxSubArrayLen;
     }
 
     // end of arrays and hashing section following is 2 pointer
@@ -4711,6 +4769,109 @@ public class App {
         }
 
         return retIndex;
+    }
+
+    // given an array of distinct integers, return all possible permutations
+    // i.e [1,2,3] -> [1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]
+
+    // void backtrack(state):
+    // if (solution found):
+    // record solution
+    // return
+
+    // for (choice in choices):
+    // make(choice)
+    // backtrack(state)
+    // undo(choice)
+
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> retList = new ArrayList<>();
+        // for permutation problems we use a backtrcaking method
+        // the backtracking method basically forms a tree where we choose a different
+        // number/letter each time, to go down that branch and form a different
+        // combination
+
+        // if the method just wanted a number, we would return nums.length factorial
+        // in this case, we can use backtracking to generate other combinations, since
+        // the leafs of our tree represent
+        // the actual permutations
+
+        backtrackPermute(retList, new ArrayList<>(), nums);
+        return retList;
+
+    }
+
+    private void backtrackPermute(List<List<Integer>> retList, List<Integer> newList, int[] nums) {
+        // this method will populate newList with a permutation, and add newList to
+        // retList
+
+        if (newList.size() == nums.length) {
+            retList.add(new ArrayList<>(newList));
+            return;
+        }
+
+        // we iterate over all the numbers in nums
+        for (int num : nums) {
+            // then we choose a number, put into newList, and then backtrack to choose
+            // another number
+            // just have to make sure we don't add the same number
+            if (newList.contains(num)) {
+                continue;
+            }
+
+            newList.add(num); // add this number, and then recall the method
+            backtrackPermute(retList, newList, nums);
+            newList.remove(newList.size() - 1); // this apparently handles duplicates
+        }
+
+        // once we have all of our newLists pushed into retList, we can leave the method
+    }
+
+    // given an array of nums, return a list of all subsets
+    // unlike all combinations having n!, subsets are 2^n
+
+    public List<List<Integer>> subsets(int[] nums) {
+        // like the backtracking problem, but rather than iterating through the numbers,
+        // we choose this number, and backtrack
+        // or we don't choose this number and backtrack...and if we don't choose this
+        // number, we will choose the next number
+        List<List<Integer>> retList = new ArrayList<>();
+        backtrackSubsets(retList, new ArrayList<>(), nums, 0);
+        return retList;
+    }
+
+    private void backtrackSubsets(List<List<Integer>> retList, List<Integer> sets, int[] nums, int start) {
+        // int start represents the next number, if we don't choose this one
+        retList.add(new ArrayList<>(sets));
+
+        for (int i = start; i < nums.length; i++) {
+            sets.add(nums[start]);
+            backtrackSubsets(retList, sets, nums, i + 1);
+            sets.remove(sets.size() - 1);
+        }
+    }
+
+    public double myPow(double x, int n) {
+        // handle negative exponent properly
+        if (n < 0) {
+            return 1.0 / calc(x, -n);
+        }
+        return calc(x, n);
+    }
+
+    private double calc(double x, int n) {
+        if (n == 0) {
+            return 1;
+        }
+
+        // fast exponentiation: divide problem in half
+        double half = calc(x, n / 2);
+
+        if (n % 2 == 0) {
+            return half * half;
+        } else {
+            return x * half * half;
+        }
     }
 
 }
