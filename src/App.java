@@ -4845,7 +4845,7 @@ public class App {
         retList.add(new ArrayList<>(sets));
 
         for (int i = start; i < nums.length; i++) {
-            sets.add(nums[start]);
+            sets.add(nums[i]);
             backtrackSubsets(retList, sets, nums, i + 1);
             sets.remove(sets.size() - 1);
         }
@@ -4872,6 +4872,43 @@ public class App {
         } else {
             return x * half * half;
         }
+    }
+
+    // a set is beautiful if no 2 numbers exist such that a - b == k (strictly equal to k)
+    // given array of nums, and k, find number of beutiful sets
+
+    public int beautifulSubsets(int[] nums, int k) {
+        // this is a backtracking problem, lets get a list of all subsets
+        // then for each subset, we can check if its beautiful or not
+        List<List<Integer>> subset = subsets(nums);
+        int numSets = 0;
+        // traverse the list and call function
+        for (List<Integer> set : subset) {
+            if (beautifulSet(set, k)) {
+                numSets++;
+            }
+        }
+        return numSets - 1;
+    }
+
+    private boolean beautifulSet(List<Integer> set, int k) {
+        // a set is beautiful if no 2 numbers have a difference of k
+        // i.e set[i] - set[j] == k is false
+
+        // we can use the same approach from twosum problem
+        // where if k - set[i] exists in set, return false, else return true
+        // or is it k + set[i]? its +
+
+        Set<Integer> numSet = new HashSet<>();
+        //basically if k + currNum exists in the set (call it b) that means b - currNum = k, and thats bad
+        for(int num : set){
+            if(numSet.contains(k + num) || numSet.contains(k - num)){
+                return false;
+            }
+            numSet.add(num);
+        }
+        return true;
+
     }
 
 }
