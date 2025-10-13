@@ -4874,7 +4874,8 @@ public class App {
         }
     }
 
-    // a set is beautiful if no 2 numbers exist such that a - b == k (strictly equal to k)
+    // a set is beautiful if no 2 numbers exist such that a - b == k (strictly equal
+    // to k)
     // given array of nums, and k, find number of beutiful sets
 
     public int beautifulSubsets(int[] nums, int k) {
@@ -4900,15 +4901,37 @@ public class App {
         // or is it k + set[i]? its +
 
         Set<Integer> numSet = new HashSet<>();
-        //basically if k + currNum exists in the set (call it b) that means b - currNum = k, and thats bad
-        for(int num : set){
-            if(numSet.contains(k + num) || numSet.contains(k - num)){
+        // basically if k + currNum exists in the set (call it b) that means b - currNum
+        // = k, and thats bad
+        for (int num : set) {
+            if (numSet.contains(k + num) || numSet.contains(k - num)) {
                 return false;
             }
             numSet.add(num);
         }
         return true;
 
+    }
+
+    // Given two binary strings a and b, return their sum as a binary string.
+
+    public String addBinary(String a, String b) {
+        // a and b can be diff lengths
+        // we wanna start at the end of a and b
+        // output can be different length
+
+        StringBuilder sb = new StringBuilder();
+        //we want to append the sum of a, and b
+        //similar to adding linked list, but the structure is different
+
+        //traverse from the end of the strings
+        int i = a.length() - 1;
+        int j = b.length() - 1;
+        int remainder = 0;
+
+        while(a.charAt(i) || b.charAt(j) || remainder == 1){
+            
+        }
     }
 
 }
