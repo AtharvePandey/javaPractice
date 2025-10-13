@@ -4921,17 +4921,85 @@ public class App {
         // output can be different length
 
         StringBuilder sb = new StringBuilder();
-        //we want to append the sum of a, and b
-        //similar to adding linked list, but the structure is different
+        // we want to append the sum of a, and b
+        // similar to adding linked list, but the structure is different
 
-        //traverse from the end of the strings
+        // traverse from the end of the strings
         int i = a.length() - 1;
         int j = b.length() - 1;
         int remainder = 0;
 
-        while(a.charAt(i) || b.charAt(j) || remainder == 1){
-            
+        while (i >= 0 || j >= 0 || remainder == 1) {
+            // we want to get character for each, and then add it to the carry
+            // we can treat remainder as our running sum
+            if (i >= 0) {
+                // we are basically saying add the numerical value to the 'sum'
+                // we get a chars numeric value by - '0'
+                // similar to how we get a non number char's numeric value
+                // by -'a'
+
+                remainder += a.charAt(i) - '0';
+            }
+            if (j >= 0) {
+                remainder += b.charAt(j) - '0';
+            }
+            // next we have to do 2 things
+            // 1. add to the string, our current sum
+            // i.e if charAt a, and b, is 1, our current sum to append should b 0
+            // but our remainder value would be 2
+            // similarly lets say our remainder value was already 1 from a previous
+            // iteration
+            // and from this iteration we have 1, and 1 for both charAt a, b
+            // we should append 1 + 1 + 1 which is 1 in binary addition, but 3 in real
+            // addition
+            // ...which is the value of our remainder since we are also treating it as a sum
+            sb.append(remainder % 2); // this appends what we need
+            remainder = remainder / 2; // similar to 'add linked list' problem, we update remainder
+
         }
+        return sb.reverse().toString(); // and we reverse
+    }
+
+    // Given a non-negative integer x, return the square root of x
+    // rounded down to the nearest integer.
+    // The returned integer should be non-negative as well.
+
+    public int mySqrt(int x) {
+        // when we want to find the sqrt of something
+        // what do we do?
+
+        // well we can factor the number, and then find powers of 2
+        // i.e 16 is 8*2, 4*2*2, 2*2*2*2. there are even number of 2's
+        // we can take half of them, and return their product
+
+        // but usually what a square root is, just a number times itself
+        // which we can find. Since 0->x is guarenteed range for sqrt(x),
+        // we can treat it as our search space
+
+        // actually 1 -> x/2 should be the search space and we omit 0, since thats not a
+        // square for any number > itself
+        // handled by below case
+        if (x < 2) {
+            return x;
+        }
+        int low = 1;
+        int high = x / 2;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            long square =(long)mid * mid;
+            if (square == x) {
+                // this means we found our number
+                return mid;
+            } else if (square > x) {
+                // this means we have to search left half
+                high = mid - 1;
+            } else {
+                // search right half
+                low = mid + 1;
+            }
+        }
+        return high;
     }
 
 }
