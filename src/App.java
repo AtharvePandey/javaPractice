@@ -5041,4 +5041,51 @@ public class App {
         }
     }
 
+    // Given the head of a sorted linked list, delete all duplicates such that each
+    // element appears only once. Return the linked list sorted as well.
+    public ListNode deleteDuplicates(ListNode head) {
+        // trivially
+        if (head == null) {
+            return head;
+        }
+        // ok so we know the list is sorted
+        // trivially it will stay sorted unless we do some shiftings
+
+        // also since its sorted, and we find a duplicate
+        // we would remove the last instance of that duplicate
+        // i.e 1->1->10, we would remove the second 1 not the first
+        // because then its easier, we can just set pointer of first
+        // to point to the next non duplicate
+
+        // due to sorted property we can assume no other duplicates exist further down
+        // in the list
+
+        // we need to return head of new list, lets take a 2 pointer approach, where
+        // if we have a duplicate, we traverse the second pointer until we break the
+        // repeating number (reach a new number)
+        // set first pointers next value to second pointer
+        // this would eliminate all the duplicates
+        // then we set first pointer to second pointer and second pointer equal
+        ListNode first = head;
+        ListNode second = head.next != null ? head.next : null;
+        if (second == null) { // if we only have one node in the list, return head
+            return head;
+        }
+        while (second != null) { // while the second node doesn't reach the end of list
+            if (second.val == first.val) { // if the values are the same (duplicates)
+                second = second.next; // move the pointer for the second node
+            } else {
+                first.next = second; // if the nodes are distinct, set first's next to second
+                first = second; // update first to be second
+                second = first.next != null ? first.next : null;
+                ; // move second forward if not null
+                // even in the case where the list has no duplicates, first and second will move
+                // and first's old next pointer will still point to the same next node
+            }
+        }
+        // this is ensuring to get rid of last duplicate
+        first.next = null;
+        return head;
+    }
+
 }
