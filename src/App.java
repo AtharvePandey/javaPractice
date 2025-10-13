@@ -5149,4 +5149,80 @@ public class App {
         return hasPathSum(root.left, targetSum - root.val) || hasPathSum(root.right, targetSum - root.val);
     }
 
+    // Given an integer numRows, return the first numRows of Pascal's triangle.
+    // In Pascal's triangle, each number is the sum of the two numbers directly
+
+    public List<List<Integer>> generate(int numRows) {
+        // kind of like a dp problem, we want to make numRows worth of 2d list
+        // where each row i, is the ith row of pascals triangle
+
+        // for each new row, the start and end are 1's
+        List<List<Integer>> retList = new ArrayList<>();
+        if (numRows == 0) { // return an empty list if there are no rows
+            return retList;
+        }
+        // lets add base of triangle
+        List<Integer> firstList = new ArrayList<>();
+        firstList.add(1);
+        retList.add(firstList); // base of triangle
+
+        for (int i = 1; i < numRows; i++) {
+            // for each new row, we know that it starts and ends with 1, so lets do that
+            // and we also know to form this row, we have to add previous rows above this
+            // index
+            // and previous
+            List<Integer> prevList = retList.get(i - 1);
+            List<Integer> currRowList = new ArrayList<>();
+            currRowList.add(1); // each row starts and ends with one
+
+            // now we have to figure out how to add from previous rows 2, into this rows
+            for (int j = 1; j < i; j++) {
+                currRowList.add(prevList.get(j) + prevList.get(j - 1));
+            }
+
+            currRowList.add(1); // we end each new row with 1
+            retList.add(currRowList); // we add this new row
+        }
+
+        return retList;
+    }
+
+    //given rowIndex, return the 
+
+    public List<Integer> getRow(int rowIndex) {
+        // this is that n choose k thing as part of the binomial theorem to get the coefficients
+        //of the numbers formed after computing (x+y)^n
+        //usually the same as pascals triangle
+        // n!/k!(n-k)!
+
+        //so either use method above, return list.get(rowIndex)
+        //or form the ith row, and return as a list
+        List<Integer> retList = new ArrayList<>();
+        if(rowIndex == 0){
+            retList.add(1);
+            return retList;
+        }
+        for(int i = 0; i<=rowIndex; i++){
+            retList.add((int)getNchooseK(rowIndex, i));
+        }
+        return retList;
+
+    }
+
+    private long getNchooseK(int n, int k){
+        return (factorial(n) / (factorial(k) * factorial(n - k)));
+    }
+
+    private long factorial(int n){ //this method will return factorial of a number
+        if(n < 0){
+            //base case since negative number factorials are not required
+            return - 1;
+        }
+        if(n == 0){
+            return 1; //trivial proof 0! = 1
+        }else{
+            return n * factorial(n - 1);
+        }
+    }
+
 }
