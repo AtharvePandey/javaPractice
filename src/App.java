@@ -5225,4 +5225,38 @@ public class App {
         }
     }
 
+
+    //return true if string is valid palendrome
+    //removing all non alphanumeric, and changing upper to lower,
+    //if string is same forward and backward, it is a palendrome
+
+    public boolean isPalendrome(String s){
+        //we can use the character class apparently
+        if(s.isEmpty()){
+            return true; //an empty string is a palendrome
+        }
+
+        //use a two pointer approach
+        int i = 0;
+        int j = s.length() - 1;
+
+        while(i <= j){
+            if(!Character.isLetterOrDigit(s.charAt(i))){
+                //we dont care about alpha numerics, so no point in comparing them
+                i++;
+            }else if(!Character.isLetterOrDigit(s.charAt(j))){
+                j--; //by the same logic
+            }else{
+                //both str at i and j are valid characters,
+                //lets hope they are the same
+                if(Character.toLowerCase(s.charAt(i)) != Character.toLowerCase(s.charAt(j))){
+                    return false;
+                }
+                i++;
+                j--;
+            }
+        }
+        return true;
+    }
+
 }
