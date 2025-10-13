@@ -4987,7 +4987,7 @@ public class App {
 
         while (low <= high) {
             int mid = low + (high - low) / 2;
-            long square =(long)mid * mid;
+            long square = (long) mid * mid;
             if (square == x) {
                 // this means we found our number
                 return mid;
@@ -5000,6 +5000,44 @@ public class App {
             }
         }
         return high;
+    }
+
+    // You are climbing a staircase. It takes n steps to reach the top.
+    // Each time you can either climb 1 or 2 steps. In how many distinct
+    // ways can you climb to the top?
+
+    public int climbStairs(int n) {
+        //for this problem, we can choose to either climb 1 step or 2 steps
+        //to get to n steps
+
+        //so this is forming a bunch of subproblems, and is similar to the robot
+        //problem where we go from topright to bottom left corner
+
+        //so for n = 0, there are 0 ways, but its out of bounds
+        //for n = 1 there are 1 ways, (can't go up using 2 steps if there are only 1 step)
+        //n = 2, you get 1 + 1, or directly 2 steps, so 2 ways
+        //for n = 3, 1+1+1, 2+1, or 1+2 so 3 ways
+        //for n = 4, 1+1+1+1, 2+2, 1+1+2, 2+1+1, 1+2+1, 5 ways
+
+        //the pattern is, for n = 1, 1; n = 2, 2; n = 3, n=1. + n=2; n=4, n=3 + n=2;
+
+        //so we can either recursively do this with a big recursion tree
+        //where if n == 1, return 1, n==2 return 2 else we return (n-1) + (n-2)
+
+        //or use a dp array, where arr[0] = 1; arr[1] = 2
+        if(n == 1){
+            return 1;
+        }else if(n == 2){
+            return 2;
+        }else{
+            int[] dp = new int[n];
+            dp[0] = 1;
+            dp[1] = 2; 
+            for(int i = 2; i<n; i++){
+                dp[i] = dp[i-1] + dp[i-2];
+            }
+            return dp[n-1];
+        }
     }
 
 }
