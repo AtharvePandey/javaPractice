@@ -5079,13 +5079,55 @@ public class App {
                 first = second; // update first to be second
                 second = first.next != null ? first.next : null;
                 ; // move second forward if not null
-                // even in the case where the list has no duplicates, first and second will move
-                // and first's old next pointer will still point to the same next node
+                  // even in the case where the list has no duplicates, first and second will move
+                  // and first's old next pointer will still point to the same next node
             }
         }
         // this is ensuring to get rid of last duplicate
         first.next = null;
         return head;
+    }
+
+    // Given an integer array nums where the elements are sorted in ascending order,
+    // convert it to a height-balanced binary search tree.
+
+    public TreeNode sortedArrayToBST(int[] nums) {
+        // the array is sorted, so we know mid of array has to be root of tree
+        // everything left of mid has to be tree.left
+        // everything right of mid has to tree.right
+        return buildBst(nums, 0, nums.length - 1);
+    }
+
+    private TreeNode buildBst(int[] nums, int low, int high) {
+        if (low > high) { // this will break us out of recursion
+            return null;
+        }
+        int mid = low + (high - low) / 2; // else arr[mid] is our root
+        TreeNode root = new TreeNode(nums[mid]);
+        root.left = buildBst(nums, low, mid - 1); // and since arr is sorted
+        // left and right are left and right of mid respectively
+        root.right = buildBst(nums, mid + 1, high);
+        return root;
+
+    }
+
+    // Given a binary tree, find its minimum depth.
+    // The minimum depth is the number of nodes along the shortest
+    // path from the root node down to the nearest leaf node.
+    // Note: A leaf is a node with no children.
+
+    public int minDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int leftDepth = minDepth(root.left);
+        int rightDepth = minDepth(root.right);
+
+        if (leftDepth == 0 || rightDepth == 0) {
+            return 1 + leftDepth + rightDepth;
+        }
+
+        return 1 + Math.min(leftDepth, rightDepth);
     }
 
 }
