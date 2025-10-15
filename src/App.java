@@ -13,8 +13,6 @@ import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hamcrest.core.Every;
-
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
 import java.util.Random;
@@ -5187,69 +5185,69 @@ public class App {
         return retList;
     }
 
-    //given rowIndex, return the 
+    // given rowIndex, return the
 
     public List<Integer> getRow(int rowIndex) {
-        // this is that n choose k thing as part of the binomial theorem to get the coefficients
-        //of the numbers formed after computing (x+y)^n
-        //usually the same as pascals triangle
+        // this is that n choose k thing as part of the binomial theorem to get the
+        // coefficients
+        // of the numbers formed after computing (x+y)^n
+        // usually the same as pascals triangle
         // n!/k!(n-k)!
 
-        //so either use method above, return list.get(rowIndex)
-        //or form the ith row, and return as a list
+        // so either use method above, return list.get(rowIndex)
+        // or form the ith row, and return as a list
         List<Integer> retList = new ArrayList<>();
-        if(rowIndex == 0){
+        if (rowIndex == 0) {
             retList.add(1);
             return retList;
         }
-        for(int i = 0; i<=rowIndex; i++){
-            retList.add((int)getNchooseK(rowIndex, i));
+        for (int i = 0; i <= rowIndex; i++) {
+            retList.add((int) getNchooseK(rowIndex, i));
         }
         return retList;
 
     }
 
-    private long getNchooseK(int n, int k){
+    private long getNchooseK(int n, int k) {
         return (factorial(n) / (factorial(k) * factorial(n - k)));
     }
 
-    private long factorial(int n){ //this method will return factorial of a number
-        if(n < 0){
-            //base case since negative number factorials are not required
-            return - 1;
+    private long factorial(int n) { // this method will return factorial of a number
+        if (n < 0) {
+            // base case since negative number factorials are not required
+            return -1;
         }
-        if(n == 0){
-            return 1; //trivial proof 0! = 1
-        }else{
+        if (n == 0) {
+            return 1; // trivial proof 0! = 1
+        } else {
             return n * factorial(n - 1);
         }
     }
 
+    // return true if string is valid palendrome
+    // removing all non alphanumeric, and changing upper to lower,
+    // if string is same forward and backward, it is a palendrome
 
-    //return true if string is valid palendrome
-    //removing all non alphanumeric, and changing upper to lower,
-    //if string is same forward and backward, it is a palendrome
-
-    public boolean isPalendrome(String s){
-        //we can use the character class apparently
-        if(s.isEmpty()){
-            return true; //an empty string is a palendrome
+    public boolean isPalendrome(String s) {
+        // we can use the character class apparently
+        if (s.isEmpty()) {
+            return true; // an empty string is a palendrome
         }
 
-        //use a two pointer approach
+        // use a two pointer approach
         int i = 0;
         int j = s.length() - 1;
 
-        while(i <= j){
-            if(!Character.isLetterOrDigit(s.charAt(i))){
-                //we dont care about alpha numerics, so no point in comparing them
+        while (i <= j) {
+            if (!Character.isLetterOrDigit(s.charAt(i))) {
+                // we dont care about alpha numerics, so no point in comparing them
                 i++;
-            }else if(!Character.isLetterOrDigit(s.charAt(j))){
-                j--; //by the same logic
-            }else{
-                //both str at i and j are valid characters,
-                //lets hope they are the same
-                if(Character.toLowerCase(s.charAt(i)) != Character.toLowerCase(s.charAt(j))){
+            } else if (!Character.isLetterOrDigit(s.charAt(j))) {
+                j--; // by the same logic
+            } else {
+                // both str at i and j are valid characters,
+                // lets hope they are the same
+                if (Character.toLowerCase(s.charAt(i)) != Character.toLowerCase(s.charAt(j))) {
                     return false;
                 }
                 i++;
@@ -5257,6 +5255,246 @@ public class App {
             }
         }
         return true;
+    }
+
+    // given an array of nums, all elements appear twice except for one,
+    // return that one number; constant space and O(n) time
+
+    public int singleNumber(int[] nums) {
+        // we need a way to keep track of numbers already seen,
+        // can't use any other datastructure, need constant space
+        // no sorting, breaks O(n) constraint
+
+        // exclusive or is commutative, and a ^ a = 0; a ^ 0 = a;
+        // a ^ b ^ c ... = ... c ^ b ^ a
+
+        // so given an array of nums, we don't really have to sort
+        // because xor is commutative, we can pretend the non distinct numbers
+        // get ^ to 0, leaving 0 and b; where b is the distinct number
+
+        int retVal = 0; // start value of the commutative ints
+        for (int num : nums) {
+            retVal ^= num;
+        }
+        return retVal;
+
+        // so for future reference, ^ a group of numbers will give you
+        // distinct number in that list, assuming every other number isnt distinct
+
+    }
+
+    public static final Map<Character, Integer> ALPHABET_MAP = new HashMap<>();
+
+    static {
+        for (char c = 'A'; c <= 'Z'; c++) {
+            ALPHABET_MAP.put(c, c - 'A' + 1);
+        }
+    }
+
+    public static final Map<Integer, Character> NUMBER_TO_CHAR = new HashMap<>();
+
+    static {
+        for (int i = 1; i <= 26; i++) {
+            NUMBER_TO_CHAR.put(i, (char) ('A' + i - 1));
+        }
+    }
+
+    // Given an integer columnNumber, return its corresponding column title as it
+    // appears in an Excel sheet.
+    public String convertToTitle(int columnNumber) {
+        // we wanna return a string, based off column number
+        // A -> 1 up till Z -> 26, then
+        // 27 is AA, 28 is AB etc...
+
+        StringBuilder sb = new StringBuilder();
+
+        // process the input number, using map build the output string...
+        // how do we process input number? take 28 as an example...
+        // num % 26 will give us the last character, update num = num / 10
+        // until num is 0?
+
+        // so lets try 28, 28 % 26 = 2 -> maps to B, so we add B, and update number to 2
+        // 2 % 26 = ... wait this doesnt work, what if we check if number is <= 26
+
+        // that wont work either
+
+        // (columnNumber - 1) % 26 + 1; 28 - 1 = 27; % 26 = 1; + 1 = 2; which maps to
+        // B...
+        // although the current logic of columnNumber % 26 gives the same answer for 28,
+        // it doesnt give correct answer for say 26
+        // because 26 % 26 is 0, which doesnt map to anything, but should be mapped to Z
+        // (26) (same is true for any multiple)
+        // so the - 1 ensures we don't have this problem, but we would get a number
+        // which maps to letter before
+        // so we add 1 to the end
+
+        while (columnNumber > 0) {
+            int number = (columnNumber - 1) % 26 + 1;
+            sb.append(NUMBER_TO_CHAR.get(number));
+            // now to update, we have to follow same logic, but we aren't in base 10, but
+            // base 26
+            columnNumber = (columnNumber - 1) / 26;
+        }
+        return sb.reverse().toString();
+    }
+
+    // now do the oppotite
+    public int titleToNumber(String columnTitle) {
+        int retVal = 0;
+        // use the map to build the int while the string is not empty.
+        for (int i = 0; i < columnTitle.length(); i++) {
+            retVal = retVal * 26 + ALPHABET_MAP.get(columnTitle.charAt(i));
+        }
+
+        return retVal;
+    }
+
+    // given int n, reverse its bits and return new number
+
+    public int reverseBits(int n) {
+        int retInt = 0; // this is 0 in binary, 1 bit
+        // we are told that the size of int will be 32 bits
+        for (int i = 0; i < 32; i++) {
+            retInt = retInt << 1; // this makes retInt 00 in first iteration, then we have to copy over first
+                                  // rightmost bit
+            // to copy first extract the rightmost bit from n, we can do this by & n with
+            // 000....01, or just 1
+            // then once we have the rightmost bit, we need to set retInt's rightmost bit to
+            // the extracted bit
+            // if we |, it guarentees to set it
+            retInt |= (n & 1);
+            // and then update n by getting rid of rightmost bit
+            n = n >>> 1; // forces regular rightshift regardless of sign or unsigned int
+        }
+        return retInt;
+    }
+
+    // given an int, return number of 1's it has in the binary representation
+    public int hammingWeight(int n) {
+        // basically extract this bit, if its a 1 increase count
+        int count = 0;
+        while (n != 0) {
+            if ((n & 1) == 1) {
+                count++;
+            }
+            n = n >> 1;
+        }
+        return count;
+    }
+
+    // return true if a number is happy, false otherwise
+    // sum of the squares of all digits in n, is what n is updated to
+    // until the number is permanantly 1...
+    public boolean isHappy(int n) {
+        if (n == 1 || n == 7) {
+            return true; // this is like the trivial base case...
+        }
+        // an easy solution is to just loop from 0 to 2^31 - 1
+        // if at any point n become 1, return true, else false outside the loop...
+
+        // we also need to end early if we enter a loop of numbers
+        Set<Integer> seen = new HashSet<>();
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            n = getNewN(n);
+            if (n == 1) {
+                return true;
+            }
+            if (seen.contains(n)) {
+                return false;
+            }
+            seen.add(n);
+        }
+        return false;
+        // another way is to build a map, and then check if this number falls in the map
+        // or not
+    }
+
+    private int getNewN(int n) {
+        // will return sum of square of all digits in n
+        int retNum = 0;
+        while (n != 0) {
+            // get rightmost digit in n, square and add it to retNum
+            retNum = retNum + ((n % 10) * (n % 10));
+            n = n / 10; // update n
+        }
+        return retNum;
+    }
+
+    // given head of a list, remove all nodes where node.val == val
+
+    public ListNode removeElements(ListNode head, int val) {
+        // can use a two pointer approach, where if curr.val == val, prev.next =
+        // curr.next
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode prev = dummy;
+        ListNode curr = head;
+
+        if (curr == null) {
+            return head; // we don't care about
+        }
+
+        while (curr != null) {
+            if (curr.val == val) {
+                // found a val to remove
+                prev.next = curr.next;
+            } else {
+                prev = curr;
+            }
+            curr = curr.next;
+        }
+        return head;
+    }
+
+    static boolean retBool = true; // needed for following method
+
+    // Given two strings s and t, determine if they are isomorphic.
+    public boolean isIsomorphic(String s, String t) {
+        // i guess we just have to map each character to another character
+        // and if a single character maps to multiple we return false
+        // goes both ways
+        if (s.length() != t.length()) {
+            return false; // no way the strings can be isometric
+        }
+
+        // basically for 2 strings to be isometric, each letter in the string
+        // has to map to each letter in the other string
+
+        // such that we can replace characters of one string to get the other
+        // if one character maps to 2 different characters, then the strings can't be
+        // isometric
+
+        Map<Character, List<Character>> map = new HashMap<>();
+
+        // we want to map the characters in s, to the characters in t
+        // then we want to check if the values for one character are different or not
+        // and if they are then we return false
+
+        for (int i = 0; i < s.length(); i++) {
+            if (!map.containsKey(s.charAt(i))) {
+                List<Character> tempList = new ArrayList<>(); // we make a new list
+                // for that list, we add the mapping
+                tempList.add(t.charAt(i));
+                map.put(s.charAt(i), tempList);
+            } else {
+                // we add this character to the mapping
+                map.get(s.charAt(i)).add(t.charAt(i));
+            }
+        }
+
+        // after we have the mapping, all we have to do is make sure
+        // that all the values contain non distinct characters
+        Collection<List<Character>> values = map.values();
+        values.stream().forEach(subList -> {
+            char d = subList.get(0);
+            for (char c : subList) {
+                if (c != d) {
+                    retBool = false;
+                }
+            }
+        });
+
+        return retBool;
     }
 
 }
