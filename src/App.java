@@ -360,6 +360,46 @@ public class App {
         }
     }
 
+    // implement stack using queues
+    // we are allowed only 2 queues
+
+    class MyStack {
+        private Queue<Integer> in; 
+
+        public MyStack() {
+            this.in = new LinkedList<>();
+        }
+
+        public void push(int x) {
+            //when we push, if size is > 1, we pop front and push back into queue
+            //we would do this size - 1 times since if size is 5 (5 elements)
+            //the first 4 should be shifted towards back to get the latest element pushed into the queue
+            //so that we can mimick a stack
+            //after adding new element to the queue
+            //this way we can ensure the top element in stack gets popped
+            this.in.add(x);
+            if(this.in.size() > 1){
+                int i = 0;
+                while(i < this.in.size() - 1){
+                    this.in.add(this.in.poll());
+                    i++;
+                }
+            }
+        }
+
+        public int pop() {
+            return this.in.poll();
+        }
+
+        public int top() {
+            return this.in.peek();
+        }
+
+        public boolean empty() {
+            return this.in.isEmpty();
+        }
+    }
+
     class Solution {
         // the trick for this is n - blacklist.length; [0,2,3] is blacklist,
         // blacklist.length is 3
@@ -429,6 +469,8 @@ public class App {
     public int minAsciiDelete(String s1, String s2) {
         // Given two strings s1 and s2, return the lowest ASCII sum of deleted
         // characters to make two strings equal.
+        // because if either string is equal to 0 in length, we would need to delete
+        //everything in the other string, and that would be our answer.
         // OPT(i,j) = ascii(i) + OPT(i--,0) if s2.length is 0
         // OPT(i,j) = ascii(j) + OPT(0,j--) if s1.length is 0
 
@@ -5495,6 +5537,130 @@ public class App {
         });
 
         return retBool;
+    }
+
+    // given head of list, reverse it
+
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head; // can't reverse a one len list
+        }
+        ListNode prev = null;
+        ListNode curr = head;
+        ListNode next = head.next;
+
+        // next node is there to iterate through the list, head will point to prev
+        // prev points to head, and head points to next
+        // next = next.next
+        while (curr != null) {
+            next = curr.next; // store next node
+            curr.next = prev; // reverse pointer
+            prev = curr; // move prev forward
+            curr = next; // move curr forward
+        }
+        return prev;
+    }
+
+    // //given root of a complete binary tree
+    // //write algorithm in < o(n) time to return number of nodes in the tree
+
+    // public int countNodes(TreeNode root) {
+    // if(root == null){
+    // return 0;
+    // }
+    // // less than o(n) means log(n), unless the tree is complete with all leaf - 1
+    // // nodes having 2 children
+    // // our algo will be < o(n)... technically...
+
+    // // what if we just find the largest node in the tree (rightmost), and return
+    // // that
+    // // would work, but tree values dont have to be 1->n can be n-(n-1) -> n
+
+    // //few things to note:
+    // // number of nodes in complete binary tree is 2^h-1 + #of leaf nodes
+    // // we just need to figure out how to count number of leaf nodes
+    // //if all non leaf nodes have 2 children which are leaf
+    // //then number of nodes = 2^h - 1 nodes
+    // //else its 2 ^ (h-1) + leaf node count
+
+    // int height = 1; //1 for the root, num nodes is 2^1 -1 = 1;
+    // //i think we --should first find height by traversing to the leftmost
+    // //keeping a pointer for the node before leaf node so we can quickly check if
+    // left subtree is complete
+    // TreeNode prev = root;
+    // if(root.left == null){
+    // return 1;
+    // }
+    // TreeNode curr = root.left;
+    // while(curr.left != null){
+    // height++; //might be misadding height here; //i.e curr is at level 3, height
+    // is 2...
+    // prev = curr;
+    // curr = curr.left;
+    // }
+
+    // if(prev.right == null){
+    // //this means tree is complete, with one leaf...the left most
+    // return (int)Math.pow(2, height - 1) + 1;
+    // }
+    // //if this is not the case, it means we either have 3 leaf nodes or a complete
+    // right subtree
+    // //so lets traverse the right side...
+
+    // height = 1;
+    // prev = root;
+    // //in complete binary tree, every level except last is filled, so we dont have
+    // to check
+    // //if root.right exists; lefts existance implies right existance
+    // curr = prev.right;
+
+    // while(curr.right != null){
+    // height++;
+    // prev = curr;
+    // curr = curr.right;
+    // }
+    // if(prev.left != null && prev.right == null){
+    // //3 leaf nodes, 2 in the left subtree, 1 in right
+    // return (int)Math.pow(2, height - 1) + 3;
+    // }else{
+    // //all leaf nodes are filled
+    // return (int)Math.pow(2, height -1);
+    // }
+
+    // }
+
+    // below is better solution for above, less buggy and more straightforward
+    //
+
+    public int countNodes(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+
+        // Find the height of the leftmost path
+        int leftHeight = 0;
+        TreeNode left = root;
+        while (left != null) {
+            leftHeight++;
+            left = left.left;
+        }
+
+        // Find the height of the rightmost path
+        int rightHeight = 0;
+        TreeNode right = root;
+        while (right != null) {
+            rightHeight++;
+            right = right.right;
+        }
+
+        // If equal, the tree is perfect and we can directly return 2^h - 1
+        if (leftHeight == rightHeight) {
+            return (int) Math.pow(2, leftHeight) - 1;
+        }
+
+        // Otherwise, recursively count left and right
+        // (but only one side will recurse deeper each time)
+        return 1 + countNodes(root.left) + countNodes(root.right);
     }
 
 }
