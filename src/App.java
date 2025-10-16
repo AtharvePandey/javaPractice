@@ -305,82 +305,71 @@ public class App {
         return maxHeap.peek();
     }
 
-    // public class RecentCounter {
-    // private Queue<Integer> q;
-
-    // public RecentCounter() {
-    // q = new LinkedList<>();
-    // }
-
-    // public int ping(int t) {
-    // q.add(t);
-    // while (q.peek() < t - 3000) {
-    // q.poll();
-    // }
-    // return q.size();
-    // }
-    // }
-    public class Q {
-        // implement queue behavior using 2 stacks
+    public class MyQueue {
         private Stack<Integer> in;
         private Stack<Integer> out;
 
-        public Q() {
+        public MyQueue() {
             this.in = new Stack<>();
             this.out = new Stack<>();
         }
 
         public void push(int x) {
+            // Move everything from 'in' to 'out'
+            while (!this.in.isEmpty()) {
+                this.out.push(this.in.pop());
+            }
+
+            // Push the new element onto 'in'
             this.in.push(x);
+
+            // Move everything back to 'in' so that front stays on top
+            while (!this.out.isEmpty()) {
+                this.in.push(this.out.pop());
+            }
         }
 
         public int pop() {
-            if (this.out.empty()) {
-                while (!this.in.empty()) {
-                    this.out.push(this.in.pop());
-                }
-                return this.out.pop();
+            if (this.in.isEmpty()) {
+                throw new RuntimeException("Queue is empty");
             }
-            return this.out.pop();
+            return this.in.pop();
         }
 
         public int peek() {
-            if (this.out.empty()) {
-                while (!this.in.empty()) {
-                    this.out.push(this.in.pop());
-                }
-                return this.out.peek();
+            if (this.in.isEmpty()) {
+                throw new RuntimeException("Queue is empty");
             }
-
-            return this.out.peek();
+            return this.in.peek();
         }
 
         public boolean empty() {
-            return this.in.empty() && this.out.empty();
+            return this.in.isEmpty();
         }
     }
 
     // implement stack using queues
     // we are allowed only 2 queues
 
-    class MyStack {
-        private Queue<Integer> in; 
+    public class MyStack {
+        private Queue<Integer> in;
 
         public MyStack() {
             this.in = new LinkedList<>();
         }
 
         public void push(int x) {
-            //when we push, if size is > 1, we pop front and push back into queue
-            //we would do this size - 1 times since if size is 5 (5 elements)
-            //the first 4 should be shifted towards back to get the latest element pushed into the queue
-            //so that we can mimick a stack
-            //after adding new element to the queue
-            //this way we can ensure the top element in stack gets popped
+            // when we push, if size is > 1, we pop front and push back into queue
+            // we would do this size - 1 times since if size is 5 (5 elements)
+            // the first 4 should be shifted towards back to get the latest element pushed
+            // into the queue
+            // so that we can mimick a stack
+            // after adding new element to the queue
+            // this way we can ensure the top element in stack gets popped
             this.in.add(x);
-            if(this.in.size() > 1){
+            if (this.in.size() > 1) {
                 int i = 0;
-                while(i < this.in.size() - 1){
+                while (i < this.in.size() - 1) {
                     this.in.add(this.in.poll());
                     i++;
                 }
@@ -458,6 +447,7 @@ public class App {
             int random = rand.nextInt(n - blacklist.length);
             return this.whiteList.containsKey(random) ? this.whiteList.get(random) : random;
         }
+
     }
 
     /**
@@ -470,7 +460,7 @@ public class App {
         // Given two strings s1 and s2, return the lowest ASCII sum of deleted
         // characters to make two strings equal.
         // because if either string is equal to 0 in length, we would need to delete
-        //everything in the other string, and that would be our answer.
+        // everything in the other string, and that would be our answer.
         // OPT(i,j) = ascii(i) + OPT(i--,0) if s2.length is 0
         // OPT(i,j) = ascii(j) + OPT(0,j--) if s1.length is 0
 
@@ -5661,6 +5651,53 @@ public class App {
         // Otherwise, recursively count left and right
         // (but only one side will recurse deeper each time)
         return 1 + countNodes(root.left) + countNodes(root.right);
+    }
+
+    // You are given a sorted unique integer array nums.
+    // A range [a,b] is the set of all integers from a to b (inclusive).
+    // Return the smallest sorted list of ranges that cover all the numbers in the
+    // array exactly.
+    // That is, each element of nums is covered by exactly one of the ranges, and
+    // there is no integer x such that x
+    // is in one of the ranges but not in nums.
+    // Each range [a,b] in the list should be output as:
+
+    // "a->b" if a != b
+    // "a" if a == b
+
+    public List<String> summaryRanges(int[] nums) {
+        List<String> retList = new ArrayList<>();
+        if (nums.length == 0) {
+            return retList;
+        }
+        // we are told the array is sorted, and all numbers are unique
+        // so in a single pass, we can add the ranges
+        // there are 2 cases when going through the array
+        // nums[i-1] + 1 = nums[i];
+        // nums[i-1] + 1 != nums[i];
+        // in the first case, our string is gonna be "a->b", where b will be the index
+        // at which the first
+        // case is violated
+
+        int i = 0;
+        while (i < nums.length) {
+            // we have an int to look at when we start
+            int start = nums[i];
+            // now from start, we check if the next number is the one we expect
+            // the number we expect is supposed to be this number + 1
+            // if it isnt then we add this number byitself as a string to the list
+            while (i < nums.length - 1 && nums[i] + 1 == nums[i + 1]) {
+                i++;
+            }
+            if (start != nums[i]) {
+                // this means we found a range
+                retList.add(String.valueOf(start) + "->" + String.valueOf(nums[i]));
+            } else {
+                retList.add(String.valueOf(nums[i])); // or start same thing
+            }
+            i++;
+        }
+        return retList;
     }
 
 }
