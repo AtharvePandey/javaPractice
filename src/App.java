@@ -5700,4 +5700,95 @@ public class App {
         return retList;
     }
 
+    // given root of binary tree, return a list of all the paths in "a -> b" fashion
+    // below list we can use to push back Strings...
+
+    public List<String> binaryTreePaths(TreeNode root) {
+        // to get all paths, we can do dfs on the tree, and build the string before
+        // pushing it into the list
+        // will backtracking work here? we can generate a path until we reach leaf, once
+        // we reach leaf we add the path
+        // to the final answer, and remove the last element to 'backtrack';
+        List<String> retList = new ArrayList<>();
+        // the below function would use dfs to traverse the tree, and will take in a
+        // string to build
+        if (root != null) {
+            dfs(root, "", retList);
+        }
+        return retList;
+
+    }
+
+    private void dfs(TreeNode root, String currPath, List<String> retList) {
+        if (root.left == null && root.right == null) {
+            // if we are at a leaf node right now
+            // add the value to current path, and add the entire path to the retList
+            currPath += root.val;
+            retList.add(currPath);
+        }
+        // else we traverse each subtree
+        // starting with left
+        if (root.left != null) {
+            dfs(root.left, currPath + root.val + "->", retList); // add arrow and current val to the path
+        }
+        // same logic for the right
+        if (root.right != null) {
+            dfs(root.right, currPath + root.val + "->", retList);
+        }
+    }
+
+    // Given an integer num, repeatedly add all its digits until the result has only
+    // one digit, and return it.
+    public int addDigits(int num) {
+        if (num == 0) {
+            return 0;
+        }
+        // if we are in single digits, return the number
+        // else we add its digits
+
+        while (num >= 10) {
+            // get the rightmost digits and sum them up
+            int tempSum = 0;
+            while (num != 0) {
+                int currDigit = num % 10;
+                tempSum += currDigit;
+                num = num / 10;
+            }
+            num = tempSum;
+        }
+
+        return num;
+    }
+
+    // check if a number is prime
+
+    public boolean isPrime(int num) {
+        // if n % any number out side of 1, and itself is == 0, then num is not prime
+        if (num <= 2) {
+            return true;
+        }
+
+        // for(int i = 3; i<num;i++){
+        // if(num % i == 0){
+        // return false;
+        // }
+        // }
+        // return true;
+
+        // we can optimize above algortithm further by only checking up to the sqrt(n)
+        // this is because after sqrt(n) we have all factors just in different order
+        // e.g 36, after 6 * 6, (everything before was 4 * 9, 12 * 3, 18 * 2),
+        // everything after is the same, 9 * 4 etc.. just diff order
+
+        for (int i = 2; i * i <= num; i++) {
+            if (num % i == 0)
+                return false;
+        }
+
+        return true;
+
+        //above has sqrt(n) time complexity
+
+    }
+
 }
