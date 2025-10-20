@@ -30,8 +30,9 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] nums = { 1, 2, 3 };
-        app.permute(nums);
+        String pattern = "abba";
+        String s = "dog cat cat dog";
+        app.wordPattern(pattern, s);
     }
 
     public ListNode tempfunction1() {
@@ -5841,19 +5842,50 @@ public class App {
     // Here follow means a full match, such that there is a bijection between
     // a letter in pattern and a non-empty word in s.
 
-    // public boolean wordPattern(String pattern, String s) {
-    // s = s.trim();
-    // String[] words = s.split(" ");
-    // Map<Character, String> patternStrMap = new HashMap<>();
-    // int j = 0;
-    // for(char c : pattern.toCharArray()){
-    // patternStrMap.put(c, words[j]);
-    // j++;
-    // if(j == words.length){
-    // //we looked at the last word already
-    // break;
-    // }
-    // }
-    // }
+    // e.g if pattern is abba, and words are cat, dog, dog, cat
+    // we return true
 
+    public boolean wordPattern(String pattern, String s) {
+        // first of all, each letter in patter has to match with exactly
+        // one word in s and vice versa.
+
+        // then the string should use the words in the same order as pattern;
+        String[] words = s.split(" "); // gives us all the words
+        if (words.length != pattern.length()) { // if length is not equal
+            // then it is trivial to return false
+            // since you can't have a pattern longer or shorter than amount of words
+            return false;
+        }
+
+        HashMap<Character, String> map = new HashMap<>();
+        // going through the patterns
+        // we have to check if this character maps to the correct string word
+        // i.e if mapped value is the current word
+        // and if this character is not in the map, check if current word maps
+        // to it
+        // else we add character and string
+
+        for (int i = 0; i < pattern.length(); i++) {
+            char ch = pattern.charAt(i);
+            String currWord = words[i];
+
+            // we check if this character maps to the correct (current) word
+            if (map.containsKey(ch)) {
+                if(!(map.get(ch).equals(currWord))){
+                    return false;
+                }
+            } else{
+                // we are checking if the current word exists in the map
+                // and it isn't being mapped to the current charcter
+                if (map.containsValue(currWord)){
+                    return false;
+                }
+                
+                map.put(ch, currWord);
+            }
+        }
+        return true;
+    }
+      
 }
+
