@@ -3752,26 +3752,60 @@ public class App {
     // and integers greater than 231 - 1 should be rounded to 231 - 1.
     // Return the integer as the final result.
 
-    // public int myAtoi(String s) {
-    // //first lets tackle the whitespace thing
-    // s = s.trim(); //this will get rid of all whitespace throughout the string
-    // //next lets make a boolean which will let us know when we are finished
-    // reading in
-    // //leading 0's
-    // boolean readingZero = true;
-    // //now lets account for converting chars to numbers via hashmap
-    // //we can just do Character.getNumericalValue(c);'
+    public int myAtoi(String s) {
+        long result = 0; // we will round down, if this is > Integer.MAX_VALUE
+        // since we ignore leading whitespace
+        s = s.trim();
 
-    // //this is the result to return
-    // int result = 0;
+        // we gotta start reading, signedness should be the first thing we read
+        boolean isNegative = false;
+        StringBuilder sb = new StringBuilder(); // this will be what we read in
+        int j = 0;
 
-    // //now we traverse and read char by char
-    // for(int i = 0; i<s.length(); i++){
-    // //we need to first make sure this current char is not a 0
-    // //also i feel a while loop would be better
-    // }
+        // getting rid of whitespace, the sign should be first thing we read
+        if (j < s.length() && (s.charAt(j) == '-' || s.charAt(j) == '+')) {
+            isNegative = s.charAt(j) == '-';
+            j++;
+        }
 
-    // }
+        // but it could be case where its just a number
+
+        // read digits until non-digit
+        while (j < s.length() && Character.isDigit(s.charAt(j))) {
+            sb.append(s.charAt(j));
+            j++;
+        }
+
+        // i think our sb should have just a number, unless its empty
+        // if its empty just return 0
+        if (sb.length() == 0) {
+            return (int) result;
+        }
+
+        // now we gotta contruct the number
+        String str = sb.toString();
+        int i = 0;
+        while (i < str.length()) {
+            // we have to build an int,
+            // s.charAt(i) - '0' will get us int representation...
+            int digit = str.charAt(i) - '0';
+            result = result * 10 + digit;
+
+            // if the result overflows (we use long to ensure we dont actually overflow)
+            if (!isNegative && result > Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE; // we return the max value if not negative
+            } else if (isNegative && -result < Integer.MIN_VALUE) {
+                return Integer.MIN_VALUE; // else return the min value if negative
+            }
+            i++;
+        }
+
+        if (isNegative) {
+            result = -result;
+        }
+
+        return (int) result;
+    }
 
     // given an array of positive ints, and a number k, we need to return the maxsum
     // possible
@@ -5787,8 +5821,39 @@ public class App {
 
         return true;
 
-        //above has sqrt(n) time complexity
+        // above has sqrt(n) time complexity
 
     }
+
+    // a number is ugly if in its factor set, there is either 2,3, or 5
+
+    public boolean isUgly(int num) {
+        // out of all factors, a number has, if that factor is prime
+        // it must be only 2,3,5
+
+        for (int i = 2; i < 6 && num > 0; i++)
+            while (num % i == 0)
+                num /= i;
+        return num == 1;
+    }
+
+    // Given a pattern and a string s, find if s follows the same pattern.
+    // Here follow means a full match, such that there is a bijection between
+    // a letter in pattern and a non-empty word in s.
+
+    // public boolean wordPattern(String pattern, String s) {
+    // s = s.trim();
+    // String[] words = s.split(" ");
+    // Map<Character, String> patternStrMap = new HashMap<>();
+    // int j = 0;
+    // for(char c : pattern.toCharArray()){
+    // patternStrMap.put(c, words[j]);
+    // j++;
+    // if(j == words.length){
+    // //we looked at the last word already
+    // break;
+    // }
+    // }
+    // }
 
 }
