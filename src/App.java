@@ -5871,21 +5871,164 @@ public class App {
 
             // we check if this character maps to the correct (current) word
             if (map.containsKey(ch)) {
-                if(!(map.get(ch).equals(currWord))){
+                if (!(map.get(ch).equals(currWord))) {
                     return false;
                 }
-            } else{
+            } else {
                 // we are checking if the current word exists in the map
                 // and it isn't being mapped to the current charcter
-                if (map.containsValue(currWord)){
+                if (map.containsValue(currWord)) {
                     return false;
                 }
-                
+
                 map.put(ch, currWord);
             }
         }
         return true;
     }
-      
-}
 
+    // You are playing the following Nim Game with your friend:
+    // Initially, there is a heap of stones on the table.
+    // You and your friend will alternate taking turns, and you go first.
+    // On each turn, the person whose turn it is will remove 1 to 3
+    // stones from the heap.
+    // The one who removes the last stone is the winner.
+    // Given n, the number of stones in the heap, return true if you can
+    // win the game assuming both you and your friend play optimally,
+    // otherwise return false.
+
+    public boolean canWinNim(int n) {
+        // and each turn you can either take 1,2 or 3 stones
+        // the person that picks the last stone wins
+        // the other player will play optimally...
+        // we draw first
+
+        // if there are < 4 stones, we can win if we go first
+        // if there are 5 stones, we always pick 1 on our turn
+        // until there are less than 4 stones on our turn
+        // same idea for 6, as long as our opponent gets 4 stones
+        // to pick from, we will always win in our turn
+
+        // so to win in our turn, any number but multiple of 4
+        // means we can win
+        return !(n % 4 == 0);
+
+    }
+
+    // given an int, return true if power of 3 else false
+
+    public boolean isPowerOfThree(int n) {
+        // //theres the obvious way of doing this by loops or recursion
+        // if(n<1){
+        // return false;
+        // }
+        // while(n%3 == 0){
+        // n = n/3;
+        // }
+        // return n == 1;
+        // 3^19 is the largest number within int which is 2^32
+        // so if n is a divisor of 3^19, then we know n is a power of 3
+        // because 3 is prime
+        return n > 0 && 1162261467 % n == 0;
+    }
+
+    // Given an integer n, return an array ans of length n + 1 such that
+    // for each i (0 <= i <= n), ans[i] is the number of 1's in the binary
+    // representation
+    // of i.
+
+    public int[] countBits(int n) {
+        // we can use dp
+
+        // or we can solve by counting number of 1's from 0->n
+        int[] retArr = new int[n + 1];
+        // given any number of n
+        // how would we count the number of 1 bits?
+        // num % 2
+        // num / 2 updates the number
+        for (int i = 0; i <= n; i++) {
+            int sum = 0; // this represents the number of 1's in the binary of i
+            int num = i;
+            while (num != 0) {
+                sum = sum + num % 2;
+                num = num / 2;
+            }
+            retArr[i] = sum;
+        }
+        return retArr;
+
+    }
+
+    // given int n, return true if it is a power of 2
+    public boolean isPowerOfTwo(int n) {
+        // all powers of 2 have their MSB set and no other bit set
+        // a power of 2 is 10000, power of 2 - 1 is 01111
+        // and if we and the two, we should get 1, if it is a power of 2
+        return (n & (n - 1)) == 0;
+    }
+
+    // given int n, return true if it is a power of 4
+    public boolean isPowerOfFour(int n) {
+        // power of 4 is just power of 2
+        // but we also make check if n-1 is divisible by 3
+        // e.g powers of 4 are 16, 64 etc, n-1 is 15, and 63 which are also divisible by
+        // 3
+        if (n < 1) {
+            return false;
+        }
+        return isPowerOfTwo(n) && (n - 1) % 3 == 0;
+    }
+
+    // Given a string s, reverse only all the vowels in the string and return it.
+    // The vowels are 'a', 'e', 'i', 'o', and 'u', and they can appear in both lower
+    // and upper cases, more than once.
+
+    public String reverseVowels(String s) {
+        // here we can use a two pointer approach, and just swap indicies where there
+        // are both vowels
+        // if there is only 1 vowell then nothing would get swapped
+        int i = 0;
+        int j = s.length() - 1;
+        Set<Character> vowels = new HashSet<>();
+        vowels.add('a');
+        vowels.add('e');
+        vowels.add('i');
+        vowels.add('o');
+        vowels.add('u');
+        // need to add uppercase vowels too or we can just check .toLowerCase()
+        vowels.add('A');
+        vowels.add('E');
+        vowels.add('I');
+        vowels.add('O');
+        vowels.add('U');
+        char[] chars = s.toCharArray();
+        while (i <= j) {
+            char one = chars[i];
+            char two = chars[j];
+            if (vowels.contains(one) && vowels.contains(two)) {
+                // we have vowels to reverse, so we will swap it
+                // swap i and j in chars array
+                char temp = chars[i];
+                chars[i] = chars[j];
+                chars[j] = temp;
+                // continue iterating
+                i++;
+                j--;
+            } else if (vowels.contains(one) && !vowels.contains(two)) {
+                // we need to find the next vowell to swap from the right side
+                j--;
+            } else if (vowels.contains(two) && !vowels.contains(one)) {
+                // similar logic from start
+                i++;
+            } else {
+                // else we iterate both sides
+                i++;
+                j--;
+            }
+        }
+        // return chars.toString(); <-- this returns memory address or some garbage
+        // value
+        return new String(chars);
+    }
+
+}
