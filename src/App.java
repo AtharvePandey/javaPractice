@@ -1,5 +1,5 @@
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
 import java.util.Random;
+import java.security.KeyStore.Entry;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +31,9 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        String pattern = "abba";
-        String s = "dog cat cat dog";
-        app.wordPattern(pattern, s);
+        String s = "abc";
+        String t = "ahbgdc";
+        app.isSubsequence(s, t);
     }
 
     public ListNode tempfunction1() {
@@ -2648,6 +2649,7 @@ public class App {
     // of j are already sorted, all we need to do is compare using mid, if value of
     // mid is 0, swap with i and increment i, else swap with j and decrement j
     // [2,0,2,1,1,0]
+
     public void sortColors(int[] nums) {
         int low = 0, mid = 0, high = nums.length - 1;
         while (mid <= high) {
@@ -6029,6 +6031,304 @@ public class App {
         // return chars.toString(); <-- this returns memory address or some garbage
         // value
         return new String(chars);
+    }
+
+    // given two arrays, we need to find the intersection of the two
+    // and return it in an array
+
+    public int[] intersect(int[] nums1, int[] nums2) {
+        // elements common to both nums1 and nums2 will be pushed into retList
+        // order we push doesnt matter
+        // we can use a map to store the number, and its frequency
+        // we use whichever array is smaller to save space
+        if (nums1.length > nums2.length) {
+            // here we can call the function again so everything below this line is
+            // guarenteed to have nums1 as the smaller array
+            // also prevents repetitive checks where we have to check length of arrays
+            intersect(nums2, nums1);
+        }
+
+        HashMap<Integer, Integer> hm = new HashMap<>();
+        // we gotta populate the map
+        for (int num : nums1) {
+            hm.put(num, 1 + hm.getOrDefault(num, 0));
+        }
+        // next we populate the array, size of array should be length of shorter passed
+        // in array
+        int[] retArr = new int[nums1.length];
+        int j = 0; // this is gonna help us populate the array
+        for (int num : nums2) {
+            if (hm.containsKey(num) && hm.get(num) > 0) {
+                retArr[j] = num;
+                j++;
+                hm.put(num, hm.get(num) - 1);
+            }
+        }
+        return Arrays.copyOfRange(retArr, 0, j);
+    }
+
+    // given a number, find out if its a perfect square
+
+    public boolean isPerfectSquare(int num) {
+        // perfect square of any number is atleast half of that number
+        // or exists from 0 -> half of that number
+        // so our search space becomes 0 -> num/2
+        // if any number in that space ^ 2 == num, we return true
+        // else if its greater, search left half of our subspace, else search right half
+        // this is a binary search problem
+        long high = num / 2;
+        long low = 0;
+        while (low <= high) {
+            long mid = low + (high - low) / 2;
+            if (mid * mid == num) {
+                return true;
+            } else if (mid * mid > num) {
+                // we search the left half (smaller numbers)
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return false;
+    }
+
+    // Given a string s, find the first non-repeating character in it and return its
+    // index. If it does not exist, return -1.
+    public int firstUniqChar(String s) {
+        // use a map to store charcter, index pairs
+        // if map already contains the character, remove it
+        // and add what we removed to a set (so that we don't add the character again)
+        // then return the character with the smallest index as that would be unique
+        int retVal = -1;
+        Map<Character, Integer> hm = new HashMap<>();
+        Set<Character> seen = new HashSet<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            // if this charcter is in seen, continue
+            if (seen.contains(s.charAt(i))) {
+                continue;
+            }
+
+            if (hm.containsKey(s.charAt(i))) {
+                hm.remove(s.charAt(i));
+                seen.add(s.charAt(i));
+            } else {
+                hm.put(s.charAt(i), i);
+            }
+        }
+
+        // out map is populated, now we have to return smallest values
+        Collection<Integer> values = hm.values();
+        retVal = values.stream().min(Integer::compareTo).orElse(-1);
+
+        return retVal;
+
+    }
+
+    // an alternate approach to above:
+
+    public int firstUChar(String s) {
+        // lets use an array and char c - 'a' to get the index value
+        int[] frequency = new int[26]; // letters in the alphabet, 0 -> 25 index
+        for (char c : s.toCharArray()) {
+            frequency[c - 'a']++; // we are counting all the frequencies of characters
+        }
+        // now we loop through the string, and return index of any character who's count
+        // is 1
+        for (int i = 0; i < s.length(); i++) {
+            if (frequency[s.charAt(i)] == 1) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // You are given two strings s and t.
+    // String t is generated by random shuffling string s and then add one more
+    // letter at a random position.
+    // Return the letter that was added to t.
+
+    public char findTheDifference(String s, String t) {
+        // if s is empty, then t will only have 1 character
+        if (s.isEmpty()) {
+            return t.charAt(0);
+        }
+        // now we need a way to figure out which characters are in s, and which ones are
+        // in t
+        // are we told the characters are distinct?
+
+        // one way to do it would be to sort both strings, and iterate through until
+        // characters differ
+        // return the second character
+
+        // string will not have distinct characters
+
+        // we can sum up both strings by ascii value, and get the difference between t
+        // and s
+        // and return the value
+        int a = 0;
+        int b = 0;
+
+        for (int i = 0; i < s.length(); i++) {
+            a += s.charAt(i);
+        }
+
+        for (int i = 0; i < t.length(); i++) {
+            b += t.charAt(i);
+        }
+
+        return (char) (b - a);
+    }
+
+    // Given two strings s and t, return true if s is a subsequence of t, or false
+    // otherwise.
+    // A subsequence of a string is a new string that is formed from the original
+    // string by deleting some
+    // (can be none) of the characters without disturbing the relative positions of
+    // the remaining characters.
+    // (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
+
+    public boolean isSubsequence(String s, String t) {
+        // can use a 2 pointer approach, only move s pointer when you see the letter in
+        // t
+        // if we go through all of s before t, return true else false
+        int i = 0;
+        int j = 0;
+        do {
+            if (i == s.length()) {
+                return true;
+            }
+            if (j == t.length()) {
+                break;
+            }
+            if (s.charAt(i) == t.charAt(j)) {
+                i++;
+            }
+            j++;
+        } while (j < t.length());
+        return i == s.length();
+    }
+
+    // given root of tree, return sum of all left leafs
+    // i.e any leaf node that is a left child, is to be summed
+    // there will be atleast one node
+
+    public int sumOfLeftLeaves(TreeNode root) {
+        if (root.left == null && root.right == null) {
+            return 0; // because there is no left leaf to sum
+        }
+
+        // next we gotta find the left leafs
+        // from root, get left leaf from left subtree
+        // if node.left == null, and we come from left tree, sum node.val
+        // or we can collect all left leafs into an array
+
+        // basically any leaf node is a left leaf if we come from root.left
+        // given a node, is there any we can tell if it is a left leaf? we know its a
+        // leaf
+        // when it doesnt have any children
+
+        // so the only way to tell if this node is a left leaf is a boolean flag
+        // and for most tree problems we either use dfs or bfs to solve
+        // and we also define a separate function to do the traversing
+
+        // for our case we can define a seperate function
+        // which takes in node, and flag which tells us if it is a left node
+        // (i.e) we come from the left
+        return getSum(root, false); // since root isn't a left leaf
+
+    }
+
+    private int getSum(TreeNode root, boolean isLeft) {
+        if (root == null) {
+            // if we are at a left left
+            return 0;
+        }
+
+        if (root.left == null && root.right == null && isLeft) {
+            return root.val;
+        }
+
+        int a = getSum(root.left, true);
+        int b = getSum(root.right, false);
+
+        return a + b;
+    }
+
+    // given a number, convert it into a hexadecimal, returning a string
+
+    public String toHex(int num) {
+        if (num == 0) {
+            return "0";
+        }
+
+        // now hexadeciaml
+        // 0 -> 9 corrispond to themselves
+        // 10 -> A, 11->B, 12->C, 13->D, 14->E, 15->F
+        Map<Integer, Character> hm = new HashMap<>();
+        hm.put(10, 'A');
+        hm.put(11, 'B');
+        hm.put(12, 'C');
+        hm.put(13, 'D');
+        hm.put(14, 'E');
+        hm.put(15, 'F');
+
+        // basically, num/16, and then remainder maps to above corrispondance
+        // and then we update num to equal num/16 (floor it)
+
+        // and then we have to reverse
+        StringBuilder sb = new StringBuilder();
+        long val = num;
+        if (num < 0) {
+            val = (long) Math.pow(2, 32) + num;
+        }
+
+        while (val != 0) {
+            int remainder = (int) (val % 16); // then we map the remainder to the value
+            if (remainder <= 9 && remainder >= 0) {
+                sb.append(remainder);
+            } else {
+                sb.append(hm.get(remainder));
+            }
+            val = val / 16;
+        }
+        return sb.reverse().toString().toLowerCase();
+    }
+
+    // Given a string s which consists of lowercase or uppercase letters,
+    // return the length of the longest palindrome that can be built with those
+    // letters.
+
+    public int longestPalindrome(String s) {
+        // the largest palendrome which can be constructed
+        // has to have at most equal number of even number letters
+        // with 1 letter having odd number
+
+        // the sum of freq of these letters is the answer
+
+        // sum all even frequent characters, and one odd frequent character
+        // the greater odd frequent character the longer our palendrome
+
+        HashMap <Character, Integer> hm = new HashMap<>();
+        for(char c : s.toCharArray()){
+            hm.put(c, 1 + hm.getOrDefault(c, 0));
+        }
+
+        //now we need to collect all characters that are even with counts, and then choose the largest
+        //odd numbered count to form our palendrome string
+        int strLen = 0;
+        //how to iterate through map? 
+        for(Map.Entry<Character, Integer> entry : hm.entrySet()){
+            Integer i = entry.getValue();
+            if(i % 2 == 0){
+                strLen += i;
+                hm.remove(entry.getKey()); //this way only odd values will be left in map
+            }
+        }
+
+        //now we need to find the largest odd value to choose from
+        
+
     }
 
 }
