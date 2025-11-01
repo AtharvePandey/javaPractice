@@ -13,10 +13,13 @@ import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import apple.laf.JRSUIUtils.Tree;
+
+// import javax.swing.text.Segment;
+
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
 import java.util.Random;
-import java.security.KeyStore.Entry;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,9 +34,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        String s = "abc";
-        String t = "ahbgdc";
-        app.isSubsequence(s, t);
+        String f = "FlaG";
+        app.detectCapitalUse(f);
     }
 
     public ListNode tempfunction1() {
@@ -6309,26 +6311,1076 @@ public class App {
         // sum all even frequent characters, and one odd frequent character
         // the greater odd frequent character the longer our palendrome
 
-        HashMap <Character, Integer> hm = new HashMap<>();
-        for(char c : s.toCharArray()){
+        HashMap<Character, Integer> hm = new HashMap<>();
+        for (char c : s.toCharArray()) {
             hm.put(c, 1 + hm.getOrDefault(c, 0));
         }
 
-        //now we need to collect all characters that are even with counts, and then choose the largest
-        //odd numbered count to form our palendrome string
+        boolean weUsedOdd = false;
+
+        // now we need to collect all characters that are even with counts, and then
+        // choose the largest
+        // odd numbered count to form our palendrome string
         int strLen = 0;
-        //how to iterate through map? 
-        for(Map.Entry<Character, Integer> entry : hm.entrySet()){
+        // how to iterate through map?
+        for (Map.Entry<Character, Integer> entry : hm.entrySet()) {
             Integer i = entry.getValue();
-            if(i % 2 == 0){
+            if (i % 2 == 0) {
                 strLen += i;
-                hm.remove(entry.getKey()); //this way only odd values will be left in map
+            } else {
+                strLen += i - 1; // if the number is odd, make it even, and use it
+                weUsedOdd = true;
             }
         }
 
-        //now we need to find the largest odd value to choose from
-        
+        if (weUsedOdd) {
+            strLen += 1;
+        }
 
+        return strLen;
+
+    }
+
+    // given two strings, add them and return a string
+    // can't convert both strings to ints directly
+    // both strings have only ints, and no leading zeroes
+
+    public String addStrings(String num1, String num2) {
+        // we can use s.charAt(i) - '0' to get the integer value
+        // we need to keep track of the sum and also the remainder
+        // loop till either string is empty
+
+        // following logic of addList as well, and no need to check if passed in str
+        // length is 0
+        int i = num1.length() - 1;
+        int j = num2.length() - 1;
+        int remainder = 0;
+        StringBuilder sb = new StringBuilder();
+
+        while (i >= 0 || j >= 0 || remainder != 0) {
+            // we loop as long as we have a digit to add or a remainder
+            int firstNum = i >= 0 ? num1.charAt(i) - '0' : 0;
+            int secondNum = j >= 0 ? num2.charAt(j) - '0' : 0;
+            int sum = firstNum + secondNum + remainder;
+            sb.append(sum % 10); // we want the digit in the ones place, if sum<9 should be fine
+            remainder = sum / 10; // update remainder with anything in the 10's place
+            i--;
+            j--;
+        }
+        return sb.reverse().toString();
+    }
+
+    // given 2 arrays, g represents greed factor of child, and s is cookie size
+    // child g[i] is satisfied if s[j] (cookie size) meets their needs
+    // return maximum number of satisfied children
+
+    public int findContentChildren(int[] g, int[] s) {
+        // as long as there exists a cookie size >= greedFactor for some child
+        // that child will get a cookie
+        // and the count of children being happy increases
+
+        // if we sort both greed factor and cookies
+        // then we can count how many children
+        // meet this cookie size, using two pointers for each g, s array
+        int i = 0;
+        int j = 0;
+        Arrays.sort(g);
+        Arrays.sort(s);
+        int retVal = 0;
+        while (i < g.length) {
+            if (j == s.length) {
+                break;
+            }
+            if (g[i] <= s[j]) {
+                retVal++;
+                i++;
+                j++;
+            } else {
+                i++;
+            }
+        }
+        return retVal;
+    }
+
+    // given string, return true, if it can be constructed
+    // from a substring
+
+    public boolean repeatedSubstringPattern(String s) {
+        // the bruteforce way to solve this is to
+        // use backtracking, get all substrings
+        // and check if those substrings can concat to form s
+        // that cause o(n^2) time
+
+        // if we concat the string with itself
+        // then remove first and last character
+        // and then check if s is in this new string
+        // then by some string proof, we can return true
+
+        StringBuilder sb = new StringBuilder(s);
+        sb.append(s); // construct string * 2
+
+        // delete first and last character
+        sb = sb.delete(0, 1);
+        sb = sb.delete(sb.length() - 1, sb.length());
+        int j = 0;
+        int i = 0;
+        String str = sb.toString();
+        while (i < str.length() && j < s.length()) {
+            if (str.charAt(i) == s.charAt(j)) {
+                j++;
+                i++;
+                if (j == s.length()) {
+                    return true;
+                }
+            } else {
+                i = i - j + 1; // updates i to the last position we checked
+                j = 0; // we reset j
+            }
+        }
+        return false;
+    }
+
+    // given two numbers, return an int
+    // where int is the number of bits different in the number
+
+    public int hammingDistance(int x, int y) {
+        int retNum = 0;
+        // we need to go through both numbers, and if bits are not equal, add to retNum
+        while (x != 0 || y != 0) {
+            // numbers can have different sizes in bits
+            // how to extract rightmost bit, and then shift all bits?
+            int firstBit = x & 1;
+            x = x >> 1;
+            int secondBit = y & 1;
+            y = y >> 1;
+            if (firstBit != secondBit) {
+                retNum++;
+            }
+        }
+
+        if (x > 0) {
+            // some bits left in x, add the rest of them into retNum
+            while (x > 0) {
+                retNum++;
+                x = x >> 1;
+            }
+        }
+        if (y > 0) {
+            while (y > 0) {
+                retNum++;
+                y = y >> 1;
+            }
+        }
+        return retNum;
+    }
+
+    // we are given a 2d grid array
+    // we want to find the perimeter of the island in the grid
+    // we are guaranteed 1 island, no water in the island either
+    // grid[i][j] = 1 means there is land, else no land
+
+    public int islandPerimeter(int[][] grid) {
+        // when grid[i][j] is 1, that represents a perimeter of 4
+        // since there are 4 sides to the grid being formed
+        // if grid[i][j] shares land with say [i][j+1]
+        // then grid[i][j] has 3 sides, and i[j+1] has 3 sides
+        // with perimeter being 6
+
+        // so for each grid[i][j] = 1, perimeter is 4
+        // but if there is anything adjacent, substract 2
+        // as in above case, perimeter was 8, but its 2 blocks adjacent
+        // so actual perimeter is 6
+
+        // go through grid, if 1, at i,j add 4
+        // check if there is land to left or above current grid
+        // substact 2 from final perimeter
+
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+
+        int perimeter = 0;
+
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                // check this grid square
+                if (grid[i][j] == 1) {
+                    perimeter += 4; // 4 sides to a grid square
+                    // next we check if there is a boundry left or above
+                    // we check left and above to avoid duplicate - 2's
+                    // and also because we are going topleft to bottom right
+
+                    // first to check if there is land on above, we have to check i-1,j == 1
+                    // while making sure i-1 is in bounds
+                    if (i > 0 && grid[i - 1][j] == 1) {
+                        perimeter -= 2;
+                    }
+
+                    // then we check i, j-1
+                    if (j > 0 && grid[i][j - 1] == 1) {
+                        perimeter -= 2;
+                    }
+                }
+            }
+        }
+        return perimeter;
+
+    }
+
+    // You are given an integer array nums.
+
+    // Start by selecting a starting position curr such that nums[curr] == 0, and
+    // choose a movement direction of either left or right.
+
+    // After that, you repeat the following process:
+
+    // If curr is out of the range [0, n - 1], this process ends.
+    // If nums[curr] == 0, move in the current direction by incrementing curr if you
+    // are moving right, or decrementing curr if you are moving left.
+    // Else if nums[curr] > 0:
+    // Decrement nums[curr] by 1.
+    // Reverse your movement direction (left becomes right and vice versa).
+    // Take a step in your new direction.
+    // A selection of the initial position curr and movement direction is considered
+    // valid if every element in nums becomes 0 by the end of the process.
+
+    // Return the number of possible valid selections.
+
+    public int countValidSelections(int[] nums) {
+        // we can keep track of prefix sum for both left and right of nums[i]
+        // if the sums are equal, then we can go 2 possible ways (both are valid)
+        // else if the difference is 1, then only 1 way is possible (the one with > sum)
+        // the rightSum is totalSum - currentLeftSum and nums[i]
+
+        int totalSum = 0;
+        int leftSum = nums[0];
+        int ans = 0;
+
+        for (int num : nums) {
+            totalSum += num;
+        }
+
+        for (int num : nums) {
+            if (num == 0) {
+                int rightSum = totalSum - leftSum - num; // although num is 0 so it doesnt matter...
+                if (rightSum == leftSum) {
+                    ans += 2;
+                } else if (Math.abs(rightSum - leftSum) == 1) {
+                    ans += 1;
+                }
+            }
+            leftSum += num;
+        }
+
+        return ans;
+
+    }
+
+    // a number compliment is what you get when you flip all the integers of 1 to 0
+    // and 0 to 1 in a number
+    // given a number > 0, find its compliment
+
+    public int findComplement(int num) {
+        if (num == 1) {
+            return 0;
+        }
+
+        // we need to extract the bits of num, and build retNum
+
+        // to extract bit of num, we just do num & 1, to get rightmost bit
+        // when we rightshift num, we get next bit to extract
+
+        // how will we update retNum? if we do retNum | ~extracted bit, we will get the
+        // bit into num
+        // then leftshift retNum by 1 and repeat
+        // but we will be in reverse order with the correct bits extracted...
+
+        // so then have another loop which reverses the bits, and we return the answer
+
+        // lets just return the compliement of num
+        // return ~num;
+
+        // above doesn't work, signed numbers, we dont have that.
+
+        // what if we xor with 1?
+        // 1 << some bits is the mask, where num ^ 111... gives the compliment
+
+        // so to find leftshift value, we can just count how many bits there are
+        int numBits = 0;
+        int n = num;
+        while (n != 0) {
+            n = n >> 1;
+            numBits++;
+        }
+        int mask = (1 << numBits) - 1;
+        return num ^ mask;
+
+    }
+
+    // You are given a license key represented as a string s that consists of only
+    // alphanumeric characters and dashes.
+    // The string is separated into n + 1 groups by n dashes. You are also given an
+    // integer k.
+    // We want to reformat the string s such that each group contains exactly k
+    // characters, except for the first group, which could be shorter than k but
+    // still must contain at least one character.
+    // Furthermore, there must be a dash inserted between two groups, and you should
+    // convert all lowercase letters to uppercase.
+    // Return the reformatted license key.
+
+    // 2 e.g:
+    // Input: s = "5F3Z-2e-9-w", k = 4
+    // Output: "5F3Z-2E9W"
+
+    // Input: s = "2-5g-3-J", k = 2
+    // Output: "2-5G-3J"
+
+    public String licenseKeyFormatting(String s, int k) {
+        // split the string into k parts, where first part can be <= k
+        // we can start by removing dashes
+        // is a capital character
+
+        s = s.toUpperCase().replaceAll("-", "");
+
+        // now we need to construct output,
+        // we can take a sort of greedy approach by building from end to start
+        // since start can be <= k, build string, when length added % k, add a dash
+
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            sb.append(s.charAt(i));
+            count++;
+            if (count % k == 0 && i != 0) {
+                sb.append("-");
+            }
+        }
+
+        return sb.reverse().toString();
+
+    }
+
+    // A web developer needs to know how to design a web page's size. So, given a
+    // specific rectangular web page’s area,
+    // your job by now is to design a rectangular web page, whose length L and width
+    // W satisfy the following requirements:
+
+    // The area of the rectangular web page you designed must equal to the given
+    // target area.
+    // The width W should not be larger than the length L, which means L >= W.
+    // The difference between length L and width W should be as small as possible.
+    // Return an array [L, W] where L and W are the length and width of the web page
+    // you designed in sequence.
+
+    public int[] constructRectangle(int area) {
+        // area is l * w, if the difference between l and w is minimal, we get answer
+        // l = w is the most optimal answer, and l, w have to be whole numbers
+
+        // sqrt(area) is the search space, where we have to loop through and keep track
+        // of two things:
+        // if l * w = area, and if the difference is minimum
+
+        // so the width can be the first number from sqrt(area) -> 0 which divides area.
+        // i.e say l = w, then sqrt(area) = l, w. because l*w = area. but when that is
+        // not the case
+        // we know that both l and w have to be from 0 -> sqrt(area), and to get the
+        // smallest difference between l and w
+        // we can take the first factor we find to be w, and second to be area/w
+
+        int[] retArr = new int[2];
+
+        int w = (int) Math.sqrt(area);
+
+        while (area % w != 0) {
+            w--;
+        }
+
+        retArr[0] = area / w;
+        retArr[1] = w;
+
+        return retArr;
+    }
+
+    // Our hero Teemo is attacking an enemy Ashe with poison attacks! When Teemo
+    // attacks Ashe, Ashe gets poisoned
+    // for a exactly duration seconds. More formally, an attack at second t will
+    // mean Ashe is poisoned during the inclusive time interval
+    // [t, t + duration - 1]. If Teemo attacks again before the poison effect ends,
+    // the timer for it is reset, and the poison effect will end duration seconds
+    // after the new attack.
+    // You are given a non-decreasing integer array timeSeries, where timeSeries[i]
+    // denotes that Teemo attacks Ashe at second timeSeries[i],
+    // and an integer duration.
+    // Return the total number of seconds that Ashe is poisoned.
+
+    public int findPoisonedDuration(int[] timeSeries, int duration) {
+        // the posion resets if we poison again before the previous duration ends
+        // 1, 2, 3, 5, 7 and duration 2
+        // we need to return int of total time posioned
+
+        // t == 1, will be posioned from second 1, to (1 + 2) - 1 or 2 seconds
+        // t == 2, since we are already posioned at this time, the timer resets, and we
+        // will be poisoned till (2+2) - 1 = 3 seconds
+        // t == 3, same logic, timer resets, and from 3 to (3+2) -1 = 4 seconds, so far
+        // we have been poisoned for 3 seconds
+        // t == 4, we are still posioned this second, so 4 seconds we have been poisoned
+        // t == 5, we get posioned from 5 --> (5+2) - 1= 6 seconds, poisoned for 5
+        // seconds so far
+        // t == 6, done getting poisoned, poisoned for 6 seconds
+        // t == 7, posioned from 7 -> 8 seconds,
+        // t == 8, poison ends, poisoned for a total of 8 seconds.
+
+        // so we add to seconds poisoned, depending on interval and duration
+        // if the duration < interval between attack 1 and 2 (as example), then we add
+        // duration to our seconds poisoned
+        // else we add the interval
+
+        int secondsPoisoned = 0;
+        for (int i = 0; i < timeSeries.length - 1; i++) {
+            int interval = timeSeries[i + 1] - timeSeries[i];
+            secondsPoisoned += Math.min(interval, duration);
+        }
+
+        // and at the end, we add duration to whatever is at the last element of
+        // timeSeries
+        // this is because we looped to < length - 1;
+
+        secondsPoisoned += duration;
+        return secondsPoisoned;
+    }
+
+    // The next greater element of some element x in an array is the first greater
+    // element that is to the right of x in the same array.
+    // You are given two distinct 0-indexed integer arrays nums1 and nums2, where
+    // nums1 is a subset of nums2.
+    // For each 0 <= i < nums1.length, find the index j such that nums1[i] ==
+    // nums2[j] and determine the next greater element of nums2[j]
+    // in nums2. If there is no next greater element, then the answer for this query
+    // is -1.
+    // Return an array ans of length nums1.length such that ans[i] is the next
+    // greater element as described above.
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        // first thing that comes to mind is to sort nums1, and nums2, and then
+        // loop through length of smaller array, and find greater element in nums2
+
+        // sorting through takes 2(nlogn) time
+        // then finding num[i] in nums[2] we can use binary search
+        // and then finding the next greater element
+
+        // overall nlogn time
+
+        // can we do it in linear time?
+
+        // we can use a strictly decreasing stack, and traverse nums2 from end to
+        // beginning
+        // push an element onto the stack, if stack is empty when we push, that means
+        // nums2[i] has no greater right
+        // so we can give that value a -1 in the map
+        // else we add the top value to nums2[i] and then add this current value
+
+        Stack<Integer> stack = new Stack<>();
+        Map<Integer, Integer> hm = new HashMap<>();
+        for (int i = nums2.length - 1; i >= 0; i--) {
+            // we first wanna make sure we keep the strictly decreasing order
+            // so we pop from stack while num2[i] > stack.top
+            // then if stack is empty, put nums2[i] as key, and -1 as value, else stack.top
+            // as value to represent strictly greater
+            while (!stack.empty() && nums2[i] > stack.peek()) {
+                stack.pop();
+            }
+            if (stack.empty()) {
+                hm.put(nums2[i], -1);
+            } else {
+                hm.put(nums2[i], stack.peek());
+            }
+            stack.add(nums2[i]);
+        }
+
+        for (int i = 0; i < nums1.length; i++) {
+            if (hm.containsKey(nums1[i])) {
+                nums1[i] = hm.get(nums1[i]);
+            }
+        }
+        return nums1;
+    }
+
+    // Given an array of strings words, return the words that can be typed using
+    // letters of the alphabet on only one
+    // row of American keyboard like the image below.
+    // Note that the strings are case-insensitive, both lowercased and uppercased of
+    // the same letter are treated
+    // as if they are at the same row.
+
+    // In the American keyboard:
+
+    // the first row consists of the characters "qwertyuiop",
+    // the second row consists of the characters "asdfghjkl", and
+    // the third row consists of the characters "zxcvbnm".
+
+    public String[] findWords(String[] words) {
+        // case doesn't matter, so for each string, we need to see if it can be
+        // constructed by using only 1 row on keyboard
+        // if it can, we return a string array of the words
+
+        // n^2 soln is trivial, can we do better
+        // essentially, its making sure all characters in each word, is contained within
+        // either row
+
+        // we loop through the words array
+        // lets say we have a word, how do we check if all characters in this word are
+        // part of first row, or second or third
+        // and can we do it in constant time?
+
+        // i.e word and first row, else second else third, don't add it to result if
+        // none
+        ArrayList<String> retList = new ArrayList<>(); // at most, we will have all the words in this list
+
+        Set<Character> firstRow = "qwertyuiop".chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
+        Set<Character> secondRow = "asdfghjkl".chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
+        Set<Character> thirdRow = "zxcvbnm".chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
+
+        for (String word : words) {
+            String temp = word.toLowerCase();
+            if (firstRow.contains(temp.charAt(0)) && stringInSet(temp, firstRow)) {
+                retList.add(word);
+            } else if (secondRow.contains(temp.charAt(0)) && stringInSet(temp, secondRow)) {
+                retList.add(word);
+            } else if (thirdRow.contains(temp.charAt(0)) && stringInSet(temp, thirdRow)) {
+                retList.add(word);
+            }
+        }
+
+        return retList.toArray(new String[0]);
+    }
+
+    private boolean stringInSet(String str, Set<Character> chars) {
+        for (char c : str.toCharArray()) {
+            if (!chars.contains(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Given the root of a binary search tree (BST) with duplicates, return all the
+    // mode(s) (i.e.,
+    // the most frequently occurred element) in it.
+    // If the tree has more than one mode, return them in any order.
+    // Assume a BST is defined as follows:
+    // The left subtree of a node contains only nodes with keys less than or equal
+    // to the node's key.
+    // The right subtree of a node contains only nodes with keys greater than or
+    // equal to the node's key.
+    // Both the left and right subtrees must also be binary search trees.
+
+    public int[] findMode(TreeNode root) {
+        // find the most frequent number in binary tree
+        // can do it in single pass of tree, if we iteratively build a map...
+        Map<Integer, Integer> hm = new HashMap<>();
+        buildMap(root, hm);
+
+        // now we need the largest element, and if there are more than 2, add them as
+        // well...
+        ArrayList<Integer> retList = new ArrayList<>();
+
+        int freq = 0;
+        for (Map.Entry<Integer, Integer> entry : hm.entrySet()) {
+            // we need the highest key, value pairs
+            freq = Math.max(freq, entry.getValue());
+        }
+
+        // now we add all keys with this value to retlist
+        for (Map.Entry<Integer, Integer> entry : hm.entrySet()) {
+            if (entry.getValue() == freq) {
+                retList.add(entry.getKey());
+            }
+        }
+
+        // convert list to int[]
+        int[] res = new int[retList.size()];
+        for (int i = 0; i < retList.size(); i++) {
+            res[i] = retList.get(i);
+        }
+
+        return res;
+
+    }
+
+    private void buildMap(TreeNode root, Map<Integer, Integer> freq) {
+        if (root == null) {
+            return;
+        }
+        freq.put(root.val, 1 + freq.getOrDefault(root.val, 0));
+        buildMap(root.left, freq);
+        buildMap(root.right, freq);
+    }
+
+    // given num, return string representation in base 7
+
+    public String convertToBase7(int num) {
+        if (num == 0) {
+            return "0";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        boolean negative = num < 0;
+        int val = Math.abs(num);
+
+        while (val != 0) {
+            sb.append(val % 7);
+            val /= 7;
+        }
+
+        if (negative) {
+            sb.append("-");
+        }
+
+        return sb.reverse().toString();
+    }
+
+    // You are given a positive number n.
+    // Return the smallest number x greater than or equal to n,
+    // such that the binary representation of x contains only set bits
+
+    public int smallestNumber(int n) {
+        // set bits:
+        // 1 (1), 11(3), 111(7), 1111(15), 11111(29) etc...
+        // so given a number n, we need to figure out the next number that has all of
+        // its bits set to 1
+        // we can just figure out how many bits are in in, and return n+1st amount of
+        // bits, set to 1
+
+        int numBits = 0;
+        int retVal = 0; // the minimum number
+        while (n != 0) {
+            numBits++;
+            n = n >> 1;
+        }
+
+        for (int i = 0; i < numBits; i++) {
+            retVal = retVal << 1; // make space for another bit
+            retVal = retVal | 1; // set the new bit to 1
+        }
+
+        return retVal;
+    }
+
+    // You are given an integer array score of size n, where score[i] is the score
+    // of the ith athlete in a competition. All the
+    // scores are guaranteed to be unique.
+    // The athletes are placed based on their scores, where the 1st place athlete
+    // has the highest score, the 2nd place athlete has
+    // the 2nd highest score, and so on. The placement of each athlete determines
+    // their rank:
+    // The 1st place athlete's rank is "Gold Medal".
+    // The 2nd place athlete's rank is "Silver Medal".
+    // The 3rd place athlete's rank is "Bronze Medal".
+    // For the 4th place to the nth place athlete, their rank is their placement
+    // number (i.e., the xth place athlete's rank is "x").
+    // Return an array answer of size n where answer[i] is the rank of the ith
+    // athlete.
+
+    public String[] findRelativeRanks(int[] score) {
+        // we can either sort, or use a heap
+        Queue<Integer> pq = new PriorityQueue<>();
+        for (int s : score) {
+            pq.add(s);
+        }
+
+        Map<Integer, String> rankMap = new HashMap<>();
+        // for the first 3 numbers, we give gold, silver and bronze, then just the
+        // number itself as a string
+        int i = 0;
+        while (!pq.isEmpty()) {
+            int val = pq.poll();
+            if (i == 0) {
+                rankMap.put(val, "Gold Medal");
+            } else if (i == 1) {
+                rankMap.put(val, "Silver Medal");
+            } else if (i == 2) {
+                rankMap.put(val, "Bronze Medal");
+            } else {
+                rankMap.put(val, String.valueOf(i + 1));
+            }
+            i++;
+        }
+        List<String> retList = new ArrayList<>();
+        for (int s : score) {
+            retList.add(rankMap.get(s));
+        }
+
+        return retList.toArray(new String[0]);
+    }
+
+    // A perfect number is a positive integer that is equal to the sum of its
+    // positive divisors, excluding the number itself.
+    // A divisor of an integer x is an integer that can divide x evenly.
+    // Given an integer n, return true if n is a perfect number, otherwise return
+    // false.
+
+    public boolean checkPerfectNumber(int num) {
+        // constraints for n are 10^8, so we can potentially have the most slow code to
+        // solve this
+        // but we can do this in linear time
+        // loop from num - 1 to 1, if num % currNum is 0, add it to list
+        // then return true if sum of list is num
+
+        int sum = 0;
+
+        for (int i = num - 1; i > 0; i--) {
+            if (num % i == 0) {
+                sum += i;
+            }
+        }
+
+        return sum == num;
+    }
+
+    // We define the usage of capitals in a word to be right when one of the
+    // following cases holds:
+
+    // All letters in this word are capitals, like "USA".
+    // All letters in this word are not capitals, like "leetcode".
+    // Only the first letter in this word is capital, like "Google".
+    // Given a string word, return true if the usage of capitals in it is right.
+
+    public boolean detectCapitalUse(String word) {
+        if (word == word.toLowerCase()) {
+            return true; // all lowercase word is valid
+        }
+
+        String w = word;
+        if (w.toUpperCase() == word) {
+            return true; // if all letters are capital
+        }
+
+        // now to handle case where only one letter (first one) is capital and rest are
+        // lower
+        if (Character.isUpperCase(w.charAt(0))) {
+            // first word is uppercase
+            for (int i = 1; i < w.length(); i++) {
+                if (Character.isUpperCase(w.charAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+
+        // simpler solution below
+
+        // int n = word.length();
+        // int upperCount = 0;
+        // for (int i = 0; i < n; i++) {
+        // if (word.charAt(i)>='A' && word.charAt(i)<='Z') {
+        // upperCount++;
+        // }
+        // }
+        // if (upperCount == n) return true;
+        // if (upperCount == 0) return true;
+        // if (upperCount == 1 && (word.charAt(0)>='A' && word.charAt(0)<='Z')) return
+        // true;
+        // return false;
+    }
+
+    // Given two strings a and b, return the length of the longest uncommon
+    // subsequence between a and b. If no such uncommon subsequence exists, return
+    // -1.
+
+    public int findLUSlength(String a, String b) {
+        // longest means largerst
+        // uncommon subsequence means a sequence that is in one string but not the other
+        // if both strings are the same, then there is no uncommon subsequence
+        // and the length of the longest one will always be the bigger string
+        return a.equals(b) ? -1 : Math.max(a.length(), b.length());
+    }
+
+    // Given the root of a Binary Search Tree (BST), return the minimum absolute
+    // difference between the values of any two different nodes in the tree.
+
+    int minDiff = Integer.MAX_VALUE;
+    Integer prev = null;
+
+    public int getMinimumDifference(TreeNode root) {
+        // we use an inorder traversal, to update global minDiff variable
+        // we keep track of previous node visited to calculate the difference
+        inorder(root);
+        return minDiff;
+    }
+
+    private void inorder(TreeNode root) {
+        if (root == null)
+            return;
+
+        inorder(root.left);
+
+        if (prev != null) {
+            minDiff = Math.min(minDiff, Math.abs(root.val - prev));
+        }
+        prev = root.val;
+
+        inorder(root.right);
+    }
+
+    // Given a string s and an integer k, reverse the first k characters for every
+    // 2k characters counting from the start of the string.
+    // If there are fewer than k characters left, reverse all of them. If there are
+    // less than 2k but greater than or equal to k characters,
+    // then reverse the first k characters and leave the other as original.
+
+    public String reverseStr(String s, int k) {
+        // //given k, 2k characters is what we choose substring of
+        // //and then out of those reverse only the first k characters
+
+        // //and then repeat
+
+        // //0 -> 2k-1 becomes substring where we reverse the first k, then update our
+        // index to 2k
+        // //basically, reverse first k, jump to 2k, repeat
+        // //until 2k is out of bounds
+
+        // //if we have < k characters, reverse as many as we can...
+
+        // StringBuilder sb = new StringBuilder();
+
+        // int i = 0;
+        // while(i < s.length()){
+        // //we need to get the first 2k into our sb, and reverse only k
+        // //...or we can reverse the first k, update i to 2k
+        // //reversing the first k means from 0 -> k - 1 indecies
+        // sb.append(s.substring(i, i + k)).reverse();
+        // //then we append the rest of our 2k substring
+        // sb.append(s.substring(i + k, i + (2 * k)));
+        // //update i
+        // i = 2 * k;
+
+        // //but somewhere along the way we need to add checks, i.e substring from k ->
+        // 2k might not exist
+        // //if 2k is out of bounds of string?
+        // }
+
+        // return sb.toString();
+
+        char[] str = s.toCharArray();
+
+        // we increment by 2k, and take the first k from that to reverse
+        for (int i = 0; i < str.length; i += 2 * k) {
+            // we reverse from i -> k - 1 (since reversing first k)
+            // but k-1 could be out of bounds so its either reverse from -> k-1
+            // or i to length - 1 of the array
+            int start = i;
+            int end = Math.min((i + k - 1), str.length - 1);
+            // end index is gonna be from i to k-1 or the length whichever comes first
+            reverse(str, start, end);
+        }
+        return new String(str);
+    }
+
+    private void reverse(char[] str, int start, int end) {
+        while (start < end) {
+            char temp = str[start];
+            str[start] = str[end];
+            str[end] = temp;
+            start++;
+            end--;
+        }
+    }
+
+    // You are given a string s representing an attendance record for a student
+    // where each character signifies whether the student was absent, late, or
+    // present on that day.
+    // The record only contains the following three characters:
+
+    // 'A': Absent.
+    // 'L': Late.
+    // 'P': Present.
+
+    // The student is eligible for an attendance award if they meet both of the
+    // following criteria:
+
+    // The student was absent ('A') for strictly fewer than 2 days total.
+    // The student was never late ('L') for 3 or more consecutive days.
+    // Return true if the student is eligible for an attendance award, or false
+    // otherwise.
+
+    public boolean checkRecord(String s) {
+        int aCount = 0;
+        boolean isConsecutive = false;
+
+        char[] c = s.toCharArray();
+        if (c[0] == 'A') {
+            aCount++;
+        }
+
+        for (int i = 1; i < s.length(); i++) {
+            if (c[i] == 'A') {
+                aCount++;
+            } else if (c[i] == 'L') {
+                if (i >= 2 && c[i - 1] == 'L' && c[i - 2] == 'L') {
+                    isConsecutive = true;
+                }
+            }
+        }
+
+        // late has to be consecutive for 3 or more times to return false
+        // and if aCount < 2 we can return true
+        if (isConsecutive || aCount >= 2) {
+            return false;
+        }
+        return true;
+    }
+
+    // Given a string s, reverse the order of characters in each word within a
+    // sentence while still preserving whitespace and initial word order.
+
+    public String reverseWords(String s) {
+        String[] strs = s.split(" ");
+        StringBuilder word = new StringBuilder();
+        for (String str : strs) {
+            StringBuilder temp = new StringBuilder(str);
+            word.append(temp.reverse());
+            word.append(" ");
+        }
+        return word.toString().trim();
+    }
+
+    // below class represents a adjacency list, given a node, we have a list of all
+    // its children...
+    // usually represents a graph rather than BST
+
+    class Node {
+        public int val;
+        public List<Node> children;
+
+        public Node() {
+        }
+
+        public Node(int _val) {
+            val = _val;
+        }
+
+        public Node(int _val, List<Node> _children) {
+            val = _val;
+            children = _children;
+        }
+    };
+
+    // Given a n-ary tree, find its maximum depth.
+    // The maximum depth is the number of nodes along the longest path from the root
+    // node down to the farthest leaf node.
+    // Nary-Tree input serialization is represented in their level order traversal,
+    // each group of children is separated by the null value.
+
+    public int maxDepth(Node root) {
+        // we wanna find the node furthest from root of the graph
+        // and return the depth
+        // i.e if from root there are 2 nodes below root, and that is the max depth,
+        // then we return 3 including root
+        // so for every node, we visit its children and keep track of count
+
+        // the max depth is also equal to number of levels in the graph, so we can use a
+        // bfs to calculate how many levels
+        if (root == null) {
+            return 0;
+        }
+
+        Queue<Node> queue = new LinkedList<>();
+
+        queue.offer(root);
+        int maxDepth = 0;
+
+        while (!queue.isEmpty()) {
+            // while the queue isn't empty, we need to explore each node
+            // we explore each node by adding this nodes children to the queue
+            // we do that by looping through all nodes in the queue
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                Node current = queue.poll();
+                for (Node child : current.children) {
+                    queue.offer(child);
+                }
+            }
+            maxDepth++;
+        }
+        return maxDepth;
+    }
+
+    // In the town of Digitville, there was a list of numbers called nums containing
+    // integers from 0 to n - 1.
+    // Each number was supposed to appear exactly once in the list, however, two
+    // mischievous numbers sneaked
+    // in an additional time, making the list longer than usual.
+    // As the town detective, your task is to find these two sneaky numbers. Return
+    // an array of size two containing the
+    // two numbers (in any order), so peace can return to Digitville.
+
+    public int[] getSneakyNumbers(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        int[] retArr = new int[2];
+        int i = 0;
+
+        for (int num : nums) {
+            if (set.contains(num)) {
+                if (i == 2) {
+                    break;
+                }
+                retArr[i] = num;
+                i++;
+            }
+            set.add(num);
+        }
+        return retArr;
+    }
+
+    // Given an integer array nums of 2n integers, group these integers into n pairs
+    // (a1, b1), (a2, b2), ..., (an, bn)
+    // such that the sum of min(ai, bi) for all i is maximized. Return the maximized
+    // sum.
+
+    public int arrayPairSum(int[] nums) {
+        int sum = 0;
+        Arrays.sort(nums);
+        int i = 0;
+        int j = 1;
+
+        while (j < nums.length) {
+            sum += Math.min(nums[i], nums[j]);
+            i += 2;
+            j += 2;
+        }
+
+        return sum;
+    }
+
+    // You are given an array of integers nums and the head of a linked list.
+    // Return the head of the modified linked list after removing all nodes from the
+    // linked list that have a value that exists in nums.
+
+    public ListNode modifiedList(int[] nums, ListNode head) {
+        // we can use a hashset to store values in nums
+        // go through the list in a single pass using 2 pointers
+        // and if head.val is in our set, we can just remove that node from list
+        ListNode temp = new ListNode(0);
+        temp.next = head;
+        ListNode prev = temp;
+        ListNode curr = head;
+
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+
+        while (curr != null) {
+            if (set.contains(curr.val)) {
+                prev.next = curr.next;
+                curr = curr.next;
+            } else {
+                prev = prev.next;
+                curr = curr.next;
+            }
+        }
+
+        return temp.next;
     }
 
 }
