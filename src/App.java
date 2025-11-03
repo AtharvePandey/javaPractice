@@ -7383,4 +7383,159 @@ public class App {
         return temp.next;
     }
 
+    // calculate tilt of binary tree
+    int tilt = 0;
+
+    public int findTilt(TreeNode root) {
+        // tilt of this node, is the absolute diff of sum of its left and right subtrees
+        // if a node doesn't have left or right children their sum is 0
+        getTilt(root);
+        return tilt;
+    }
+
+    private int getTilt(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int left = getTilt(root.left);
+        int right = getTilt(root.right);
+        tilt += Math.abs(right - left);
+        return left + right + root.val;
+    }
+
+    // given a matrix, return a matrix of size r,c rather m,n
+    // if the constraints aren't possible, return the original matrix
+
+    public int[][] matrixReshape(int[][] mat, int r, int c) {
+        // its not possible if we have less elements according to the r,c layout
+        // i.e if mat is 3x3, 9 elements, and r,c is 2,3 or any 2 numbers whos product
+        // is < 9
+        // then that means we can't do it
+        if (r * c != mat.length * mat[0].length) {
+            return mat;
+        }
+        // these two will represent where we put in new matrix
+        int i = 0;
+        int j = 0;
+
+        int[][] retMat = new int[r][c];
+        for (int k = 0; k < mat.length; k++) {
+            for (int l = 0; l < mat[0].length; l++) {
+                // here we iterate left to right, then top to bottom
+                // how do we put into new matrix?
+                // we have to reset our j ptr, since that is the length of inner array
+                // when do we reset it? when j = c, set j = 0;
+
+                // retMat[i][j] = mat[k][l]
+                retMat[i][j] = mat[k][l];
+                j++;
+                if (j == c) {
+                    j = 0;
+                    i++;
+                }
+            }
+        }
+        return retMat;
+    }
+
+    // You are given two integers m and n representing a 0-indexed m x n grid. You
+    // are also given two 2D integer arrays
+    // guards and walls where guards[i] = [rowi, coli] and walls[j] = [rowj, colj]
+    // represent the positions of the ith guard and
+    // jth wall respectively.
+    // A guard can see every cell in the four cardinal directions (north, east,
+    // south, or west) starting from their position
+    // unless obstructed by a wall or another guard. A cell is guarded if there is
+    // at least one guard that can see it.
+    // Return the number of unoccupied cells that are not guarded.
+
+    private static final int UNGUARDED = 0;
+    private static final int GUARDED = 1;
+    private static final int GUARD = 2;
+    private static final int WALL = 3;
+
+    public int countUnguarded(int m, int n, int[][] guards, int[][] walls) {
+        int[][] grid = new int[m][n];
+        // we construct our grid based off where there is a guard and wall
+        // first we can go through and put guards denoted by 2, and wherever a guard
+        // sees is a 1 (guarded)
+        // he no longer can see it, and we also block off other side of wall
+        // then we can put walls denoted by 3, and if a guard was able to see that spot
+        // change it to 0
+
+        // first lets put guards and walls in our grid
+
+        for (int[] guard : guards) {
+            grid[guard[0]][guard[1]] = GUARD; // as in we put a guard here
+        }
+
+        // now lets put walls
+
+        for (int[] wall : walls) {
+            grid[wall[0]][wall[1]] = WALL;
+        }
+
+        // now for each i,j in grid, we need to mark it unguarded by traversing each
+        // cardinal direction, but only if there is a guard there
+        // more logic on how in the function below
+
+        for (int[] guard : guards) {
+            markGuarded(guard[0], guard[1], grid);
+        }
+
+        // after this we just have to count number of cells which are still unguarded
+
+        int count = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == UNGUARDED) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+
+    }
+
+    private void markGuarded(int row, int col, int[][] grid) {
+        // we need to traverse the 4 directions here to mark them as guarded or
+        // unguarded
+
+        // it is guarded until we reach a wall or another guard
+
+        // so here we need to traverse up, to traverse up from this position (row, col)
+        // means going from row to row - 1
+        for (int i = row - 1; i >= 0; i--) {
+            if (grid[i][col] == WALL || grid[i][col] == GUARD) {
+                break;
+            }
+            grid[i][col] = GUARDED;
+        }
+
+        // traverse down, go from row, col to row + 1, col
+        for (int i = row + 1; i < grid.length; i++) {
+            if (grid[i][col] == WALL || grid[i][col] == GUARD) {
+                break;
+            }
+            grid[i][col] = GUARDED;
+        }
+
+        // traverse left from row,col we go row, col - 1
+        for (int i = col - 1; i >= 0; i--) {
+            if (grid[row][i] == WALL || grid[row][i] == GUARD) {
+                break;
+            }
+            grid[row][i] = GUARDED;
+        }
+
+        // traverse right from row, col to row, col+1
+        for (int i = col + 1; i < grid[0].length; i++) {
+            if (grid[row][i] == WALL || grid[row][i] == GUARD) {
+                break;
+            }
+            grid[row][i] = GUARDED;
+        }
+    }
+
 }
