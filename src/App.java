@@ -13,7 +13,9 @@ import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import apple.laf.JRSUIUtils.Tree;
+// import javax.swing.tree.TreeNode;
+
+// import apple.laf.JRSUIUtils.Tree;
 
 // import javax.swing.text.Segment;
 
@@ -7536,6 +7538,87 @@ public class App {
             }
             grid[row][i] = GUARDED;
         }
+    }
+
+    // Given the roots of two binary trees root and subRoot, return true if there is
+    // a subtree of root with the
+    // same structure and node values of subRoot and false otherwise.
+    // A subtree of a binary tree tree is a tree that consists of a node in tree and
+    // all of this node's descendants.
+    // The tree tree could also be considered as a subtree of itself.
+
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        // first we can find the node which matches subRoot.valid
+        // since this is where we will start comparing if both trees are equal
+        TreeNode compareNode = findRoot(root, subRoot.val);
+
+        // now we can compare both trees
+
+        return areTreesEqual(compareNode, subRoot);
+    }
+
+    // simple recursive function to check if two trees are equal
+
+    private boolean areTreesEqual(TreeNode root, TreeNode subRoot) {
+        if (root == null && subRoot != null || root != null && subRoot == null) {
+            return false;
+        }
+        return root.val == subRoot.val && areTreesEqual(root.left, subRoot.left)
+                && areTreesEqual(root.right, subRoot.right);
+    }
+
+    // simple recursive function to return reference where root.val == val
+
+    private TreeNode findRoot(TreeNode root, int val) {
+        if (root == null) {
+            return null;
+        }
+        if (root.val == val) {
+            return root;
+        }
+        if (root.val < val) {
+            // we search left subtree
+            return findRoot(root.left, val);
+        } else {
+            return findRoot(root.right, val);
+        }
+    }
+
+    // above solution works if we are using a bst
+    // below one is the correct one where we go through recrusively
+    // and if node val == subroot val, check if the trees from that point are
+    // identical
+
+    public boolean isSubtreeTwo(TreeNode root, TreeNode subRoot) {
+        return subtree(root, subRoot);
+    }
+
+    private boolean isidentical(TreeNode root, TreeNode subroot) {
+        if (root == null && subroot == null) {
+            return true;
+        } else if (root == null || subroot == null || root.val != subroot.val) {
+            return false;
+        }
+        if (!isidentical(root.left, subroot.left)) {
+            return false;
+        }
+        if (!isidentical(root.right, subroot.right)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean subtree(TreeNode root, TreeNode subroot) {
+        if (root == null) {
+            return false;
+        }
+
+        if (root.val == subroot.val) {
+            if (isidentical(root, subroot)) {
+                return true;
+            }
+        }
+        return subtree(root.left, subroot) || subtree(root.right, subroot);
     }
 
 }
