@@ -8,6 +8,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 //import java.util.function.Function;
@@ -7619,6 +7620,197 @@ public class App {
             }
         }
         return subtree(root.left, subroot) || subtree(root.right, subroot);
+    }
+
+    // Alice has n candies, where the ith candy is of type candyType[i]. Alice
+    // noticed that she started to gain weight,
+    // so she visited a doctor.
+    // The doctor advised Alice to only eat n / 2 of the candies she has (n is
+    // always even). Alice likes her candies
+    // very much, and she wants to eat the maximum number of different types of
+    // candies while still following the doctor's advice.
+    // Given the integer array candyType of length n, return the maximum number of
+    // different types of candies she can eat
+    // if she only eats n / 2 of them.
+
+    public int distributeCandies(int[] candyType) {
+        int amountOfCandies = candyType.length / 2;
+
+        // put the things in a set, then return size of set if < amountOfCandies
+        // otherwise amountOfCandies
+
+        Set<Integer> set = new HashSet<>();
+
+        for (int num : candyType) {
+            set.add(num);
+        }
+
+        return set.size() < amountOfCandies ? set.size() : amountOfCandies;
+    }
+
+    // do a preOrder traversal on non binary tree
+
+    public List<Integer> preorder(Node root) {
+        // return nodes visited in list, by adding root.val
+        // the way to do preorder is root, left, right
+
+        List<Integer> retList = new ArrayList<>();
+
+        if (root == null) { // edge case here
+            return retList;
+        }
+
+        populateList(root, root.children, retList);
+
+        return retList;
+
+    }
+
+    private void populateList(Node root, List<Node> children, List<Integer> retList) {
+        if (root == null) { // we don't add a null child
+            return;
+        }
+
+        retList.add(root.val);
+
+        // now for each child, we go left to right
+
+        for (Node child : children) {
+            populateList(child, child.children, retList);
+        }
+    }
+
+    // now do the same thing but for postOrder
+
+    public List<Integer> postorder(Node root) {
+        // return nodes visited in list, by adding root.val
+        // the way to do preorder is root, left, right
+
+        List<Integer> retList = new ArrayList<>();
+
+        if (root == null) { // edge case here
+            return retList;
+        }
+
+        populateListPostOrder(root, root.children, retList);
+
+        return retList;
+    }
+
+    private void populateListPostOrder(Node root, List<Node> children, List<Integer> retList) {
+        // for post order we call with children first, then go to root
+
+        if (root == null) {
+            return;
+        }
+
+        for (Node child : children) {
+            populateListPostOrder(child, child.children, retList);
+        }
+
+        retList.add(root.val);
+    }
+
+    // find the longes harmonious sequence in the array
+
+    public int findLHS(int[] nums) {
+        // harmonious sequence is a subsequence (including entire array) where the
+        // difference between max and min
+        // is exactly 1
+
+        // we need to notice its the longest sequence where the difference is 1 between
+        // low and high
+        // but also need to notice that its not contiguous
+        // so lets take each num in nums, and check if nums+1 exists in the map
+        // if it does, add its count to count of nums, and update max
+
+        int max = 0;
+
+        Map<Integer, Integer> hm = new HashMap<>();
+
+        for (int num : nums) {
+            hm.put(num, 1 + hm.getOrDefault(hm.get(num), 0));
+        }
+
+        for (int num : nums) {
+            if (hm.containsKey(num + 1)) {
+                max = Math.max(max, hm.get(num) + hm.get(num + 1));
+            }
+        }
+
+        return max;
+
+    }
+
+    // You are given an m x n matrix M initialized with all 0's and an array of
+    // operations ops, where
+    // ops[i] = [ai, bi] means M[x][y] should be incremented by one for all 0 <= x <
+    // ai and 0 <= y < bi.
+    // Count and return the number of maximum integers in the matrix after
+    // performing all the operations.
+
+    public int maxCount(int m, int n, int[][] ops) {
+        // there are 2 ways we can do this
+        // one way is for each operation, add 1 from i = 0 to ops[0] and from j = 0 to
+        // ops[1]
+        // and then find the max integer, and count how many times it occurs (bad
+        // runtime)
+
+        // else we can notice that we increment 1 in a range, and any range greater than
+        // that (in future ops)
+        // we still increment
+
+        // so the smallest range we increment is gonna contain the largest number
+        // and if we just calculate the area we can get our answer
+
+        int minRow = m;
+        int minCol = n;
+
+        for (int[] op : ops) {
+            minRow = Math.min(minRow, op[0]);
+            minCol = Math.min(minCol, op[1]);
+        }
+
+        return minRow * minCol;
+    }
+
+    // You are given an array nums of n integers and two integers k and x.
+    // The x-sum of an array is calculated by the following procedure:
+    // Count the occurrences of all elements in the array.
+    // Keep only the occurrences of the top x most frequent elements. If two
+    // elements have the
+    // same number of occurrences, the element with the bigger value is considered
+    // more frequent.
+    // Calculate the sum of the resulting array.
+    // Note that if an array has less than x distinct elements, its x-sum is the sum
+    // of the array.
+    // Return an integer array answer of length n - k + 1 where answer[i] is the
+    // x-sum of the subarray nums[i..i + k - 1].
+
+    // public int[] findXSum(int[] nums, int k, int x) {
+
+    // }
+
+    // Given an integer array nums and an integer k, return the k most frequent
+    // elements. You may return the answer in any order.
+
+    public int[] topKFrequentDifferentWay(int[] nums, int k) {
+        TreeMap<Integer, Integer> tm = new TreeMap<>();
+
+        for (int num : nums) {
+            tm.put(num, 1 + tm.getOrDefault(num, 0));
+        }
+
+        // sort entries by value (frequency) descending
+        List<Map.Entry<Integer, Integer>> list = new ArrayList<>(tm.entrySet());
+        list.sort((a, b) -> b.getValue() - a.getValue());
+
+        int[] res = new int[k];
+        for (int i = 0; i < k; i++) {
+            res[i] = list.get(i).getKey();
+        }
+
+        return res;
     }
 
 }

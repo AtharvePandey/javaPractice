@@ -14,12 +14,12 @@ public class mergeSort {
         System.out.println("unsorted array: ");
         int[] arr = { 2, 5, 3, 4, 1 };
         printArr.accept(arr);
-        ms.mergeSort(arr, 0, arr.length - 1);
+        ms.ms(arr, 0, arr.length - 1);
         System.out.println("sorted array: ");
         printArr.accept(arr);
     }
 
-    private void mergeSort(int[] arr, int l, int r) { // merge sort implementation
+    private void ms(int[] arr, int l, int r) { // merge sort implementation
         // happens in 2 parts, we divide array into 2 parts
         // recursively merge the two parts
 
@@ -31,8 +31,8 @@ public class mergeSort {
         if (l < r) {
             int mid = l + (r - l) / 2;
             // now just call with left and right subhalves
-            mergeSort(arr, 0, mid - 1);
-            mergeSort(arr, mid + 1, r);
+            ms(arr, 0, mid - 1);
+            ms(arr, mid + 1, r);
 
             // and then merge the halves
             merge(arr, l, mid, r);
