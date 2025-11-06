@@ -1,0 +1,14 @@
+{
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, BreakBeforeBraces: Attach, AllowShortBlocksOnASingleLine: Always, AllowShortIfStatementsOnASingleLine: true, AllowShortFunctionsOnASingleLine: All }",
+    "C_Cpp.clang_format_fallbackStyle": "Google",
+    "editor.formatOnSave": false,
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "files.associations": {
+        "iostream": "cpp"
+    }
+}
