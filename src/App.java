@@ -37,8 +37,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        String f = "FlaG";
-        app.detectCapitalUse(f);
+        int[] ints = { 4, 6, 2, 7, 8, 10 };
+        app.getDecreasingMonotonicStack(ints);
     }
 
     public ListNode tempfunction1() {
@@ -7812,5 +7812,249 @@ public class App {
 
         return res;
     }
+
+    // Given two arrays of strings list1 and list2, find the common strings with the
+    // least index sum.
+    // A common string is a string that appeared in both list1 and list2.
+    // A common string with the least index sum is a common string such that if it
+    // appeared at list1[i] and list2[j]
+    // then i + j should be the minimum value among all the other common strings.
+    // Return all the common strings with the least index sum. Return the answer in
+    // any order.
+
+    public String[] findRestaurant(String[] list1, String[] list2) {
+        ArrayList<String> retArr = new ArrayList<>();
+        Map<String, Integer> l1Map = new HashMap<>();
+
+        // store index of each string in list1
+        for (int i = 0; i < list1.length; i++) {
+            l1Map.put(list1[i], i);
+        }
+
+        int minSum = Integer.MAX_VALUE;
+
+        // iterate through list2 and check common strings
+        for (int j = 0; j < list2.length; j++) {
+            String str = list2[j];
+            if (l1Map.containsKey(str)) {
+                int sum = j + l1Map.get(str);
+
+                if (sum < minSum) {
+                    retArr.clear();
+                    retArr.add(str);
+                    minSum = sum;
+                } else if (sum == minSum) {
+                    retArr.add(str);
+                }
+            }
+        }
+
+        return retArr.toArray(new String[0]);
+    }
+
+    // given an array of numbers, make a increasing monotonic stack of the array
+
+    public Stack<Integer> getIncreasingMonotonicStack(int[] nums) {
+        // a stack that keeps elements in a specific order (increasing or decreasing)
+        // a monotonic increasing stack means the top element is the smallest
+        // you get greater elements as you go down and pop more
+
+        // so when building an increasing stack, if the current number is smaller than
+        // top of stack, we pop elements off
+        // and then add the current element to the stack, or index of current element
+
+        Stack<Integer> retStack = new Stack<>();
+
+        // nums: 4,6,2,7,8,10; 0->5 indecies
+
+        for (int i = 0; i < nums.length; i++) {
+            while (!retStack.empty() && nums[retStack.peek()] > nums[i]) {
+                retStack.pop();
+            }
+            retStack.add(i);
+        }
+
+        return retStack; // this contains array indecies
+
+    }
+
+    public Stack<Integer> getDecreasingMonotonicStack(int[] nums) {
+        // a monotonic decreasing stack is used for next greater/larger/warmer etc
+
+        Stack<Integer> retStack = new Stack<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            while (!retStack.empty() && nums[retStack.peek()] < nums[i]) {
+                retStack.pop();
+            }
+            retStack.add(i);
+        }
+
+        return retStack;
+
+    }
+
+    // the following will define directions when traversing a 2x2 grid
+
+    public int[][] getDirections() {
+        int retArr[][] = {
+                { -1, 0 }, // this one makes row -1, so we go up
+                { 1, 0 }, // adds to row so we go up
+                { 0, -1 }, // we go left
+                { 0, 1 } // we go right
+        }; // goes up down, left right
+
+        return retArr;
+    }
+
+    private int[][] direction = getDirections();
+
+    // so given directions we can use this to traverse a 2x2 grid via dfs:
+
+    // given a 2x2 grid where 1 represents land and 0 ocean, count number of islands
+
+    public int numIslands(int[][] grid) {
+        int row = grid.length;
+        int col = grid[0].length;
+
+        int count = 0;
+        // traversing the grid, if we come across an island block
+        // we need to mark it and all adjacent squares that are 1, to 0
+        // and then increase count of islands
+
+        // dfs comes in when we traverse the adjacent grids
+
+        for (int r = 0; r < row; r++) {
+            for (int c = 0; c < col; c++) {
+                // if this is land, use dfs to recursively mark entire island as seen
+                if (grid[r][c] == 1) {
+                    traverseGrid(r, c, grid);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private void traverseGrid(int row, int col, int[][] grid) {
+        // here if the current block is 0, we return, or if we are out of bounds of grid
+        if (grid[row][col] == 0 || row < 0 || col < 0 || row >= grid.length || col >= grid[0].length) {
+            return;
+        }
+
+        // otherwise mark this as visited
+
+        grid[row][col] = 0;
+
+        // and then call dfs on all directions
+
+        for (int[] dir : direction) {
+            int drow = row + dir[0];
+            int dcol = col + dir[1];
+            traverseGrid(drow, dcol, grid);
+        }
+
+    }
+
+    // A valid parentheses string is either empty "", "(" + A + ")", or A + B, where
+    // A and B are valid parentheses strings, and +
+    // represents string concatenation.
+    // For example, "", "()", "(())()", and "(()(()))" are all valid parentheses
+    // strings.
+    // A valid parentheses string s is primitive if it is nonempty, and there does
+    // not exist a way to split it into
+    // s = A + B, with A and B nonempty valid parentheses strings.
+    // Given a valid parentheses string s, consider its primitive decomposition: s =
+    // P1 + P2 + ... + Pk, where Pi are primitive valid
+    // parentheses strings.
+    // Return s after removing the outermost parentheses of every primitive string
+    // in the primitive decomposition of s.
+
+    public String removeOuterParentheses(String s) {
+        // is there a way we can split s into "(" + (A | B)* + ")";
+        // and then remove the first and second parenthesis
+
+        if (s.isEmpty()) {
+            return s;
+        }
+
+        // actually if we want to remove first and last parenthesis
+        // we can just build a new string
+
+        StringBuilder sb = new StringBuilder();
+        int depth = 0; // how far along we are in the string
+
+        // we will increment depth if there is an open parenthesis
+        // else decrement it since we are sort of 'moving outwards'
+
+        // we append to sb if depth is > 0 since that means we passed the outermost
+        // paren
+
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                if (depth > 0)
+                    sb.append(c);
+                depth++;
+            } else { // c == ')'
+                depth--;
+                if (depth > 0)
+                    sb.append(c);
+            }
+        }
+
+        return sb.toString();
+
+    }
+
+    // You are given an array of binary strings strs and two integers m and n.
+    // Return the size of the largest subset of strs such that there are at most m
+    // 0's and n 1's in the subset.
+    // A set x is a subset of a set y if all elements of x are also elements of y.
+
+    public int findMaxForm(String[] strs, int m, int n) {
+        // we need to, given strings, group strings such that they have at most m 0's
+        // and n 1;s in them
+        // and return how many of the strings in strs fit that criteria
+
+        // an obvious solution is o(n^2)
+
+        // our constraints are relatively small such that we can do the bruteforce
+        // solution
+
+        int count = 0;
+
+        for (String s : strs) {
+            // we map the string's 0, 1 count
+            HashMap<Character, Integer> hm = mapifyString(s);
+
+            // if(hm.get('0') < m && hm.get('1') < n){
+            // count++;
+            // }
+
+            // above throws exception, i.e say we only have string of 0 or 1, then hm.get
+            // will throw exception
+            if (hm.getOrDefault('0', 0) <= m && hm.getOrDefault('1', 0) <= n) {
+                count++;
+            }
+
+        }
+
+        return count;
+
+    }
+
+    // private HashMap<Character, Integer> mapifyString(String str) {
+    // HashMap<Character, Integer> retMap = new HashMap<>();
+    // char[] chars = str.toCharArray();
+    // for (char c : chars) {
+    // retMap.put(c, 1 + retMap.getOrDefault(c, 0));
+    // }
+    // return retMap;
+    // }
+
+    // for monotonic stack, when current is > stack.peek(), it is a decresing stack
+    // else increasing stack
+
+    // in decreasing we want the index
 
 }
