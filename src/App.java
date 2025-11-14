@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 //import java.util.stream.Stream;
 //import java.util.stream.Stream;
 import java.util.Random;
+//import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import java.util.Collection;
 //import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+//import java.util.Deque;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -37,8 +39,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] ints = { 4, 6, 2, 7, 8, 10 };
-        app.getDecreasingMonotonicStack(ints);
+        int[] nums = { 2, 6, 3, 4 };
+        app.minOperationsII(nums);
     }
 
     public ListNode tempfunction1() {
@@ -8007,11 +8009,10 @@ public class App {
     }
 
     // You are given an array of binary strings strs and two integers m and n.
-    // Return the size of the largest subset of strs such that there are at most m
-    // 0's and n 1's in the subset.
-    // A set x is a subset of a set y if all elements of x are also elements of y.
+    // Return the number of strs such that there are at most m
+    // 0's and n 1's in the string.
 
-    public int findMaxForm(String[] strs, int m, int n) {
+    public int findStringsWithZeroesandOnes(String[] strs, int m, int n) {
         // we need to, given strings, group strings such that they have at most m 0's
         // and n 1;s in them
         // and return how many of the strings in strs fit that criteria
@@ -8052,9 +8053,427 @@ public class App {
     // return retMap;
     // }
 
+    // You are given an array of binary strings strs and two integers m and n.
+    // Return the size of the largest subset of strs such that there are at most m
+    // 0's and n 1's in the subset.
+    // A set x is a subset of a set y if all elements of x are also elements of y.
+
+    // 0,1 knapsack problem, our sequence is usually from last to first
+    // we should try all possible solutions and pick best one
+    // 2^n possible solutions where n is strs.length at most
+
+    public int findMaxForm(String[] strs, int m, int n) {
+        // this one is a dp problem, where for each string, we count the number of 0's
+        // and 1's
+        // and we either choose to include it in our set, or exclude it
+        // we want to maximize the amount of strings we decide to include in our set
+        // the amount of 1's and 0's will substract from m,n eventually
+
+        // dp[i][j] = maximum number of strings we can form using at most i zeros and j
+        // ones.
+
+        int[][] dp = new int[m + 1][n + 1];
+        // we do + 1, since m,0 and 0,n will be init to 0
+        // we are basically saying 'if either m or n are 0, then we won't have any
+        // string
+
+        for (String str : strs) {
+            // we need to count 1 and 0's
+            int zero = 0;
+            int one = 0;
+            for (char c : str.toCharArray()) {
+                if (c == '0') {
+                    zero++;
+                } else {
+                    one++;
+                }
+            }
+
+            // now for this string, we have 0 and 1 count,
+            // lets see if we include it what happens
+            for (int i = m; i >= zero; i--) {
+                for (int j = n; j >= one; j--) {
+                    dp[i][j] = Math.max(dp[i][j], 1 + dp[i - zero][j - one]);
+                }
+            }
+        }
+
+        return dp[m][n];
+
+    }
+
+    // to solve below, defining a temp unionfind class to account for 1 based
+    // indexing
+
+    class DSU {
+        private int[] parents;
+
+        public DSU(int c) {
+            this.parents = new int[c + 1];
+            for (int i = 1; i < c + 1; i++) {
+                this.parents[i] = i; // to start with, each parent belongs to its own connected componenet
+            }
+        }
+
+        // returns parent of the node passed in, where parent means
+        // how we identify the entire connected componenet
+        public int getParent(int node) {
+            if (this.parents[node] != node) {
+                this.parents[node] = getParent(this.parents[node]);
+            }
+
+            return this.parents[node];
+        }
+
+        // here a and b are in range of 1 -> c, and they represent nodes, we would join
+        // a, b if
+        // they are within a connected componenet
+        public void join(int a, int b) {
+
+            int parentA = this.getParent(a);
+            int parentB = this.getParent(b);
+            if (parentA != parentB) {
+                this.parents[parentA] = parentB;
+            }
+        }
+    }
+
+    // You are given an integer c representing c power stations, each with a unique
+    // identifier id from 1 to c (1‑based indexing).
+    // These stations are interconnected via n bidirectional cables, represented by
+    // a 2D array connections, where each element connections[i] = [ui, vi]
+    // indicates a connection between station ui and station vi. Stations that are
+    // directly or indirectly connected form a power grid.
+    // Initially, all stations are online (operational).
+    // You are also given a 2D array queries, where each query is one of the
+    // following two types:
+    // [1, x]: A maintenance check is requested for station x. If station x is
+    // online, it resolves the check by itself.
+    // If station x is offline, the check is resolved by the operational station
+    // with the smallest id in the same power grid as x.
+    // If no operational station exists in that grid, return -1.
+    // [2, x]: Station x goes offline (i.e., it becomes non-operational).
+    // Return an array of integers representing the results of each query of type
+    // [1, x] in the order they appear.
+    // Note: The power grid preserves its structure; an offline (non‑operational)
+    // node remains part of its grid and taking it
+    // offline does not alter connectivity.
+
+    public int[] processQueries(int c, int[][] connections, int[][] queries) {
+        // c is number of power stations
+        // each powerstation has id from 1 to c
+        // i.e if there are c = 5 power stations, the id's would be 1 -> 5
+
+        // connections array, where connections[i] e.g i = 0, means
+        // there is a bidirectional connection between station U0 and V0
+
+        // queries is a 2d array where each subarray is [1,x] or [2,x]
+        // [1,x] means do a maintenance check for station x. (here x is id)
+        // and im assuming is stored in connections[x-1] since id is 1-indexed
+        // if connection[1,x] is online, we resolve, if its offline, we check
+        // smallest connection in the same powergrid as connection[x] (before it was
+        // checking [x][0])
+
+        // [2,x] means station x becomes offline
+
+        // we need to return an array of ints which returns result of each query, i.e
+        // the node which resolves the query
+        // so for query [1, x] if x is active, we add x to resultArray[i] for ith query
+        // (or next smallest active node in x's component)
+        // and for query [2,x] just add x, after marking
+
+        // we use dfs to form componenet
+        // we store component in hashmap, which stores parent, set of nodes in that
+        // component
+
+        // the intuition is there, but the way we are given the 'nodes' makes it tricky
+        // to
+
+        // what if we make an adjacency list which stores a set of integers as connected
+        // componenets
+        // such that we can look up next smallest node to check when query[i] = [1,x] is
+        DSU unionFind = new DSU(c);
+        HashMap<Integer, PriorityQueue<Integer>> map = getConnectedComponentMap(c, connections, unionFind);
+
+        // now we can process queries and put answers in retlist
+        List<Integer> retList = new ArrayList<>();
+
+        // but we also need an array to keep track of whether or not this node is online
+        // or not
+        boolean[] isOnline = new boolean[c + 1]; // this whole 1 based indexing is annoying
+        Arrays.fill(isOnline, true);
+
+        for (int[] query : queries) {
+            if (query[0] == 1) {
+                // first type of query, we have to check if its online, and resolve, else go to
+                // next one to resolve
+                if (isOnline[query[1]]) {
+                    retList.add(query[1]);
+                } else {
+                    // we have to get the next smallest node in cc, and process the query until
+                    // there is no next smallest node
+                    // in which case we add -1 to the list
+                    int parent = unionFind.getParent(query[1]);
+                    PriorityQueue<Integer> temp = map.get(parent);
+                    if (temp == null) {
+                        retList.add(-1);
+                        continue;
+                    }
+                    while (!temp.isEmpty()) {
+                        int node = temp.peek(); // don’t poll yet
+                        if (isOnline[node]) {
+                            retList.add(node);
+                            break;
+                        } else {
+                            temp.poll(); // remove offline nodes
+                        }
+                    }
+
+                    if (temp.isEmpty()) {
+                        retList.add(-1);
+                    }
+
+                }
+            } else {
+                // here query[0] = 2, so we make the thing offline, and add it to list
+                isOnline[query[1]] = false;
+                retList.add(query[1]);
+            }
+        }
+
+        return retList.stream().mapToInt(i -> i.intValue()).toArray();
+
+    }
+
+    private HashMap<Integer, PriorityQueue<Integer>> getConnectedComponentMap(int c, int[][] connections,
+            DSU unionFind) {
+        // use union find
+
+        // we need to use the connections list to set up our connected componenets
+
+        for (int[] conn : connections) {
+            unionFind.join(conn[0], conn[1]);
+        }
+
+        // now we can construct a map which stores a node, (as parent), and all its
+        // connections in the component as heap
+        // we will need this because if query[1,x] fails, we would re-run it on next
+        // smallest node in that component
+
+        HashMap<Integer, PriorityQueue<Integer>> retMap = new HashMap<>();
+
+        for (int i = 1; i <= c; i++) {
+            // given a node, if its parent is not in map, put it in map, and offer conn[1]
+            // to heap...
+            int parent = unionFind.getParent(i);
+            // if (!retMap.containsKey(parent)) { // if parent not in map, add it to map
+            // with new priority queue
+            // retMap.put(parent, new PriorityQueue<>());
+            // retMap.get(parent).offer(conn[1]);
+            // } else {
+            // if (!retMap.get(parent).contains(conn[1])) { // if parent in map, add conn
+            // component node only if not in
+            // // heap
+            // retMap.get(parent).offer(conn[1]);
+            // }
+            // }
+            retMap.computeIfAbsent(parent, k -> new PriorityQueue<>()).offer(i);
+        }
+        return retMap;
+    }
+
+    // You are given a 0-indexed array nums consisiting of positive integers. You
+    // can do the following operation on the array any number of times:
+    // Select an index i such that 0 <= i < n - 1 and replace either of nums[i] or
+    // nums[i+1] with their gcd value.
+    // Return the minimum number of operations to make all elements of nums equal to
+    // 1. If it is impossible, return -1.
+    // The gcd of two integers is the greatest common divisor of the two integers.
+
+    public int minOperationsII(int[] nums) {
+        // the gcd of 1 and any number is always 1
+        // if we have one 1 in the array, then we know we can make all elements
+        // equal to 1 by computing gcd of adjacent elements (if there are n elements,
+        // and exactly one 1)
+        // then that means it will take us atleast nums.length - numOnes time
+        // else if no two adjacent elements have gcd 1, then its impossible to get one
+
+        int oneCount = countOnes(nums);
+
+        if (oneCount > 0) {
+            return nums.length - oneCount;
+        } else {
+            // here we need to ensure gcd of two consecutive elements in array is 1 and if
+            // it is, return nums.length - 1;
+            // else -1
+            int i = 0;
+            int j = nums.length > 1 ? 1 : 0;
+            if (i == j && nums[0] != 1) {
+                return -1;
+            }
+
+            while (j < nums.length) {
+                if (findGCD(nums[i], nums[j]) == 1) {
+                    return nums.length - 1; // atleast one 1 is there so min op is len - 1
+                }
+                i++;
+                j++;
+            }
+            return -1;
+        }
+
+    }
+
+    private int findGCD(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+        return findGCD(b, a % b);
+    }
+
+    private int countOnes(int[] nums) {
+        int count = 0;
+        for (int num : nums) {
+            if (num == 1) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // You are given a binary string s.
+    // You can perform the following operation on the string any number of times:
+    // Choose any index i from the string where i + 1 < s.length such that s[i] ==
+    // '1' and s[i + 1] == '0'.
+    // Move the character s[i] to the right until it reaches the end of the string
+    // or another '1'.
+    // For example, for s = "010010", if we choose i = 1, the resulting string will
+    // be s = "000110".
+    // Return the maximum number of operations that you can perform.
+
+    public int maxOperations(String s) {
+        // since we want to maximize operations, we need to choose indecies to perform
+        // operations on
+        // as early as possible; one operation counts as moving string till we can't i.e
+        // 1 is to the right
+
+        // we need a couple of things, when we swap, it will be in a while loop, and we
+        // have to swap till i+1 = 1 or end of array
+        // outside that loop will be when we increment count of operations
+
+        int count = 0;
+
+        // we can take a greedy approach if nothing else works, and it is obvious that
+        // we always should choose early possible
+        // movable 1, now how we move 1 correlates to operations as well
+        // 0101110010. in this string, we move left most 1 (1 operation)
+        // 0011110010. now we have to move the series of 1's, if moving each 1 consists
+        // of 1 operation,
+        // then moving the 4 1's would add 4 operations
+        // 0000111110, now finally we need to move the 5 ones, adding 5 operations
+        // so total of 10 operations required
+
+        // we actually don't have to move any 1's, in our original string, just have to
+        // keep track of number of 1;s encountered
+        // 0101110010, onesEncountered = 1, i = 2, so add to count because s[i] = 0, we
+        // aren't at end of string, but next char is 1
+        // onesEncountered = 4, i = 7, for same reason, add 4 to count, count is now 5
+        // onesEncounterd = 5, i = len(s), so add 5, and we get a total of 10
+        // operations, same as brute force method
+
+        int onesEncounterd = 0;
+
+        int n = s.length();
+
+        for (int i = 0; i < n; i++) {
+            if (s.charAt(i) == '0' && (i == n - 1 || s.charAt(i + 1) == '1')) {
+                count += onesEncounterd;
+            } else if (s.charAt(i) == '1') {
+                onesEncounterd++;
+            }
+        }
+
+        return count;
+
+    }
+
+    // You are given two binary trees root1 and root2.
+    // Imagine that when you put one of them to cover the other, some nodes of the
+    // two trees are
+    // overlapped while the others are not. You need to merge the two trees into a
+    // new binary tree.
+    // The merge rule is that if two nodes overlap, then sum node values up as the
+    // new value of the merged node.
+    // Otherwise, the NOT null node will be used as the node of the new tree.
+    // Return the merged tree.
+    // Note: The merging process must start from the root nodes of both trees.
+
+    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+        // basically we need to make a new Tree, if both roots exists, we take sum, else
+        // take nonnull one
+        // and then call it recursively
+        // and theres no need to create a new tree, we can modify, say, root1
+        return makeTree(root1, root2);
+    }
+
+    private TreeNode makeTree(TreeNode root1, TreeNode root2) {
+        if (root1 == null && root2 == null) {
+            return null;
+        } else if (root2 == null && root1 != null) {
+            return root1;
+        } else if (root2 != null && root1 == null) {
+            return root2;
+        }
+        root1.val += root2.val;
+        root1.left = makeTree(root1.left, root2.left);
+        root1.right = makeTree(root1.right, root2.right);
+        return root1;
+    }
+
+    // Given an integer array nums, find three numbers whose product is maximum and
+    // return the maximum product.
+
+    public int maximumProduct(int[] nums) {
+        // set the max numbers to smallest integer value by default so they get updated
+        int num1 = Integer.MIN_VALUE; // highest max
+        int num2 = Integer.MIN_VALUE;
+        int num3 = Integer.MIN_VALUE;// third highest max
+
+        // same logic here for min vals
+        int min1 = Integer.MAX_VALUE;
+        int min2 = Integer.MAX_VALUE;
+
+        for (int num : nums) {
+            if (num > num1) { // if current number is greater than largest max value in array
+                // then we shift everything over 1
+                num3 = num2;
+                num2 = num1;
+                num1 = num;
+            } else if (num > num2) {// else if its greater than second largest max value but less than largest max
+                                    // value
+                // then we shift num2 into num3 and hold num in num2
+                num3 = num2;
+                num2 = num;
+            } else if (num > num3) {// else if its greater than third largest value but less than second largest
+                                    // value
+                num3 = num; // this means num is greater than num3 but less than num2
+            }
+            // we also keep track of the minimum values
+            if (num < min1) {// we only enter this if num two doesn't get updated for the large values
+                min2 = min1;
+                min1 = num;
+            } else if (num < min2) {// and we update
+                min2 = num;
+            }
+        }
+        // now the maximum product is either the product of 3 largest numbers, or the 2
+        // smallest (negative) numbers
+        // and the largest number
+
+        return Math.max(num1 * num2 * num3, num1 * min1 * min2);
+    }
+
     // for monotonic stack, when current is > stack.peek(), it is a decresing stack
     // else increasing stack
-
-    // in decreasing we want the index
 
 }
