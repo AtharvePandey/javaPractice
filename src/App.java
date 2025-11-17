@@ -8473,7 +8473,107 @@ public class App {
         return Math.max(num1 * num2 * num3, num1 * min1 * min2);
     }
 
-    // for monotonic stack, when current is > stack.peek(), it is a decresing stack
-    // else increasing stack
+    // Given an integer array nums, handle multiple queries of the following type:
+    // Calculate the sum of the elements of nums between indices left and right
+    // inclusive where left <= right.
+    // Implement the NumArray class:
+    // NumArray(int[] nums) Initializes the object with the integer array nums.
+    // int sumRange(int left, int right) Returns the sum of the elements of nums
+    // between indices left and right
+    // inclusive (i.e. nums[left] + nums[left + 1] + ... + nums[right]).
+
+    class NumArray {
+        // if we compute prefix sum of an array, we can compute the sums from any 1
+        // index to the other
+        private int[] prefixSum;
+
+        public NumArray(int[] nums) {
+            this.prefixSum = new int[nums.length];
+            this.prefixSum[0] = nums[0];
+            for (int i = 1; i < nums.length; i++) {
+                this.prefixSum[i] = this.prefixSum[i - 1] + nums[i];
+            }
+        }
+
+        public int sumRange(int left, int right) {
+            if (left == 0) {
+                return this.prefixSum[right];
+            }
+            return this.prefixSum[right] - this.prefixSum[left - 1];
+        }
+    }
+
+    // Given a 2D matrix matrix, handle multiple queries of the following type:
+    // Calculate the sum of the elements of matrix inside the rectangle defined by
+    // its upper
+    // left corner (row1, col1) and lower right corner (row2, col2).
+    // Implement the NumMatrix class:
+    // NumMatrix(int[][] matrix) Initializes the object with the integer matrix
+    // matrix.
+    // int sumRegion(int row1, int col1, int row2, int col2) Returns the sum of the
+    // elements of matrix
+    // inside the rectangle defined by its upper left corner (row1, col1) and lower
+    // right corner (row2, col2).
+    // You must design an algorithm where sumRegion works on O(1) time complexity.
+
+    class NumMatrix {
+        //have to do the same thing, but this time we are computing prefix sum of a 2d matrix, and then querying it
+        //if we can sum the zeroth row and col of the matrix, then we reach the first row, col of matrix to fill
+        //mat[1,1] (mat[0->n, 0->m] have already been filled with prefix sum) //the sum of mat[1,1] would be equal to
+        //the sum of everything in mat[0,0] -> 1,1 exclusive, that is 0,0, 0,1, and 1,0, now we have to notice to get that sum
+        // mat[1,1] = mat[0,0] + mat[1,0] + mat[0,1], but we have to see that prefix sum and mat[1,0] and mat[0,1] already have 
+        // the prefixsum of mat[0,0]; so mat[0,0] is being summed twice
+        //so the sum for mat[1,1] = mat[1,0] + mat[0,1] - mat[0,0]
+        //and same is true for rest of the squares
+
+        //so if i = j = 1, mat[i,j] = mat[i-1,j] + mat[i,j-1] - mat[i-1, j-1];
+
+        private int[][] prefixSum;
+
+        public NumMatrix(int[][] matrix) {
+            if(matrix.length == 0){
+                return;
+            }
+            int n = matrix.length;
+            int m = matrix[0].length;
+            this.prefixSum = new int[n][m];
+            //calculate the prefix sum, but only if we are in range, i.e i-1, j-1 both exist...
+            for(int i = 0; i<n; i++){
+                for (int j = 0; j<m;j++){
+                    //now here since we calculate, 
+                    //prefix sum is the i-1,j + i,j-1 - i-1,j-1, or the top + left - topleft
+                    int top = i > 0 ? prefixSum[i-1][j] : 0;
+                    int left = j > 0 ? prefixSum[i][j-1] : 0;
+                    int topleft = i > 0 && j > 0 ? prefixSum[i-1][j-1] : 0;
+
+                    //now we assign this value to the current prefix sum
+                    prefixSum[i][j] = matrix[i][j] + (top + left) - topleft;
+                    
+                }
+            }
+        }
+                                                                                                                                                                     
+        public int sumRegion(int row1, int col1, int row2, int col2) {
+            //the region is from (row1,col1) to (row2,col2) inclusive
+            //row2,col2 represents the sum in the 2d matrix
+            int total = this.prefixSum[row2][col2];
+            //now to get sum of area here, we have to 
+            //substract everything above this rectangle/square, so that will be the value
+            //row1, at col2... so row1-1, col. 
+            int top = row1 > 0 ? this.prefixSum[row1-1][col2] : 0;
+
+            //and the left of col1, represents everything in the left shape that we don't need
+            int left = col1 > 0 ? this.prefixSum[row2][col1-1] : 0;
+
+            //and like above logic when making prefix sum, if we want to sum the region
+            //we have to account for the fact that we were substracting an overlap 2 times
+            //and that overlap is the topleft matrix sum
+            //so we add 1 instance of it (and substract it technically only 1 time)
+
+            int topLeft = row1 > 0 && col1 > 0 ? prefixSum[row1 - 1][col1 - 1] : 0;
+
+            return total - top - left + topLeft;
+        }
+    }
 
 }
