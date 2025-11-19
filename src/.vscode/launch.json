@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run L1",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/cppPractice/L1",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/cppPractice",
+            "MIMode": "lldb",
+            "externalConsole": false
+        }
+    ]
+}

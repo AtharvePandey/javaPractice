@@ -14,6 +14,8 @@ import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
 
+//import apple.laf.JRSUIUtils.Tree;
+
 // import javax.swing.tree.TreeNode;
 
 // import apple.laf.JRSUIUtils.Tree;
@@ -39,8 +41,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] nums = { 2, 6, 3, 4 };
-        app.minOperationsII(nums);
+        int[] nums = { -1 };
+        app.findMaxAverage(nums, 1);
     }
 
     public ListNode tempfunction1() {
@@ -8517,63 +8519,255 @@ public class App {
     // You must design an algorithm where sumRegion works on O(1) time complexity.
 
     class NumMatrix {
-        //have to do the same thing, but this time we are computing prefix sum of a 2d matrix, and then querying it
-        //if we can sum the zeroth row and col of the matrix, then we reach the first row, col of matrix to fill
-        //mat[1,1] (mat[0->n, 0->m] have already been filled with prefix sum) //the sum of mat[1,1] would be equal to
-        //the sum of everything in mat[0,0] -> 1,1 exclusive, that is 0,0, 0,1, and 1,0, now we have to notice to get that sum
-        // mat[1,1] = mat[0,0] + mat[1,0] + mat[0,1], but we have to see that prefix sum and mat[1,0] and mat[0,1] already have 
+        // have to do the same thing, but this time we are computing prefix sum of a 2d
+        // matrix, and then querying it
+        // if we can sum the zeroth row and col of the matrix, then we reach the first
+        // row, col of matrix to fill
+        // mat[1,1] (mat[0->n, 0->m] have already been filled with prefix sum) //the sum
+        // of mat[1,1] would be equal to
+        // the sum of everything in mat[0,0] -> 1,1 exclusive, that is 0,0, 0,1, and
+        // 1,0, now we have to notice to get that sum
+        // mat[1,1] = mat[0,0] + mat[1,0] + mat[0,1], but we have to see that prefix sum
+        // and mat[1,0] and mat[0,1] already have
         // the prefixsum of mat[0,0]; so mat[0,0] is being summed twice
-        //so the sum for mat[1,1] = mat[1,0] + mat[0,1] - mat[0,0]
-        //and same is true for rest of the squares
+        // so the sum for mat[1,1] = mat[1,0] + mat[0,1] - mat[0,0]
+        // and same is true for rest of the squares
 
-        //so if i = j = 1, mat[i,j] = mat[i-1,j] + mat[i,j-1] - mat[i-1, j-1];
+        // so if i = j = 1, mat[i,j] = mat[i-1,j] + mat[i,j-1] - mat[i-1, j-1];
 
         private int[][] prefixSum;
 
         public NumMatrix(int[][] matrix) {
-            if(matrix.length == 0){
+            if (matrix.length == 0) {
                 return;
             }
             int n = matrix.length;
             int m = matrix[0].length;
             this.prefixSum = new int[n][m];
-            //calculate the prefix sum, but only if we are in range, i.e i-1, j-1 both exist...
-            for(int i = 0; i<n; i++){
-                for (int j = 0; j<m;j++){
-                    //now here since we calculate, 
-                    //prefix sum is the i-1,j + i,j-1 - i-1,j-1, or the top + left - topleft
-                    int top = i > 0 ? prefixSum[i-1][j] : 0;
-                    int left = j > 0 ? prefixSum[i][j-1] : 0;
-                    int topleft = i > 0 && j > 0 ? prefixSum[i-1][j-1] : 0;
+            // calculate the prefix sum, but only if we are in range, i.e i-1, j-1 both
+            // exist...
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    // now here since we calculate,
+                    // prefix sum is the i-1,j + i,j-1 - i-1,j-1, or the top + left - topleft
+                    int top = i > 0 ? prefixSum[i - 1][j] : 0;
+                    int left = j > 0 ? prefixSum[i][j - 1] : 0;
+                    int topleft = i > 0 && j > 0 ? prefixSum[i - 1][j - 1] : 0;
 
-                    //now we assign this value to the current prefix sum
+                    // now we assign this value to the current prefix sum
                     prefixSum[i][j] = matrix[i][j] + (top + left) - topleft;
-                    
+
                 }
             }
         }
-                                                                                                                                                                     
+
         public int sumRegion(int row1, int col1, int row2, int col2) {
-            //the region is from (row1,col1) to (row2,col2) inclusive
-            //row2,col2 represents the sum in the 2d matrix
+            // the region is from (row1,col1) to (row2,col2) inclusive
+            // row2,col2 represents the sum in the 2d matrix
             int total = this.prefixSum[row2][col2];
-            //now to get sum of area here, we have to 
-            //substract everything above this rectangle/square, so that will be the value
-            //row1, at col2... so row1-1, col. 
-            int top = row1 > 0 ? this.prefixSum[row1-1][col2] : 0;
+            // now to get sum of area here, we have to
+            // substract everything above this rectangle/square, so that will be the value
+            // row1, at col2... so row1-1, col.
+            int top = row1 > 0 ? this.prefixSum[row1 - 1][col2] : 0;
 
-            //and the left of col1, represents everything in the left shape that we don't need
-            int left = col1 > 0 ? this.prefixSum[row2][col1-1] : 0;
+            // and the left of col1, represents everything in the left shape that we don't
+            // need
+            int left = col1 > 0 ? this.prefixSum[row2][col1 - 1] : 0;
 
-            //and like above logic when making prefix sum, if we want to sum the region
-            //we have to account for the fact that we were substracting an overlap 2 times
-            //and that overlap is the topleft matrix sum
-            //so we add 1 instance of it (and substract it technically only 1 time)
+            // and like above logic when making prefix sum, if we want to sum the region
+            // we have to account for the fact that we were substracting an overlap 2 times
+            // and that overlap is the topleft matrix sum
+            // so we add 1 instance of it (and substract it technically only 1 time)
 
             int topLeft = row1 > 0 && col1 > 0 ? prefixSum[row1 - 1][col1 - 1] : 0;
 
             return total - top - left + topLeft;
         }
+    }
+
+    // You have a long flowerbed in which some of the plots are planted, and some
+    // are not. However, flowers cannot be planted in adjacent plots.
+    // Given an integer array flowerbed containing 0's and 1's, where 0 means empty
+    // and 1 means not empty, and an integer n, return true if n new
+    // flowers can be planted in the flowerbed without violating the
+    // no-adjacent-flowers rule and false otherwise.
+
+    public boolean canPlaceFlowers(int[] flowerbed, int n) {
+        // different way, just loop through and check
+
+        for (int i = 0; i < flowerbed.length; i++) {
+            if (flowerbed[i] == 0) {
+                int prev = i == 0 ? 0 : flowerbed[i - 1];
+                int next = i == flowerbed.length - 1 ? 0 : flowerbed[i + 1];
+
+                if (prev == 0 && next == 0) {
+                    flowerbed[i] = 1;
+                    n--;
+
+                    if (n == 0) {
+                        return true;
+                    }
+                }
+
+            }
+
+        }
+        return n <= 0;
+
+    }
+
+    // Given the root of a binary tree, return the average value of the nodes on
+    // each level in the form of an array.
+    // Answers within 10-5 of the actual answer will be accepted.
+
+    public List<Double> averageOfLevels(TreeNode root) {
+        // we have to do a level order bfs traversal, and then calculate average for
+        // each level
+        // and return it as a list
+
+        List<Double> retList = new ArrayList<>();
+
+        Queue<TreeNode> queue = new LinkedList<>();
+
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            // in bfs, we get first node in queue
+            // we add that node to current level, and explore the node by adding it to queue
+            List<Integer> currLevels = new ArrayList<>();
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode currNode = queue.poll();
+                if (currNode != null) {
+                    currLevels.add(currNode.val);
+                    if (currNode.left != null) {
+                        queue.add(currNode.left);
+                    }
+                    if (currNode.right != null) {
+                        queue.add(currNode.right);
+                    }
+                }
+            }
+            if (!currLevels.isEmpty()) {
+                retList.add(getAvg(currLevels));
+            }
+        }
+        return retList;
+    }
+
+    private Double getAvg(List<Integer> list) {
+        double d = 0;
+
+        for (Integer num : list) {
+            d += num;
+        }
+
+        return d / list.size();
+    }
+
+    // You are given an integer array nums consisting of n elements, and an integer
+    // k.
+    // Find a contiguous subarray whose length is equal to k that has the maximum
+    // average value and return this value.
+    // Any answer with a calculation error less than 10-5 will be accepted.
+
+    public double findMaxAverage(int[] nums, int k) {
+        // we need to find a contiguous subarray, i.e adjacent elements, where if there
+        // is a break
+        // then the array is no longer contiguous. the length of that subarray has to be
+        // equal to k
+        // and we need to find the maximum average of any such k-length subarray
+
+        // we can use the prefix sum to calculate the sum between i -> k
+        // and then calculate average by using a fixed sized window, while updating the
+        // max average...
+
+        double maxAverage = Double.NEGATIVE_INFINITY;
+        int[] arr = getPrefixSumArr(nums);
+
+        int i = 0;
+        // k is the size of the subarray we want to look at
+        int upperBound = k - 1;
+
+        while (upperBound < arr.length) {
+            // we loop until upperBound isn't length of the prefixSum array
+            // for each upperbound, i, we get prefix sum by substracting arr[upperBound] -
+            // arr[i-1] if i > 0
+            double total = i > 0 ? arr[upperBound] - arr[i - 1] : arr[upperBound];
+
+            // and update maxAverage
+            maxAverage = Math.max(maxAverage, total / k);
+            i++;
+            upperBound++;
+        }
+
+        return maxAverage;
+
+    }
+
+    private int[] getPrefixSumArr(int[] nums) {
+        int[] prefixSum = new int[nums.length];
+
+        prefixSum[0] = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            prefixSum[i] = nums[i] + prefixSum[i - 1];
+        }
+
+        return prefixSum;
+    }
+
+    // You have a set of integers s, which originally contains all the numbers from
+    // 1 to n. Unfortunately, due to some error, one of the numbers in s
+    // got duplicated to another number in the set, which results in repetition of
+    // one number and loss of another number.
+    // You are given an integer array nums representing the data status of this set
+    // after the error.
+    // Find the number that occurs twice and the number that is missing and return
+    // them in the form of an array.
+
+    public int[] findErrorNums(int[] nums) {
+        // first find the duplicate, then we have to figure out the second number
+        // all numbers are from 1 -> n
+
+        // return incorrect number, and missing number in the array
+
+        // a way to do it is use a map to count number
+
+        // then loop from 1 -> n, and see if its in map, if its not, we found our
+        // missing number
+        // and any number with count > 1 is duplicate
+
+        // we can also use the numbers in nums as indecies, and make them negative
+        // if we come across a negative then that is our duplicate
+        // nums[i] - 1 is how we get the index to check
+
+        // how would we know here which number is the missing one?
+
+        // in a second pass, we can find the positive number, and its index + 1 is the
+        // missing number
+
+        // sum of all natural n numbers is n(n+1) / 2
+
+        int n = nums.length;
+        int totalSum = 0;
+        int expectedSum = (n * (n + 1)) / 2;
+        int duplicate = 0;
+
+        Arrays.sort(nums);
+
+        for (int i = 0; i < n; i++) {
+            totalSum += nums[i];
+
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                duplicate = nums[i];
+                break;
+            }
+        }
+
+        int missing = expectedSum - (totalSum - duplicate);
+
+        return new int[] { duplicate, missing };
     }
 
 }

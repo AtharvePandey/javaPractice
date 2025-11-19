@@ -22,21 +22,14 @@
 
 #include <iostream>
 
+#include "./leetCode.h"
+
+#include <vector>
+
 using namespace std;
 
-class Employee {
- public:
-  int salary;
-  void updateSalary(int salary) { this->salary = salary; }
-  int getSalary() { return this->salary; }
-
- private:
-};
-
 int main() {
-  Employee e;
-  e.salary = 5;  // we can only do this directly because salary is public
-  e.updateSalary(12);
-  cout << e.getSalary() << endl;
-  return 0;
+    Solution s;
+    vector<int> bits = {1,1,1,0};
+    s.isOneBitCharacter(bits);
 }
