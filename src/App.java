@@ -8770,4 +8770,155 @@ public class App {
         return new int[] { duplicate, missing };
     }
 
+    // Given a string s, return the number of unique palindromes of length three
+    // that are a subsequence of s.
+    // Note that even if there are multiple ways to obtain the same subsequence, it
+    // is still only counted once.
+    // A palindrome is a string that reads the same forwards and backwards.
+    // A subsequence of a string is a new string generated from the original string
+    // with some characters (can be none)
+    // deleted without changing the relative order of the remaining characters.
+    // For example, "ace" is a subsequence of "abcde".
+
+    public int countPalindromicSubsequence(String s) {
+        // any palindrome of len 3 is garunteed to have the same first and last
+        // character
+        // with this we can generate all possible palendromes
+        // a _ a
+        // b _ b etc...
+
+        // 26 * 26 possibilities; where '_' is any character
+        // in our string, if we have something like
+        // a,b,d,e,f,g,a
+        // max amount of len 3 palindromes is 5...
+        // how? well lets choose string from a to a.
+        // we have aba, ada, aea, afa, aga
+        // we need to choose 2 points in the string, where the difference between
+        // a characters first and last occurence is the greatest
+        // in this case i = 0, i = len(s) - 1;
+        // and the ans would be everything inbetween, so 6 - 0 + 1
+
+        // but by some math proof (above), if we always choose both ends of string
+        // where first and last are equal
+        // then the characters inbetween them will form len 3 palindromes n times (if
+        // there are n characters in between)
+
+        // we want the total number, not max number
+        // so automatically we just have to loop through the first and last occurence of
+        // every character in the string
+        // and count the things inbetween
+
+        // lets init 2 arrays to keep track of first and last occurence of characters in
+        // a string
+        int[] first = new int[26];
+        int[] last = new int[26];
+
+        Arrays.fill(first, -1);
+        Arrays.fill(last, -1);
+
+        // now we iterate through string
+        // if first[char - 'a'] is -1 we set this index as its first value
+        // set it as its last val by default
+
+        for (int i = 0; i < s.length(); i++) {
+            if (first[s.charAt(i) - 'a'] == -1) {
+                first[s.charAt(i) - 'a'] = i;
+            }
+            last[s.charAt(i) - 'a'] = i;
+        }
+
+        // now we have the first and last occurence of every character
+        // all we need to do now is for each i,j in first, last
+        // iterate and increase count...but we only increase count if the character is
+        // distinct
+        // so we will iterate through alphabet 0 -> 26 since we need a set for each i in
+        // first, last
+        int count = 0;
+        for (int i = 0; i < 26; i++) {
+            // and in here we will use a set to track the distinct letters in range
+            // of the two occurences within the string and increment our count
+            Set<Character> seen = new HashSet<>();
+            for (int j = first[i] + 1; j < last[i]; j++) {
+                // we go from first to last
+                seen.add(s.charAt(j));
+            }
+
+            count += seen.size();
+        }
+        return count;
+
+    }
+
+    // Given an integer array nums, return the maximum possible sum of elements of
+    // the array such that it is divisible by three.
+
+    public int maxSumDivThree(int[] nums) {
+
+        // brute force way would be to generate permutation sum
+        // keep track of seen permutations (dp)
+        // then check all sums generated and choose the greatest one % 3
+
+        // maximum sum is just sum of array
+        // now we need to manipulate that until it is divisible by 3
+
+        int total = sum(nums); // 3,6,5,1,8 = 23, 23 % 3 is 2
+
+        if (total % 3 == 0) { // if the sum itself is divisible by 3, return total
+            return total;
+        }
+
+        // if total % 3 != 0, it could either be 1, or 2. it cannot be 3, because a
+        // remainder of 3
+        // implies that the sum itself is divisible by 3...and anything greater than 3
+        // follows same logic
+        // except it will either have a remainder of 1 or 2 again.
+
+        // if total % 3 == 2 (like above case) then that means we need to remove 1
+        // number that is causing remainder 2
+        // the numbers that cause remainder two are below (when % with 3)
+        // 2,5,8,11 etc... out of those, 5 and 8 are in the array, and we remove the
+        // smallest one to maximize our sum
+
+        // if total % 3 == 1, then by same logic, we get possible numbers below to
+        // remove:
+        // 1,4,7,10 etc... and out of those, to maximize the sum, we need to remove the
+        // smallest number we see
+
+        // the point to do both the above things would be to make the sum maximum, and
+        // its mod 3
+
+        if (total % 3 == 1) {
+            // find the smallest num % 3 == 1
+            int smallest = Integer.MAX_VALUE;
+            for (int num : nums) {
+                if (num % 3 == 1) {
+                    smallest = Math.min(smallest, num);
+                }
+            }
+
+            return total - smallest;
+
+        } else if (total % 3 == 2) {
+            int smallest = Integer.MAX_VALUE;
+            for (int num : nums) {
+                if (num % 3 == 2) {
+                    smallest = Math.min(smallest, num);
+                }
+            }
+
+            return total - smallest;
+        }
+
+        return -1;
+    }
+
+    private int sum(int[] nums) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+
+        return sum;
+    }
+
 }

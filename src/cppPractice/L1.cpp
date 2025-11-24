@@ -25,11 +25,12 @@
 #include "./leetCode.h"
 
 #include <vector>
+#include <string>
 
 using namespace std;
 
 int main() {
     Solution s;
-    vector<int> bits = {1,1,1,0};
-    s.isOneBitCharacter(bits);
+    string str = "abc";
+    s.validPalindrome(str);
 }

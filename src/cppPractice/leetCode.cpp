@@ -228,10 +228,25 @@ int Solution::findLengthOfLCIS(vector<int>& nums) {
       j++;
     }
   }
-  maxSequence =
-      max(maxSequence,
-          (int)nums.size() - i);  // this can be because last loop we realize
-                                  // entire array is properly increasing
-  // so we update
+  maxSequence = max(maxSequence,(int)nums.size() - i);  // this can be because last loop we realize entire array is properly increasing
   return maxSequence;
+}
+
+bool Solution::validPalindrome(string s){
+  //same idea as regular, but we get to skip one and continue
+  bool skipped = false;
+  int i = 0;
+  int j = s.size() - 1;
+  while(j > i){ 
+    if(skipped && s.at(i) != s.at(j)){ //this means we already 'deleted' one
+      return false;
+    }
+    if(s.at(i) != s.at(j) && !skipped){ //this means we will choose to delete this one
+      skipped = true;
+    }
+    //continue iteration of two pointer
+    i++;
+    j--;
+  }
+  return true;
 }

@@ -1,7 +1,8 @@
 // this file will contain all datastructures needed in leetCode.cpp
 
 #include <iostream>
-
+#include <vector>
+#include <string>
 using namespace std;
 
 struct TreeNode {
@@ -84,4 +85,7 @@ class Solution {
   // A continuous increasing subsequence is defined by two indices l and r (l < r) such that 
   // it is [nums[l], nums[l + 1], ..., nums[r - 1], nums[r]] and for each l <= i < r, nums[i] < nums[i + 1].
   int findLengthOfLCIS(vector<int>& nums);
+
+  //Given a string s, return true if the s can be palindrome after deleting at most one character from it.
+  bool validPalindrome(string s);
 };
