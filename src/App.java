@@ -8861,12 +8861,6 @@ public class App {
         // maximum sum is just sum of array
         // now we need to manipulate that until it is divisible by 3
 
-        int total = sum(nums); // 3,6,5,1,8 = 23, 23 % 3 is 2
-
-        if (total % 3 == 0) { // if the sum itself is divisible by 3, return total
-            return total;
-        }
-
         // if total % 3 != 0, it could either be 1, or 2. it cannot be 3, because a
         // remainder of 3
         // implies that the sum itself is divisible by 3...and anything greater than 3
@@ -8887,38 +8881,86 @@ public class App {
         // the point to do both the above things would be to make the sum maximum, and
         // its mod 3
 
-        if (total % 3 == 1) {
-            // find the smallest num % 3 == 1
-            int smallest = Integer.MAX_VALUE;
-            for (int num : nums) {
-                if (num % 3 == 1) {
-                    smallest = Math.min(smallest, num);
-                }
-            }
+        // smallest n % 3 = 1 (if remainder is 1) -> call this number x
+        // smallest n % 3 = 2 (if remainder is 2) -> call this number y
 
-            return total - smallest;
+        // that makes sense so far
 
-        } else if (total % 3 == 2) {
-            int smallest = Integer.MAX_VALUE;
-            for (int num : nums) {
-                if (num % 3 == 2) {
-                    smallest = Math.min(smallest, num);
-                }
-            }
+        // now what if its better to remove 2 numbers which are divisible by 2 , and
+        // whose sum is < x
+        // or lets say our total sum has remainder 2, but rather than removing smallest
+        // n s.t n % 3 = 2,
+        // its better to remove 2 numbers divisible by 1 whose sum is < y?
 
-            return total - smallest;
-        }
+        // two numbers whos remainder is 2, will sum to a number whose remainder is 1,
+        // and vice versa in this case when modding with 3
 
-        return -1;
-    }
+        // if total % 3 == 1, then we smallest remove x % 3 == 1, or n1, n2 where n1 +
+        // n2 < x && n1 + n2 % 3 == 1
+        // if total % 3 == 2, then we smallest remove y % 3 == 2, or n1, n2 where n1 +
+        // n2 < y && n1 + n2 % 3 == 2
 
-    private int sum(int[] nums) {
-        int sum = 0;
+        // lets use 2 min heaps to keep track of numbers with remainders of 1 and 2
+        // respectively
+
+        PriorityQueue<Integer> minHeapR1 = new PriorityQueue<>();
+        PriorityQueue<Integer> minHeapR2 = new PriorityQueue<>();
+
+        // below is the sum
+        int total = 0;
+
         for (int num : nums) {
-            sum += num;
+            total += num;
+            if (num % 3 == 1) {
+                minHeapR1.add(num);
+            } else if (num % 3 == 2) {
+                // have to explicitly check if num % 3 == 2, else, we will add numbers divisible
+                // by 3 to minHeapR2
+                minHeapR2.add(num);
+            }
         }
 
-        return sum;
+        // now we do our checks as mentioned above
+        if (total % 3 == 0) {
+            return total;
+        }
+
+        if (total % 3 == 1) {
+            // we need to return the minimum of two things to maximize the sum
+            // either we remove the smallest number thats divisible by 1
+            // or we return sum of 2 numbers that are divisible by 2
+
+            int minR1 = minHeapR1.size() > 0 ? minHeapR1.poll() : -1;
+            // we need to make sure we have enough for sum of 2 things
+            int minR2 = minHeapR2.size() > 1 ? (minHeapR2.poll() + minHeapR2.poll()) : -1;
+
+            if (minR2 < 0) { // if thats not the case
+                return total - minR1;
+            }
+            if (minR1 < 0) {
+                return total - minR2;
+            }
+
+            return Math.max(total - minR1, total - minR2);
+        }
+
+        if (total % 3 == 2) {
+            // this is the same idea as above
+            int minR2 = minHeapR2.size() > 0 ? minHeapR2.poll() : -1;
+            int minR1 = minHeapR1.size() > 1 ? (minHeapR1.poll() + minHeapR1.poll()) : -1;
+
+            if (minR1 == -1) {
+                return total - minR2;
+            }
+            if (minR2 == -1) {
+                return total - minR1;
+            }
+
+            return Math.max(total - minR2, total - minR1);
+        }
+
+        return 0;
+
     }
 
 }
