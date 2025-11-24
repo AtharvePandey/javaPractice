@@ -8963,4 +8963,166 @@ public class App {
 
     }
 
+    // You are given a binary array nums (0-indexed).
+    // We define xi as the number whose binary representation is the subarray
+    // nums[0..i]
+    // (from most-significant-bit to least-significant-bit).
+    // For example, if nums = [1,0,1], then x0 = 1, x1 = 2, and x2 = 5.
+    // Return an array of booleans answer where answer[i] is true if xi is divisible
+    // by 5.
+
+    public List<Boolean> prefixesDivBy5(int[] nums) {
+        // for this one, we can iteratively, make our number:
+        // as we go left -> right in the nums array
+        // we construct our totalNum by left shifting the current 'bit' into totalNum
+        // and we push back totalNum % 5 into our list
+
+        int totalNum = nums[0];
+        List<Boolean> retList = new ArrayList<>();
+        retList.add(totalNum % 5 == 0);
+
+        for (int i = 1; i < nums.length; i++) {
+            // how do we construct our number?
+            // lets leftshift the number by 1 to make space in the rightmost bit
+            totalNum = totalNum << 1;
+            // and lets | with nums[i] to 'insert' the bit
+            totalNum |= nums[i];
+            // and after each iteration, add result to retList
+            totalNum %= 5; // this part avoids overflow for int
+            retList.add(totalNum % 5 == 0);
+        }
+
+        return retList;
+
+    }
+
+    // Given a binary string s, return the number of non-empty substrings that have
+    // the
+    // same number of 0's and 1's, and all the 0's and all the 1's in these
+    // substrings are grouped consecutively.
+    // Substrings that occur multiple times are counted the number of times they
+    // occur.
+
+    public int countBinarySubstrings(String s) {
+        // we can go through the string, and count how many contiguous 0's and 1's are
+        // formed
+        // and since num0 == num1, we take the minimum of our 2 counts
+        // the sum of these will be the answer
+
+        // lets use a list to store
+
+        List<Integer> list = new ArrayList<>();
+        int zeroCount = 0;
+        int oneCount = 0;
+
+        // we are gonna start counting by iterating throughout the string
+        // if s.charAt(i) == 0, increment 0 count, else 1 count
+        // but if we switch from 0 to 1 or vice versa, we reset the counts and push back
+        // into list
+        boolean zero = s.charAt(0) == '0';
+
+        for (char c : s.toCharArray()) {
+            if (zero && c == '0') {
+                zeroCount++;
+            } else if (zero && c == '1') {
+                zero = false;
+                list.add(zeroCount);
+                zeroCount = 0;
+
+                oneCount++;
+            } else if (!zero && c == '1') {
+                oneCount++;
+            } else if (!zero && c == '0') {
+                zero = true;
+                list.add(oneCount);
+                oneCount = 0;
+
+                zeroCount++;
+            }
+        }
+
+        // we were missing the last iteration, so add it here
+        list.add(oneCount > 0 ? oneCount : zeroCount);
+
+        int sum = 0;
+
+        for (int i = 0; i < list.size(); i++) {
+            int one = list.get(i);
+            int two = i + 1 == list.size() ? 0 : list.get(i + 1);
+            sum += Math.min(one, two);
+        }
+
+        return sum;
+    }
+
+    // Given a non-empty array of non-negative integers nums, the degree of this
+    // array is defined as the
+    // maximum frequency of any one of its elements.
+    // Your task is to find the smallest possible length of a (contiguous) subarray
+    // of nums, that has the same degree as nums.
+
+    public int findShortestSubArray(int[] nums) {
+        // makes no sense to first calculate the degree, and then check degree of each
+        // subarray
+        // the degree is the most count of the most frequently occuring element in the
+        // array
+        // if two of the most frequently occuring elements have same count, then we take
+        // the bigger one
+        // the constraints are small enough such that we can get away with brute force
+        // approach
+
+        // wait i re-read the question, it is a CONTIGUOUS subarray so we don't worry
+        // about backtracking or different
+        // subarrays...
+
+        // so go through the nums array, keep track of count, then to calculate the
+        // smallest subarray, thats just the
+        // difference between the first and last index of where these 'most freq'
+        // numbers appear in the array
+        // and we add 1 since its 0 indexed
+
+        HashMap<Integer, Integer> hm = new HashMap<>();
+
+        for (int num : nums) {
+            hm.put(num, 1 + hm.getOrDefault(num, 0));
+        }
+
+        int greatestFreq = Integer.MIN_VALUE;
+
+        for (Map.Entry<Integer, Integer> entries : hm.entrySet()) {// this tells us the most frequent
+            greatestFreq = Math.max(greatestFreq, entries.getValue());
+        }
+
+        // now we need the min distance between the numbers whos freqency = greatestFreq
+        int ans = Integer.MAX_VALUE;
+        for (Map.Entry<Integer, Integer> entries : hm.entrySet()) {
+            int key = entries.getKey();
+            int val = entries.getValue();
+
+            if (val == greatestFreq) {
+                ans = Math.min(ans, getIndexLen(nums, key));
+            }
+        }
+
+        return ans;
+
+    }
+
+    private int getIndexLen(int[] nums, int val) {
+        // given array and val, find the difference between start and end index of that
+        // val
+        int start = -1;
+        int end = -1;
+
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == val) {
+                if (start == -1)
+                    start = i;
+                end = i;
+            }
+        }
+
+        return end - start + 1; // because it's 0-indexed
+    }
+
 }
