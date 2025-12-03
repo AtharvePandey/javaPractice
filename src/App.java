@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -41,8 +42,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] nums = { -1 };
-        app.findMaxAverage(nums, 1);
+        int[] num = { 1, 0, 0, 1, 0, 1 };
+        System.out.println(app.kLengthApart(num, 2));
     }
 
     public ListNode tempfunction1() {
@@ -9123,6 +9124,632 @@ public class App {
         }
 
         return end - start + 1; // because it's 0-indexed
+    }
+
+    // we need to return a string given integer, that should be roman numeral
+    // representation
+    public String intToRoman(int num) {
+        // we can use operations like % and / to update/parse our num
+        // lets use a map to store num/romanNumeral conversions
+        // const map = {
+        // 3000: 'MMM',
+        // 2000: 'MM',
+        // 1000: 'M',
+        // 900: 'CM',
+        // 800: 'DCCC',
+        // 700: 'DCC',
+        // 600: 'DC',
+        // 500: 'D',
+        // 400: 'CD',
+        // 300: 'CCC',
+        // 200: 'CC',
+        // 100: 'C',
+        // 90: 'XC',
+        // 80: 'LXXX',
+        // 70: 'LXX',
+        // 60: 'LX',
+        // 50: 'L',
+        // 40: 'XL',
+        // 30: 'some reason i can't have roman numeral here, ide complains',
+        // 20: 'XX',
+        // 10: 'X',
+        // 9: 'IX',
+        // 8: 'VIII',
+        // 7: 'VII',
+        // 6: 'VI',
+        // 5: 'V',
+        // 4: 'IV',
+        // 3: 'III',
+        // 2: 'II',
+        // 1: 'I'
+        // }
+
+        Map<Integer, String> hm = new HashMap<>();
+        hm.put(3000, "MMM");
+        hm.put(2000, "MM");
+        hm.put(1000, "M");
+        hm.put(900, "CM");
+        hm.put(800, "DCCC");
+        hm.put(700, "DCC");
+        hm.put(600, "DC");
+        hm.put(500, "D");
+        hm.put(400, "CD");
+        hm.put(300, "CCC");
+        hm.put(200, "CC");
+        hm.put(100, "C");
+        hm.put(90, "XC");
+        hm.put(80, "LXXX");
+        hm.put(70, "LXX");
+        hm.put(60, "LX");
+        hm.put(50, "L");
+        hm.put(40, "XL");
+        hm.put(30, "XXX");
+        hm.put(20, "XX");
+        hm.put(10, "X");
+        hm.put(9, "IX");
+        hm.put(8, "VIII");
+        hm.put(7, "VII");
+        hm.put(6, "VI");
+        hm.put(5, "V");
+        hm.put(4, "IV");
+        hm.put(3, "III");
+        hm.put(2, "II");
+        hm.put(1, "I");
+
+        // now lets break num into digit, and construct our string left to right
+        int place = 1;
+
+        Stack<Integer> stack = new Stack<>();
+
+        while (num != 0) {
+            stack.push(num % 10);
+            place = place * 10;
+            num = num / 10;
+        }
+
+        place = place / 10; // realized we have an extra place here...
+
+        // we pop off stack and construct string
+
+        StringBuilder sb = new StringBuilder();
+
+        while (!stack.empty()) {
+            sb.append(hm.get(stack.pop() * place));
+            place = place / 10;
+        }
+
+        return sb.toString().replace("null", "");
+    }
+
+    // You are given an array of integers nums and an integer k.
+    // Return the maximum sum of a subarray of nums, such that the size of the
+    // subarray is divisible by k.
+
+    public long maxSubarraySum(int[] nums, int k) {
+        // we need to return a long not an int,
+        // ALSO the SIZE of the subarray with the maximum sum
+        // has to be divisible by k...
+
+        // i.e if we choose a subarray of size n, such that
+        // [0,3,5,2,3,5,6,7] size of array here is 8
+        // indexed from 0 to 7, lets pretend there are some negative numbers too
+        // so the maximum subarray sum would be say from i = 2, j = 7
+        // the size of that subarray is 6, indexed 0 to 5 (or 2 to 7) and we calculate
+        // it by
+        // (j - i) + 1
+
+        // so heres what we can do, since we are working with subarray sums, lets first
+        // compute the prefix sum of the array:
+        prefixSumII(nums);
+
+        // now thanks to the bounds, we can get away with n^2 complexity
+        // for lets compute (using 2 loops) the subarray sum of every i,j in nums
+        // and group the sum via some heap, and map it to the difference between i and
+        // j?
+        // explained below why we store long...
+        Map<Long, Integer> hm = new HashMap<>();
+        // we can use a list later to sort by maximum sum, and then see which ones
+        // divisible by k...like we did in prev problem
+
+        // rather than use an n^2 approach, we can also use a fixed sliding window
+        // approach
+        // computing sum for windows of size k? no that won't make sense, we would have
+        // to account for all multiples
+        // of k for larger arrays?
+
+        // also how are we returning a long, when the subarray is an int subarray?
+        // it could be maximum sum exceeds the size of an int, so maybe thats why we
+        // should store long, integer...
+
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                // lets compute the subarray sum, by using prefix sum property
+                // and then add it to map with len of this subarray
+                long sum = nums[j] - nums[i];
+                hm.put(sum, (j - i) + 1);
+            }
+        }
+
+        // now that we have populated our map, lets store it in a collection so that we
+        // can sort...
+        // the list will store entries, and use a comparator which will help us sort
+        // it...
+        List<Map.Entry<Long, Integer>> list = new ArrayList<>(hm.entrySet());
+
+        // below is the comparator, which sorts by key (i.e maximum subarray sum to
+        // minimum)...i think
+        Comparator<Map.Entry<Long, Integer>> comp = (e1, e2) -> Long.compare(e2.getKey(), e1.getKey());
+
+        list.sort(comp);
+
+        // now we iterate over the entries, if value % k == 0, we return the key
+
+        Iterator<Map.Entry<Long, Integer>> iter = list.iterator();
+
+        while (iter.hasNext()) {
+            Entry<Long, Integer> currEntry = iter.next();
+            if (currEntry.getValue() % k == 0) {
+                return currEntry.getKey();
+            }
+        }
+
+        return -1;
+
+    }
+
+    private void prefixSumII(int[] nums) {
+        for (int i = 1; i < nums.length; i++) { // this loop won't even enter if len of array is 1
+            nums[i] = nums[i - 1] + nums[i];
+        }
+    }
+
+    // Given an integer array nums of length n and an integer target, find three
+    // integers
+    // in nums such that the sum is closest to target.
+    // Return the sum of the three integers.
+    // You may assume that each input would have exactly one solution.
+
+    public int threeSumClosest(int[] nums, int target) {
+        // we will iterate over the array, and for every fixed k, compute the closest
+        // target sum
+        // such that abs(sum(three indecies) - target) < closest ? then we update
+        // closest
+        int closestDiff = Integer.MAX_VALUE;
+        int closestSum = 0;
+
+        // this will allow us a fixed k, and then two pointer logic for sorted arrays
+        Arrays.sort(nums);
+
+        for (int k = 0; k < nums.length; k++) {
+            int i = k + 1;
+            int j = nums.length - 1;
+
+            while (i < j) {
+                // here we compute and update closest
+                int sum = nums[i] + nums[j] + nums[k];
+                int diff = Math.abs(target - sum);
+
+                // update diff and sum
+                // but only when diff is at a new min
+                if (diff < closestDiff) {
+                    closestDiff = diff;
+                    closestSum = sum;
+                }
+
+                // then we update i, or j depending on sum's value
+                if (sum > target) {
+                    // in this case, we need to substract a larger value, so we move j back
+                    j--;
+                } else {
+                    i++;
+                }
+            }
+        }
+
+        return closestSum;
+
+    }
+
+    // Given an array of positive integers nums, remove the smallest subarray
+    // (possibly empty) such that the
+    // sum of the remaining elements is divisible by p. It is not allowed to remove
+    // the whole array.
+    // Return the length of the smallest subarray that you need to remove, or -1 if
+    // it's impossible.
+    // A subarray is defined as a contiguous block of elements in the array.
+
+    public int minSubarray(int[] nums, int p) {
+        // for this problem, we want to remove some subarray such that total sum -
+        // subArraySum % p == 0;
+        // but also the len of that subarray we remove is minimum
+
+        // and we return that length
+
+        int length = nums.length;
+
+        // we can use a prefix sum array to compute the total sum, and also return size
+        // of subarray we remove
+        int totalSum = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            totalSum = totalSum + nums[i - 1];
+        }
+
+        // one case is if the sum of array itself is divisible by p, then size of
+        // subarray we remove is 0
+        int remainder = totalSum % p;
+        if (remainder == 0) {
+            return 0; // no need to remove a subarray
+        }
+
+        // if that is not the case, how would we go through our array and sort of
+        // manipulate it
+        // to figure out which subarray is optimal to remove?
+        // we also can't take entire array to remove
+
+        // we can try computing total sum for each subarr removed and store the minimum
+        // difference of the window that forms
+
+        // we need to remove a subarray who's sum % p == remainder, that way the total
+        // remainder will be 0
+
+        // we basically can start at start of array
+        // this is like the twoSum problem so we will use a map
+        Map<Integer, Integer> hm = new HashMap<>();
+        hm.put(0, -1); // i.e remainder of 0 is at subarray index -1; this should never be queried in
+                       // the first place
+        // since we would have already returned if that was the case
+        int currPrefixSum = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            // we first compute remainder of current prefix sum
+            // by adding to the current running sum, and then % k
+            currPrefixSum = (currPrefixSum + nums[i]) % p;
+
+            // then like we did the twoSum problem, we can just compute 'how much more' we
+            // need
+            // and store it in the map with the current index i....
+            // to compute the difference, we know currPrefixSum would store remainder
+            // we can substract currPrefixSum's remainder with remainder of the entire array
+            // but why would we add p then mod by p? because % can produce negative results,
+            // we add p
+            int need = (currPrefixSum - remainder + p) % p;
+
+            // at start of each loop however, if we find the remainder we need, we can
+            // compute currIndex - map.get(rem)
+            // and update min total...
+
+            if (hm.containsKey(need)) {
+                // update length with the min between itself, and currIndex - index of needed
+                // remainder
+                length = Math.min(length, i - hm.get(need));
+            }
+
+            hm.put(currPrefixSum, i);
+        }
+        return length == nums.length ? -1 : length;
+
+    }
+
+    // You are given a 0-indexed array of positive integers w where w[i] describes
+    // the weight of the ith index.
+    // You need to implement the function pickIndex(), which randomly picks an index
+    // in the range
+    // [0, w.length - 1] (inclusive) and returns it. The probability of picking an
+    // index i is w[i] / sum(w).
+
+    class PickNum {
+        private double sum = 0;
+        private double[] p;
+
+        public PickNum(int[] w) {
+            // since the probability of choosing index is calculated by w[i]/sum
+            for (int num : w) {
+                this.sum += num;
+            }
+
+            // now we can make our probability array which stores ranges of the numbers
+            this.p = new double[w.length];
+
+            // to make our ranges, we include previous range + compute the current range
+
+            this.p[0] = w[0] / this.sum;
+
+            for (int i = 1; i < p.length; i++) {
+                this.p[i] = this.p[i - 1] + (w[i] / sum);
+            }
+
+            // the p array represents our probabilities / 'buckets' of valid ranges
+            // inclusive/exclusive.
+
+            // the idea is similar to generating an array of size sum, and then returning a
+            // random index
+            // from that array in our pickIndex() function to mimic the 'weights'
+
+            // but in this case we are creating 'ranges' to return the correct index in the
+            // array
+            // this way our array won't be as big as sum(w)
+
+        }
+
+        public int pickIndex() {
+            // so now that we have a valid probability array,
+            // we just need to find the range of a randomly generated number
+            // and return that index
+            double target = Math.random();
+            // if our probability at mid < target, that means we aren't on the correct range
+
+            int low = 0;
+            int high = this.p.length - 1;
+
+            while (low < high) {
+                int mid = low + (high - low) / 2;
+                if (this.p[mid] < target) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+
+            return low;
+        }
+    }
+
+    // given a binary array, return true if all 1's are atleast k apart, false
+    // otherwise
+
+    public boolean kLengthApart(int[] nums, int k) {
+        // we can use a 2 ptr approach here where we start i and j at the 0th index
+        // we loop till j is at end of array
+        // and as we loop, if i and j are equal (and 1) then that means we need to
+        // compute j - i
+        // if the distance is < k we return false, else true
+
+        // instead lets just compute the distance from this current one index
+        // to the next, and if at any point we reach 1 before k, return false
+
+        boolean counting = false;
+        int count = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            // we just wanna count the 0's inbetween 1's...
+            // why is this so tricky
+            // lets say we are at the first number, and that is a 1
+            // that means lets start counting
+            // when should we stop counting?
+            // when we reach another 1...
+            // at which point check if count < k , return false else reset count, and set
+            // boolean to false;
+
+            if (nums[i] == 1 && counting) { // this means we reached the next 1
+                if (count < k) {
+                    return false; // return false if count < 0
+                }
+
+                counting = false;
+                count = 0;
+            } else if (nums[i] == 0 && counting) {
+                count++;
+            } else {
+                counting = true;
+                count++;
+            }
+
+        }
+        return true;
+    }
+
+    // You are given a 2D integer array points, where points[i] = [xi, yi]
+    // represents the coordinates of
+    // the ith point on the Cartesian plane.
+    // A horizontal trapezoid is a convex quadrilateral with at least one pair of
+    // horizontal sides (i.e. parallel to the x-axis).
+    // Two lines are parallel if and only if they have the same slope.
+    // Return the number of unique horizontal trapezoids that can be formed by
+    // choosing any four distinct points from points.
+    // Since the answer may be very large, return it modulo 10^9 + 7.
+
+    public int countTrapezoids(int[][] points) {
+        // a horizontal trapezoid contains 2 lines that are paralell to the x axis
+        // and from there, we can choose any n points to form the trapezoid
+
+        // so basically given n points, we have to choose 2 paralel ones to form a
+        // trapezoid
+        // and that means n choose 2 is different amount of permutations we can have
+        // setting 2 lines as anchor
+        // the equation for nc2 = (n * (n-1)) / 2
+
+        // multiple points on each level will represent our paralell logic so for every
+        // point on a certain level, n,
+        // we compute the permutations we can have (nC2),
+
+        long product = 1L;
+        Map<Integer, Integer> levelCount = new HashMap<>();
+        int mod = 1000000007;
+
+        // lets populate the map with our levels
+
+        for (int[] coords : points) {
+            // we want to count the y coordinate, and how many times it occurs because that
+            // is what we will use in computing the
+            // product
+
+            levelCount.put(coords[1], 1 + levelCount.getOrDefault(coords[1], 0));
+
+        }
+
+        // now lets iterate through the keyset, and for each level, we'll have a count,
+        // so we will use that to compute product
+
+        for (Map.Entry<Integer, Integer> entries : levelCount.entrySet()) {
+            product *= nChooseK(entries.getValue()) % mod; // we don't care which level we are on, just the coordinates
+                                                           // on each level
+        }
+
+        return (int) product;
+
+    }
+
+    private long nChooseK(int n) {
+        return (long) n * (n - 1) / 2;
+    }
+
+    // Given a string containing digits from 2-9 inclusive, return all possible
+    // letter combinations
+    // that the number could represent. Return the answer in any order.
+    // A mapping of digits to letters (just like on the telephone buttons) is given
+    // below. Note that 1 does not map to any letters.
+
+    private Map<Character, String> numToStrMap = new HashMap<>();
+    private List<String> retList = new ArrayList<>();
+
+    public List<String> letterCombinations(String digits) {
+
+        // the brute force way would be using a map which stores digit to letters
+        // and then use n forloops where n is digits.length to 'multiply' the n strings
+        // and so the first thing that comes to mind is matrix multiplication to
+        // generate
+        // all possible combos
+        // we can get away with a slow soln in this case since there are only 4 strings
+        // or 81 combos
+        // the number of possible combinations are 3^n where n is number of digits in
+        // the string
+
+        // we can try a backtracking recursive approach, which is the correct way to go
+        // about
+        // one thing to notice, size of digits = size of strings in our answer
+        // to generate by backtrack, we can check if current string = size of digits,
+        // add it to the list
+        // else choose the next letter from each string?
+
+        // is this the same as combining all letters into a single string
+        // then generating permutations? now that would make size > digits.length
+
+        numToStrMap.put('2', "abc");
+        numToStrMap.put('3', "def");
+        numToStrMap.put('4', "ghi");
+        numToStrMap.put('5', "jkl");
+        numToStrMap.put('6', "mno");
+        numToStrMap.put('7', "pqrs");
+        numToStrMap.put('8', "tuv");
+        numToStrMap.put('9', "wxyz");
+
+        backTrack(digits, 0, "");
+
+        return retList;
+
+    }
+
+    private void backTrack(String digits, int index, String currString) {
+        // we need to understand that if currStrings len == digits.length, then that
+        // means we have 1 combination
+        // since combination.length is the same as the number of digits passed in...its
+        // like generating combinations of
+        // some array of ints passed in, that array of ints will all be the same size
+
+        if (digits.length() == currString.length()) {
+            retList.add(currString);
+            return;
+        }
+
+        // now in backtrack, you usually choose the next letter, at the index, and call
+        // backtrack with the next possible indecies
+        String chooseFrom = numToStrMap.get(digits.charAt(index));
+
+        // now from here we just follow the classic backtrack algorithm of choosing
+        // first index from this string
+        // and calling backtrack
+
+        for (int i = 0; i < chooseFrom.length(); i++) {
+            // we call backtrack with newly built string (choosing from the current string
+            // rep of number)
+            backTrack(digits, index + 1, currString + chooseFrom.charAt(i));
+            // and when this backtrack returns, we won't have to remove last character
+        }
+
+    }
+
+    // Given the head of a linked list, remove the nth node from the end of the list
+    // and return its head.
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        // we can keep track of current node as 1, when 1 = n, we can remove?
+        // but that won't be the 'nth' node
+
+        // how can we do this in a single pass, and how do we know if this node is nth
+        // from last?
+
+        // to find middle of linked list, we have 2 pointers, and for each 1 move for
+        // slow pointer
+        // we move second pointer by 2
+
+        // we can use a two pointer approach here too, but we preset the fast pointer to
+        // nth node
+        // then moving both pointers by 1 till second one reaches end of list.
+
+        // by math proof, the slower node would be exactly 1 before the end of list -
+        // nth node (the target)
+        // a good way to think is say we have a node at end of list, the node we want to
+        // remove is n nodes away
+        // and if we move both nodes sequentially to start of list, then we can see that
+        // in order to find the nth node
+        // from end, we need to have a node on start
+
+        ListNode fast = head;
+        ListNode slow = head;
+        for (int i = 0; i < n; i++) {
+            fast = fast.next;
+        }
+
+        // in this case if fast is end of list, that means n was len(list) which means
+        // nth from n would be delete
+        // the head node
+        if (fast == null) {
+            return head.next;
+        }
+
+        while (fast.next != null) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+
+        // now slow.next is what we should remove...
+
+        slow.next = slow.next.next;
+
+        return head;
+    }
+
+    // Given n pairs of parentheses, write a function to generate all combinations
+    // of well-formed parentheses.
+
+    private List<String> parenStr;
+
+    public List<String> generateParenthesis(int n) {
+        // this is also a backtracking problem
+        // we want to generate all combinations of parenthesis
+        parenStr = new ArrayList<>();
+        // a valid paren will have n open and close strings
+
+        // the length of each valid string should be n * 2 since
+        // open paren = close paren
+    }
+
+    private void backTrackParen(String currString, int openParen, int n) {
+        if (currString.length() == 2 * n) {
+            parenStr.add(currString);
+            return;
+        }
+
+        // now in our loop we need to generate our string, and call backtracking again
+        // with our new
+        // string, and we use open paren to keep track of whether to add an open or
+        // close string?
+        for (int i = 0; i < 2 * n; i++) {
+            // iterate since 1 string will be 2n length
+            // how do we figure out whether to add open or close?
+
+            // once we add, backtrack with n--, new currString and openParen count
+        }
     }
 
 }
