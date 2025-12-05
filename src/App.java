@@ -15,6 +15,10 @@ import java.util.function.Function;
 //import java.util.function.Function;
 import java.util.stream.Collectors;
 
+// import javax.print.attribute.standard.MediaSize.Other;
+
+// import org.junit.After;
+
 //import apple.laf.JRSUIUtils.Tree;
 
 // import javax.swing.tree.TreeNode;
@@ -42,8 +46,8 @@ public class App {
     private static App app = new App(); // to test the methods
 
     public static void main(String[] args) throws Exception {
-        int[] num = { 1, 0, 0, 1, 0, 1 };
-        System.out.println(app.kLengthApart(num, 2));
+        String directions = "RLRSLL"; // output should be 5
+        System.out.println(app.countCollisions(directions));
     }
 
     public ListNode tempfunction1() {
@@ -9732,24 +9736,151 @@ public class App {
 
         // the length of each valid string should be n * 2 since
         // open paren = close paren
+
+        backTrackParen("", 0, 0, n);
+
+        return parenStr;
     }
 
-    private void backTrackParen(String currString, int openParen, int n) {
-        if (currString.length() == 2 * n) {
+    private void backTrackParen(String currString, int openParen, int closedParen, int n) {
+        // in here at each point we can either choose an open paren or a closed one, and
+        // when we have a string len = 2 * n
+        // we know we have a valid string
+        if (currString.length() == n * 2) {
             parenStr.add(currString);
             return;
         }
 
-        // now in our loop we need to generate our string, and call backtracking again
-        // with our new
-        // string, and we use open paren to keep track of whether to add an open or
-        // close string?
-        for (int i = 0; i < 2 * n; i++) {
-            // iterate since 1 string will be 2n length
-            // how do we figure out whether to add open or close?
+        // now how do we know when to add open vs. closed paren?
+        // if our closed paren < open paren, this means we can still add some closed
+        // ones
+        // and we can still add open paren if its < n too
+        // this is because if final string is n * 2 len, then half should be open (n)
 
-            // once we add, backtrack with n--, new currString and openParen count
+        if (openParen < n) {
+            backTrackParen(currString + "(", openParen += 1, closedParen, n);
         }
+
+        if (closedParen < openParen) {
+            backTrackParen(currString + ")", openParen, closedParen += 1, n);
+        }
+
+    }
+
+    // There are n cars on an infinitely long road. The cars are numbered from 0 to
+    // n - 1
+    // from left to right and each car is present at a unique point.
+    // You are given a 0-indexed string directions of length n. directions[i] can be
+    // either 'L', 'R', or 'S' denoting whether the ith car is moving towards the
+    // left,
+    // towards the right, or staying at its current point respectively. Each moving
+    // car has the same speed.
+    // The number of collisions can be calculated as follows:
+    // When two cars moving in opposite directions collide with each other, the
+    // number of collisions increases by 2.
+    // When a moving car collides with a stationary car, the number of collisions
+    // increases by 1.
+    // After a collision, the cars involved can no longer move and will stay at the
+    // point where they collided.
+    // Other than that, cars cannot change their state or direction of motion.
+    // Return the total number of collisions that will happen on the road.
+
+    public int countCollisions(String directions) {
+        // lets use a stack, we can parse the string from right to left
+        // stack will hold latest car
+        int count = 0;
+
+        Stack<Character> cars = new Stack<>();
+
+        cars.add(directions.charAt(0));
+
+        // we compare each direction with what is on top of stack,
+        // lets say stack has R, then L will increase count by 2 and S will increase
+        // count by 1
+        // now what do we push onto stack? the current character?
+        // if L is on stack, and current char is R, we do nothing (different directions,
+        // add R to stack)
+        // if L is on stack and current char is L (pop ?), we still do nothing, likewise
+        // for R
+        // if S is on stack, that should act as a "block" on the stack, meaning we only
+        // add an R on top, all L's crash into that S
+
+        // and we iterate through the string
+
+        for (int i = 1; i < directions.length(); i++) {
+            // look at top of stack
+            // base case sort
+            if (cars.empty()) {
+                cars.push(directions.charAt(i));
+            }
+
+            // now lets do the basic checks mentioned above
+            if (cars.peek() == 'S' && directions.charAt(i) == 'L') {
+                count += 1;
+                continue;
+            } else if (cars.peek() == 'S' && directions.charAt(i) == 'R') {
+                cars.pop();
+                cars.push(directions.charAt(i));
+                continue;
+            } else if ((cars.peek() == 'L' && directions.charAt(i) == 'L')
+                    || (cars.peek() == 'R' && directions.charAt(i) == 'R')) {
+                cars.pop();
+                continue;
+            } else if (cars.peek() == 'R' && directions.charAt(i) == 'L') {
+                count += 2;
+                // in this case, do R and L make an S?
+                // yes it does acc to leetcode
+                cars.pop();
+                cars.push('S');
+                continue;
+            }
+
+            // we don't do anything in the case for opposites...
+        }
+
+        return count;
+    }
+
+    // given divisor and dividend, make a function that divides without using any
+    // multiplication,division etc
+
+    public int divide(int dividend, int divisor) {
+        if (divisor == 0){
+            return Integer.MAX_VALUE;
+        }
+
+        boolean isNegative = (dividend < 0) ^ (divisor < 0);
+
+        long top = Math.abs((long) dividend);
+        long bottom = Math.abs((long) divisor);
+
+        long quotient = 0;
+
+        while (top >= bottom) {
+
+            long subtract = bottom; // the value we subtract
+            long multiple = 1; // the power-of-two multiplier
+
+            // find largest subtract = divisor * 2^k that is <= top
+            while ((subtract << 1) <= top) {
+                subtract <<= 1;
+                multiple <<= 1;
+            }
+
+            top -= subtract; // subtract this chunk
+            quotient += multiple; // add power-of-two
+        }
+
+        if (isNegative)
+            quotient = -quotient;
+
+        // clamp to int bounds
+        if (quotient > Integer.MAX_VALUE)
+            return Integer.MAX_VALUE;
+        if (quotient < Integer.MIN_VALUE)
+            return Integer.MIN_VALUE;
+
+        return (int) quotient;
     }
 
 }
